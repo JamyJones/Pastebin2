@@ -1,97 +1,116 @@
-## Creating a Supabase Database for User Profiles
+## Creating a Supabase Database and Configuring Policies for User Profiles
 
 ---
 
-### Setting Up the `profiles` Table
+### Explanation:
 
-To create a **user profile table** in Supabase, you need a table named `profiles` that contains:
-- `id` (UUID, primary key, linked to the authenticated user's ID)
-- `name` (TEXT, stores the user's name)
-- `streak` (INTEGER, tracks hours spent)
-- `last_seen` (TIMESTAMP, records last activity)
+**1. Creating the Table `User Profiles`:**
 
-Here’s the SQL to create the table:
+Supabase uses PostgreSQL as its underlying database, so SQL commands like `CREATE TABLE` are used. Your table should include:
+
+- `user_id` — primary key, used for uniquely identifying each user.
+- `name` — user's name.
+- `streak_hours` — integer representing hours spent.
+- `last_seen` — timestamp of last activity.
+
+Here's how you can create this table:
 
 ```sql
-CREATE TABLE public.profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    streak INTEGER DEFAULT 0,
-    last_seen TIMESTAMP DEFAULT now()
+CREATE TABLE "public"."User Profiles" (
+    "user_id" UUID PRIMARY KEY,
+    "name" VARCHAR(255),
+    "streak_hours" INTEGER,
+    "last_seen" TIMESTAMP
 );
 ```
 
-This ensures that each row is uniquely identified by the user's ID and automatically deletes the profile if the user is removed.
+- **"public"** — schema; default in PostgreSQL.
+- **UUID** — suited for unique user IDs, especially when using authentication systems like Supabase Auth.
 
 ---
 
-### Enabling Row-Level Security (RLS)
+**2. Creating Policies for Authentication-Restricted Access:**
 
-Supabase uses **Row-Level Security (RLS)** to control access. First, enable RLS on the `profiles` table:
+Your current policy:
 
 ```sql
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+create policy "Enable read access for all users"
+on "public"."User Profiles"
+for select using (true);
 ```
 
----
+This enables **all users**, including unauthenticated ones, to read data. To restrict access to only authenticated users, you should modify this policy:
 
-### Creating Policies for Authenticated Users
-
-To allow **only authenticated users** to read and write their own data, define policies:
-
-#### Read Policy (Allow users to read their own profile)
 ```sql
-CREATE POLICY "Enable read access for authenticated users"
-ON public.profiles
+CREATE POLICY "Allow authenticated users to read"
+ON "public"."User Profiles"
 FOR SELECT
-USING (auth.uid() = id);
+USING (auth.role() = 'authenticated');
 ```
 
-#### Write Policy (Allow users to update their own profile)
+Similarly, for write operations:
+
 ```sql
-CREATE POLICY "Enable update access for authenticated users"
-ON public.profiles
-FOR UPDATE
-USING (auth.uid() = id);
+CREATE POLICY "Allow authenticated users to insert/update"
+ON "public"."User Profiles"
+FOR INSERT, UPDATE
+USING (auth.role() = 'authenticated');
 ```
 
-#### Insert Policy (Allow users to create their own profile)
-```sql
-CREATE POLICY "Enable insert access for authenticated users"
-ON public.profiles
-FOR INSERT
-WITH CHECK (auth.uid() = id);
-```
-
-These policies ensure that users can only access and modify their own profile data.
+- **`auth.role()`** — returns the role of the current user in Supabase; `'authenticated'` role is assigned to logged-in users.
 
 ---
 
-### Example Usage in Supabase Client
+**3. Setting Policy Commands:**
 
-To retrieve a user's profile in JavaScript:
+Ensure **Row Level Security (RLS)** is enabled on your table:
 
-```javascript
-const { data, error } = await supabase
-  .from('profiles')
-  .select('*')
-  .eq('id', supabase.auth.user().id);
+```sql
+ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
 ```
 
-To update the streak:
+This enforces policies, restricting data access based on your rules.
 
-```javascript
-const { error } = await supabase
-  .from('profiles')
-  .update({ streak: 5, last_seen: new Date() })
-  .eq('id', supabase.auth.user().id);
+---
+
+### Example: Complete SQL for your setup
+
+```sql
+-- Enable RLS
+ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
+
+-- Create the table
+CREATE TABLE "public"."User Profiles" (
+    "user_id" UUID PRIMARY KEY,
+    "name" VARCHAR(255),
+    "streak_hours" INTEGER,
+    "last_seen" TIMESTAMP
+);
+
+-- Policy for read access
+CREATE POLICY "Allow authenticated users to read"
+ON "public"."User Profiles"
+FOR SELECT
+USING (auth.role() = 'authenticated');
+
+-- Policy for write access
+CREATE POLICY "Allow authenticated users to insert/update"
+ON "public"."User Profiles"
+FOR INSERT, UPDATE
+USING (auth.role() = 'authenticated');
 ```
 
 ---
 
-### References
-## https://supabase.com/docs/guides/auth/managing-user-data ##
-## https://dev.to/erickson24/how-to-automatically-add-authenticated-users-to-your-supabase-database-4006 ##
-## https://stackoverflow.com/questions/79385928/supabase-rls-policy-with-authenticated-users ##
+### Practical Summary:
 
-This setup ensures **secure user authentication** while allowing users to manage their own profile data efficiently. 🚀 Let me know if you need further refinements!
+- Define your user profile table with necessary columns.
+- Use UUIDs for user IDs for better scalability and security.
+- Enable RLS and define policies that only allow logged-in users (`auth.role() = 'authenticated'`) to read and write.
+- When using Supabase, these policies enforce security, ensuring only authenticated users access their data.
+
+---
+
+### References:
+##https://supabase.com/docs/guides/database/security
+##https://www.postgresql.org/docs/current/ddl-constraints.html
