@@ -1,85 +1,97 @@
-## Creating a Supabase Database Table with Security Policies for User Profiles
+## Creating a Supabase Database for User Profiles
 
 ---
 
-### **Explanation**
+### Setting Up the `profiles` Table
 
-#### **Table Creation:**
-- To create a table called *"User Profiles"* which stores user-specific details with a primary key *"User Id"*, you will use the `CREATE TABLE` SQL statement.
-- Typical columns you might want:
-  - **User Id** (UUID or TEXT): Unique identifier for each user, primary key.
-  - **Name** (TEXT): User's name.
-  - **Streak** (INTEGER): Hours spent on a task.
-  - **Last Seen** (TIMESTAMP): Last active time of the user.
+To create a **user profile table** in Supabase, you need a table named `profiles` that contains:
+- `id` (UUID, primary key, linked to the authenticated user's ID)
+- `name` (TEXT, stores the user's name)
+- `streak` (INTEGER, tracks hours spent)
+- `last_seen` (TIMESTAMP, records last activity)
 
-**Sample SQL:**
+Here’s the SQL to create the table:
+
 ```sql
-CREATE TABLE "public"."User Profiles" (
-  "User Id" UUID PRIMARY KEY,
-  "Name" TEXT,
-  "Streak" INTEGER,
-  "Last Seen" TIMESTAMP DEFAULT now()
+CREATE TABLE public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    streak INTEGER DEFAULT 0,
+    last_seen TIMESTAMP DEFAULT now()
 );
 ```
 
-- **Why use UUID?** UUIDs provide a unique identifier for each user, ideal for distributed systems or when integrating with external identity providers.
-- **DEFAULT now()**: automatically sets the Last Seen field on record creation.
+This ensures that each row is uniquely identified by the user's ID and automatically deletes the profile if the user is removed.
 
 ---
 
-#### **Security Policies for Authenticated Users:**
+### Enabling Row-Level Security (RLS)
 
-- Supabase uses Row Level Security (RLS) policies to control access.
-- You must enable RLS and create policies allowing only authenticated users to read/write their data.
+Supabase uses **Row-Level Security (RLS)** to control access. First, enable RLS on the `profiles` table:
 
-**Enabling RLS:**
 ```sql
-ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ```
 
 ---
 
-#### **Policies:**
+### Creating Policies for Authenticated Users
 
-- **Read and Write Policy for Authenticated Users:**
+To allow **only authenticated users** to read and write their own data, define policies:
 
+#### Read Policy (Allow users to read their own profile)
 ```sql
--- Allow authenticated users to select their own profile
-CREATE POLICY "Allow authenticated users to read their profile"
-ON "public"."User Profiles"
+CREATE POLICY "Enable read access for authenticated users"
+ON public.profiles
 FOR SELECT
-USING ("User Id" = auth.uid());
-
--- Allow authenticated users to insert a new profile
-CREATE POLICY "Allow authenticated users to insert profile"
-ON "public"."User Profiles"
-FOR INSERT
-WITH CHECK ("User Id" = auth.uid());
-
--- Allow authenticated users to update their profile
-CREATE POLICY "Allow authenticated users to update their profile"
-ON "public"."User Profiles"
-FOR UPDATE
-WITH CHECK ("User Id" = auth.uid());
-
--- Similarly, for delete if needed
-CREATE POLICY "Allow authenticated users to delete their profile"
-ON "public"."User Profiles"
-FOR DELETE
-WITH CHECK ("User Id" = auth.uid());
+USING (auth.uid() = id);
 ```
 
-- The core idea is **matching** `"User Id"` in the table with `auth.uid()`, which is a special function returning the ID of the current authenticated user.
+#### Write Policy (Allow users to update their own profile)
+```sql
+CREATE POLICY "Enable update access for authenticated users"
+ON public.profiles
+FOR UPDATE
+USING (auth.uid() = id);
+```
+
+#### Insert Policy (Allow users to create their own profile)
+```sql
+CREATE POLICY "Enable insert access for authenticated users"
+ON public.profiles
+FOR INSERT
+WITH CHECK (auth.uid() = id);
+```
+
+These policies ensure that users can only access and modify their own profile data.
 
 ---
 
-### **Example: Practical Usage**
-Suppose a user with ID `123e4567-e89b-12d3-a456-426614174000` logs in.  
-They will only be able to read, update, or delete rows where `"User Id"` equals their own UID.  
+### Example Usage in Supabase Client
+
+To retrieve a user's profile in JavaScript:
+
+```javascript
+const { data, error } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', supabase.auth.user().id);
+```
+
+To update the streak:
+
+```javascript
+const { error } = await supabase
+  .from('profiles')
+  .update({ streak: 5, last_seen: new Date() })
+  .eq('id', supabase.auth.user().id);
+```
 
 ---
 
-### **References**
-- https://supabase.com/docs/guides/auth/auth-authorization#row-level-security
-- https://supabase.com/docs/guides/database/primary-keys
-- https://supabase.com/docs/guides/database/policies
+### References
+## https://supabase.com/docs/guides/auth/managing-user-data ##
+## https://dev.to/erickson24/how-to-automatically-add-authenticated-users-to-your-supabase-database-4006 ##
+## https://stackoverflow.com/questions/79385928/supabase-rls-policy-with-authenticated-users ##
+
+This setup ensures **secure user authentication** while allowing users to manage their own profile data efficiently. 🚀 Let me know if you need further refinements!
