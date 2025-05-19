@@ -1,94 +1,66 @@
-## Getting the current date in JavaScript <br>
+## Creating a User Profile in Supabase <br>
 ---
 
-JavaScript provides several ways to get the current date, and the most common method is using the **Date** object. Below is a breakdown of how you can retrieve today's date in different formats.
+### **Understanding the Code** <br>
+This code snippet is an **asynchronous function** named `createUserProfile` that inserts a user profile into a Supabase database table named `profile`. Below is a detailed breakdown of how it works.
 
 ---
 
-### 1. Using the `Date` object <br>
-The `Date` object in JavaScript allows us to retrieve the current date and time.
-
+#### **1. Function Definition & Parameters** <br>
 ```javascript
-const today = new Date();
-console.log(today);
+async function createUserProfile(userId, name) {
 ```
-**Explanation:** 
-- `new Date()` creates a new Date object, which holds the current date and time.
-- `console.log(today)` prints the full date and time to the console.
+- **`async`**: Declares the function as asynchronous, allowing the use of `await` for handling promises.
+- **`userId` and `name`**: These parameters are passed when the function is called, representing the user's unique ID and their name.
 
 ---
 
-### 2. Getting only the date (YYYY-MM-DD format) <br>
-To get only the date without the time, you can extract the year, month, and day separately.
-
+#### **2. Inserting Data into Supabase** <br>
 ```javascript
-const today = new Date();
-const year = today.getFullYear();
-const month = today.getMonth() + 1; // Months are zero-based
-const day = today.getDate();
-const formattedDate = `${year}-${month}-${day}`;
-
-console.log(formattedDate);
+const { data, error } = await supabase
+  .from('profile')
+  .insert([
+    { user_id: userId, name: name, streak_hours: 0, last_seen: new Date().toISOString() }
+  ]);
 ```
-**Explanation:** 
-- `getFullYear()` returns the current year.
-- `getMonth()` returns the month (zero-based, meaning January is 0).
-- `getDate()` returns the day of the month.
-- The date is formatted as `YYYY-MM-DD`.
+- **`supabase.from('profile')`**: Specifies the table to interact with (`profile`).
+- **`.insert([...])`**: Inserts a new row into the table, structured as an object:
+  - `user_id: userId` → Stores the user ID.
+  - `name: name` → Stores the user's name.
+  - `streak_hours: 0` → Initializes a streak counter at **0**.
+  - `last_seen: new Date().toISOString()` → Sets the current timestamp in ISO format.
 
 ---
 
-### 3. Using `toLocaleDateString()` to format the date <br>
-You can format the date based on your locale settings.
-
+#### **3. Handling Errors & Logging Results** <br>
 ```javascript
-const today = new Date();
-const formattedDate = today.toLocaleDateString('en-US');
-console.log(formattedDate);
+if (error) console.error(error);
+else console.log('Profile created:', data);
 ```
-**Explanation:** 
-- `toLocaleDateString('en-US')` formats the date in MM/DD/YYYY format based on the US locale.
+- **Error Handling**:
+  - If `error` exists, it is logged to the console (`console.error(error);`).
+  - Otherwise, `data` (the response from Supabase) is logged (`console.log('Profile created:', data);`).
 
 ---
 
-### 4. Using `Intl.DateTimeFormat()` for more control <br>
-For advanced date formatting:
-
+### **Example Usage** <br>
 ```javascript
-const today = new Date();
-const options = { year: 'numeric', month: 'long', day: 'numeric' };
-const formattedDate = new Intl.DateTimeFormat('en-US', options).format(today);
-
-console.log(formattedDate);
+createUserProfile('user_123', 'Alice');
 ```
-**Explanation:** 
-- The `Intl.DateTimeFormat` object provides more control over how the date is displayed.
-- Options allow you to specify **long month names**, numeric years, and numeric days.
-
----
-
-## Example <br>
-
-If the current date is **May 19, 2025**, here’s how different methods will display it:
-```plaintext
-new Date()             --> Mon May 19 2025 18:15:00 GMT+0000 (UTC)
-YYYY-MM-DD format      --> 2025-05-19
-toLocaleDateString()   --> 5/19/2025
-Intl.DateTimeFormat()  --> May 19, 2025
+**Expected Output (if successful):**
 ```
-
+Profile created: [ { user_id: 'user_123', name: 'Alice', streak_hours: 0, last_seen: '2025-05-19T18:42:00.000Z' } ]
+```
+**Error Output (if something goes wrong):**
+```
+Error: [Supabase error message]
+```
 ---
 
-## Summary <br>
-JavaScript provides multiple ways to get and format the current date:
-- Use `new Date()` to get the full date and time.
-- Extract `getFullYear()`, `getMonth()`, and `getDate()` for custom formats.
-- Use `toLocaleDateString()` or `Intl.DateTimeFormat()` for easy formatting.
-- **Consider time zones** if working with international applications!
+### **Key Takeaways**
+- This function **automatically** inserts user profiles into Supabase.
+- **Error handling** ensures issues are reported.
+- **`async` and `await`** enable smooth asynchronous data handling.
+- The **timestamp** field (`last_seen`) updates dynamically.
 
----
-
-## References <br>
-## https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date ##
-
-This should give you everything you need to work with the current date in JavaScript! Let me know if you need more details or help with formatting. 🚀
+Let me know if you need modifications or further explanations! 🚀
