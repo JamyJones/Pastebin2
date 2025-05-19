@@ -1,102 +1,69 @@
-## How to retrieve text and password input values in JavaScript
+## Getting Text Value from Text and Password Input Elements in HTML <br>
+---<br>
 
---- 
-### Explanation:
+### Explanation:<br>
 
-**This guide explains the methods for accessing the values of `<input>` elements of types `text` and `password` in HTML using JavaScript.**
+**1. Accessing Input Elements in JavaScript**<br>
+To retrieve the value entered in a text or password input field, you need to first select the element in JavaScript. You can use the `document.getElementById()` or `document.querySelector()` method for this.<br>
 
----
+**2. Retrieving the Text Value**<br>
+Once you have selected the element, you can access the `value` property of the input element to obtain the text entered by the user.<br>
 
-### Basic Approach:
-
-When working with HTML forms, each `<input>` element can be accessed via JavaScript using its `id`, `name`, or other DOM features, and then reading its `value` property.
-
----
-
-### Step-by-step Process:
-
-#### 1. **Assign IDs to your input elements**
-
-```html
-<input type="text" id="myTextInput" />
-<input type="password" id="myPasswordInput" />
-```
-
-- **Why?** Using IDs makes it straightforward to target specific elements via JavaScript with `document.getElementById`.
+**3. Applying This to Text and Password Inputs**<br>
+The process is the same for both `<input type="text">` and `<input type="password">`. The only difference is that the password input obscures the characters visually but still stores them as a value.<br>
 
 ---
 
-#### 2. **Retrieve the values with JavaScript**
-
-```javascript
-// Get references to the input elements
-const textInput = document.getElementById('myTextInput');
-const passwordInput = document.getElementById('myPasswordInput');
-
-// Access the 'value' property
-const textValue = textInput.value;
-const passwordValue = passwordInput.value;
-```
-
-- **What each line does:**
-
-| Line | Function | Explanation |
-|--------|---------|--------------|
-| `document.getElementById('myTextInput')` | Finds the HTML element with the specified ID | Returns the DOM element, which can be used to access properties like `value` |
-| `.value` | Property of `<input>` elements | Contains the current value entered by the user |
-
----
-
-### When to retrieve values
-
-Usually, values are retrieved in response to an event, such as a button click:
-
-```html
-<button onclick="getValues()">Get Input Values</button>
-```
-
-```javascript
-function getValues() {
-  const text = document.getElementById('myTextInput').value;
-  const password = document.getElementById('myPasswordInput').value;
-  console.log('Text:', text);
-  console.log('Password:', password);
-}
-```
-
-- The function `getValues()` will execute when the button is clicked, grabbing and printing current input values.
-
----
-
-### Example: Full HTML + JavaScript snippet
+### Example:<br>
+Here is a practical example demonstrating how to retrieve the values from both a text and password input:<br>
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Input Values</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrieve Input Values</title>
 </head>
 <body>
+    <label for="username">Username:</label>
+    <input type="text" id="username"><br><br>
 
-<input type="text" id="myTextInput" placeholder="Enter text here" />
-<input type="password" id="myPasswordInput" placeholder="Enter password" />
+    <label for="password">Password:</label>
+    <input type="password" id="password"><br><br>
 
-<button onclick="getValues()">Get Input Values</button>
+    <button onclick="getValues()">Submit</button>
 
-<script>
-function getValues() {
-    const textValue = document.getElementById('myTextInput').value;
-    const passwordValue = document.getElementById('myPasswordInput').value;
-    alert('Text Input: ' + textValue + '\nPassword Input: ' + passwordValue);
-}
-</script>
-
+    <script>
+        function getValues() {
+            // Selecting the input elements
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            
+            // Displaying the values
+            alert("Username: " + username + "\nPassword: " + password);
+        }
+    </script>
 </body>
 </html>
 ```
 
+**Breakdown of the Code:**<br>
+- `document.getElementById("username").value;` → Retrieves the entered text from the username input field.<br>
+- `document.getElementById("password").value;` → Retrieves the password entered in the password input field.<br>
+- `alert("Username: " + username + "\nPassword: " + password);` → Displays the retrieved values in an alert box.<br>
+
 ---
-### References:
-## MDN Web Docs on `<input>` element: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+
+### Notes:<br>
+- The `value` property of an input element is used to fetch the entered content.<br>
+- The `alert()` function is used here for demonstration but in a real-world scenario, you might store values in a database or perform validation.<br>
+- For security reasons, avoid logging passwords directly in a console or storing them in plain text.<br>
+
+---
+
+#### Hope this helps! 🚀 Let me know if you need further clarification.<br> [[0]](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md)
+
+
+
+> [0] [](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md)
