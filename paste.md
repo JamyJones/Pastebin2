@@ -1,83 +1,72 @@
-## Creating a Supabase Database for User Profiles
+## Creating a Supabase Database with User Profiles and Access Policies
 
 ---
 
-### Explanation
+### Explanation:
 
-#### **1. Setting Up the User Profile Table**
-To create a `profiles` table that stores user details, including `name`, `streak`, and `last_seen`, while ensuring each row is uniquely identified by the user's ID, you can use the following SQL:
-
+#### Setting up the table `profile` with user-specific details:
+- To create a table called `profile` that stores user data such as `name`, `streak`, and `last_seen`, with each row linked to a user ID:
+  
 ```sql
-CREATE TABLE public.profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    streak INT DEFAULT 0,
-    last_seen TIMESTAMP DEFAULT now()
+CREATE TABLE public.profile (
+    user_id uuid PRIMARY KEY,        -- Unique identifier for each user, references the auth system’s UUID
+    name text,                        -- User's name, stored as text
+    streak integer,                   -- Hours spent on the site, stored as an integer
+    last_seen timestamp with time zone -- Last activity timestamp, in timezone-aware format
 );
 ```
 
-- **`id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE`**: Ensures that each profile is linked to a user in the `auth.users` table and deletes the profile if the user is removed.
-- **`name TEXT NOT NULL`**: Stores the user's name.
-- **`streak INT DEFAULT 0`**: Tracks the number of hours spent on the site.
-- **`last_seen TIMESTAMP DEFAULT now()`**: Records the last time the user was active.
+- **Note:** The `user_id` is the primary key ensuring each user has a unique profile. It typically links to the Supabase Auth user's UUID.
+
+#### Setting Database Policies for Authentication:
+- To restrict **read** and **write** access **only** to authenticated users, you need to implement appropriate policies.
+
+**Example Policy for SELECT (Read) access:**
+
+```sql
+create policy "Allow authenticated users to read their profile"
+on "public"."profile"
+for select
+using (auth.uid() = user_id);
+```
+
+**Explanation:**
+- `auth.uid()` fetches the current authenticated user's ID.
+- The `using` clause limits rows returned to only those where the `user_id` matches the current user, ensuring each user sees only their own data.
 
 ---
 
-#### **2. Enabling Row-Level Security (RLS)**
-Supabase requires **Row-Level Security (RLS)** to be enabled for policies to take effect:
+**Similarly, for INSERT and UPDATE:**
 
 ```sql
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+create policy "Allow authenticated users to insert/update their profile"
+on "public"."profile"
+for all
+using (auth.uid() = user_id)
+with_check (auth.uid() = user_id);
 ```
 
-This ensures that unauthorized users cannot access the table.
+- **`with_check`** ensures that during inserts or updates, the user can only modify their own record, linked via the `user_id`.
+
+**Optional: Disabling access to unauthenticated users**
+
+```sql
+-- No policy will allow access unless explicitly granted, so ensure default is restrictive
+```
 
 ---
 
-#### **3. Creating Policies for Authenticated Users**
-To allow only authenticated users to read and write their own data, you need to define policies:
+### Example usage:
+Suppose authenticated user with ID `uuid-1234` logs in, they can:
+- insert their profile data
+- update their data
+- read only their profile data
 
-##### **Read Policy (Allow users to read their own data)**
-```sql
-CREATE POLICY "Enable read access for authenticated users"
-ON public.profiles
-FOR SELECT
-USING (auth.uid() = id);
-```
-
-##### **Write Policy (Allow users to update their own data)**
-```sql
-CREATE POLICY "Enable write access for authenticated users"
-ON public.profiles
-FOR UPDATE
-USING (auth.uid() = id);
-```
-
-- **`auth.uid()`**: Retrieves the currently authenticated user's ID.
-- **`USING (auth.uid() = id)`**: Ensures users can only access their own data.
-
----
-
-### Example Usage in Supabase API
-
-To retrieve a user's profile in JavaScript:
-
-```javascript
-const { data, error } = await supabase
-  .from('profiles')
-  .select('*')
-  .eq('id', supabase.auth.user().id);
-
-console.log(data);
-```
-
-This fetches the profile of the currently authenticated user.
+This setup guarantees **security** and **privacy**, restricting visibility and modifications to the user.  
 
 ---
 
 ### References
-## https://supabase.com/docs/guides/auth/managing-user-data ##
-## https://stackoverflow.com/questions/78550922/how-do-i-authorise-users-with-username-in-supabase ##
-## https://github.com/orgs/supabase/discussions/3491 ##
-
-Would you like additional customization for your database setup? 🚀
+- ##Supabase Policies Documentation##  
+- ##PostgreSQL CREATE TABLE##  
+- ##Using auth.uid() in Supabase policies##
