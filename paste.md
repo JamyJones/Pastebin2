@@ -1,78 +1,82 @@
-## Extracting Text and Password Input Values in JavaScript
+## Retrieving Text and Password Input Values in JavaScript
 
 ---
 
-**Explanation:**
+### Explanation:
 
-When working with HTML form inputs, JavaScript allows you to access the **value** property of **input** elements to get the current user-entered data. For **text** and **password** inputs, the process is identical; it involves selecting the input element and then retrieving its `.value`.
-
----
-
-### Selecting Input Elements
-
-**Method 1: Using `getElementById()`**
-
-- **Purpose:** To select an element with a specific `id` attribute.
-- **Usage:** `document.getElementById('elementId')`
-
-**Method 2: Using `querySelector()`**
-
-- **Purpose:** To select elements based on CSS selectors.
-- **Usage:** `document.querySelector('input[type="text"]')`
+In HTML, `<input>` elements are commonly used to receive user input, such as text and passwords. To access their values using JavaScript, you need to select the input element and then read its `value` property.
 
 ---
 
-### Retrieving Values
-
-- Once you have a reference to the input element, you can access its **value** property:
+### How to get the value of a text input element:
 
 ```javascript
+// Step 1: Select the input element by its ID
 const textInput = document.getElementById('textInputId');
+
+// Step 2: Access the 'value' property
+const textValue = textInput.value;
+
+console.log(textValue);
+```
+
+**Breakdown:**
+- **`document.getElementById('textInputId')`**: This fetches the HTML element with the specific ID.
+- **`.value`**: Retrieves the current value inside the input box.
+
+---
+
+### How to get the value of a password input element:
+
+```javascript
+// Step 1: Select the password input by its ID
 const passwordInput = document.getElementById('passwordInputId');
 
-const textValue = textInput.value;
+// Step 2: Access its value
 const passwordValue = passwordInput.value;
+
+console.log(passwordValue);
 ```
 
-- These variables now hold the **current text** entered in the respective input fields.
+**Note:** Both input types (`text` and `password`) in HTML are similar in behavior regarding retrieving their values; the main difference lies in how they display user input on the page.
 
 ---
 
-### Example: Complete Script with HTML
+### Example: Complete HTML & JavaScript
 
 ```html
-<!-- HTML Part -->
-<input type="text" id="textInput" placeholder="Enter text here" />
-<input type="password" id="passwordInput" placeholder="Enter password" />
-<button id="submitBtn">Get Values</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Input Values Example</title>
+</head>
+<body>
 
-<!-- JavaScript Part -->
+<!-- Text Input -->
+<input type="text" id="textInputId" placeholder="Enter text here" />
+
+<!-- Password Input -->
+<input type="password" id="passwordInputId" placeholder="Enter password" />
+
+<!-- Button to trigger value fetch -->
+<button onclick="fetchInputValues()">Get Values</button>
+
 <script>
-  document.getElementById('submitBtn').addEventListener('click', () => {
-    const textVal = document.getElementById('textInput').value;
-    const passVal = document.getElementById('passwordInput').value;
-    console.log('Text:', textVal);
-    console.log('Password:', passVal);
-  });
+function fetchInputValues() {
+  const textValue = document.getElementById('textInputId').value;
+  const passwordValue = document.getElementById('passwordInputId').value;
+
+  alert('Text Input: ' + textValue + '\nPassword Input: ' + passwordValue);
+}
 </script>
+
+</body>
+</html>
 ```
 
-**In this example:**
-
-- When the user clicks the button, it triggers an event listener.
-- The script then retrieves the **current** values from **both input fields**.
-- Values are output to the console for demonstration.
-
 ---
 
-### Summary
-
-- Select input elements via `getElementById()` or `querySelector()`.
-- Access the **`.value`** property to get the entered data.
-- This approach works similarly for **text** and **password** input types.
-
----
-
-**References:**
-
-## MDN Web Docs - HTMLInputElement: https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement
+### References:
+##MDN Web Docs - `<input>` HTML Element##
+##https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input##
