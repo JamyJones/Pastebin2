@@ -1,58 +1,81 @@
-## Summary
-How to specify and insert a user in a Supabase database using an asynchronous JavaScript function  
+## Retrieving a Row from Supabase Database Using JavaScript Client
 
----  
-  
-**Explanation:**  
-  
-**1. Function Definition and Parameters**  
-The `createUserProfile(userId, name)` function is defined as an asynchronous function (`async`) that takes two parameters:  
-- `userId` (the unique identifier for the user)  
-- `name` (the user's name)  
-  
-This setup allows you to pass specific user data when calling the function.  
-  
----  
-  
-**2. Using Supabase Client Method `.from()` and `.insert()`**  
-Within the function, the Supabase client (`supabase`) interacts with the `'profile'` table:  
-  
-```js
-.suapabase
-  .from('profile')        // Specifies the 'profile' table in your database
-  .insert([                // Inserts data into the table
-    { user_id: userId, name: name, streak_hours: 0, last_seen: new Date().toISOString() }
-  ]);
-```
-- `.from('profile')`: indicates which table the operation affects.  
-- `.insert([ { ... } ])`: inserts a new record with specified fields.  
-  
-**3. Structuring the Data Object**  
-The object passed to `.insert()` includes:  
-- `user_id`: set to the `userId` parameter provided to the function, which can be a string or number based on your database schema.  
-- `name`: set to the `name` parameter.  
-- `streak_hours`: initialized to `0`.  
-- `last_seen`: set to the current date-time in ISO string format with `new Date().toISOString()`.  
-  
-This way, you **specify the user** by passing their identifying information directly into the function call.  
-  
----  
-  
-**4. Error Handling and Logging**  
-The `.insert()` method returns an object with `data` and `error`.  
-- If there’s an error, `console.error(error)` outputs the issue.  
-- Otherwise, `console.log('Profile created:', data)` confirms success.  
-  
 ---
 
-**Practical Example:**  
-```js
-createUserProfile('12345', 'Alice');
+### **Explanation**
+
+#### **Connecting to Supabase**
+To interact with Supabase using JavaScript, you first need to initialize the Supabase client. This requires your Supabase project URL and anonymous key.
+
+```javascript
+// Import the Supabase client
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase
+const SUPABASE_URL = 'https://YOUR_PROJECT_URL.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 ```
-This call creates a profile for user with ID `'12345'` and name `'Alice'`.  
-  
----  
-  
-**References:**  
-##Supabase JavaScript Client Documentation##  
-##JavaScript Date.toISOString() Method##
+- `createClient()` is a method from the `@supabase/supabase-js` package that initializes the connection.
+- The `SUPABASE_URL` and `SUPABASE_ANON_KEY` are credentials found in your Supabase dashboard under **Settings > API**.
+
+---
+
+#### **Fetching a Single Row from a Table**
+To retrieve a specific row from a table, use the `.select()` method along with `.eq()` to filter by a column value.
+
+```javascript
+async function getRow() {
+  const { data, error } = await supabase
+    .from('your_table_name')
+    .select('*')
+    .eq('id', 1) // Fetch row where 'id' is 1
+    .single(); // Ensures only one row is returned
+
+  if (error) {
+    console.error('Error fetching row:', error);
+    return;
+  }
+
+  console.log('Retrieved row:', data);
+  return data;
+}
+
+getRow();
+```
+- `.from('your_table_name')` specifies the table to query.
+- `.select('*')` retrieves all columns from the row.
+- `.eq('id', 1)` filters the row where the `id` column equals `1`.
+- `.single()` ensures that only one row is returned instead of an array.
+
+---
+
+### **Example**
+If you have a table named `users` with columns `id`, `name`, and `email`, and you want to fetch the row where `id = 5`, modify the function like this:
+
+```javascript
+async function getUser() {
+  const { data, error } = await supabase
+    .from('users')
+    .select('name, email')
+    .eq('id', 5)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user:', error);
+    return;
+  }
+
+  console.log('User details:', data);
+  return data;
+}
+
+getUser();
+```
+This will return an object containing the `name` and `email` of the user with `id = 5`.
+
+---
+
+### **References**
+## https://supabase.com/docs/reference/javascript/single ##
+## https://onebite.dev/play-with-supabase-database-in-website-with-javascript/ ##
