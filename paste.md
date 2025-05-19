@@ -1,73 +1,67 @@
-## Summary: PostgreSQL Row Level Security Policy Error and Solution
+## How to Get the Current Date in JavaScript
 
 ---
 
-**Explanation:**
+Explanation:
 
-The error **"ERROR: 42601: WITH CHECK cannot be applied to SELECT or DELETE"** occurs because **PostgreSQL's row level security policies** apply different rules for **ALL**, **SELECT**, **INSERT**, **UPDATE**, and **DELETE** commands. In particular, **WITH CHECK** clauses are only valid for **INSERT** and **UPDATE** policies. They are **not applicable** for **SELECT** or **DELETE** policies.
-
----
-
-**Detailed Breakdown:**
-
-### What is the Error About?
-
-- The error indicates that the **WITH CHECK** clause has been used in a **DELETE policy**.
-- According to PostgreSQL documentation, **WITH CHECK** constraints **define access** for **INSERT** and **UPDATE** operations, **not** for **DELETE**.
-- **DELETE policies** only require a condition without the **WITH CHECK** clause.
+**JavaScript provides built-in classes and methods to work with dates.** To get the current date, you typically use the `Date` object, which represents a single moment in time. The `Date` object is part of JavaScript's core language features and doesn't require any additional libraries.
 
 ---
 
-### Correct Policy Structure for DELETE
+### Creating a Date object for the current date
 
-- For delete operations, only the `USING` clause is needed.
-- The `USING` clause **determines which rows** a user is **allowed to delete**.
-- The `WITH CHECK` clause **cannot** be used in delete policies.
-
-### Corrected Policy Example:
-
-```sql
-CREATE POLICY "Allow authenticated users to delete their profile"
-ON "public"."User Profiles"
-FOR DELETE
-USING ("User Id" = auth.uid());
+```javascript
+const today = new Date();
 ```
 
-- **This** policy allows **authenticated users** to delete **only their own profile** based on the condition that their **"User Id"** matches the **current user id (`auth.uid()`)**.
-  
-- Notice that **`WITH CHECK`** is removed because it is invalid in this context.
+- **`new Date()`**: This constructor creates a new Date object set to the current date and time according to the system's clock.
+- This object, `today`, now stores the precise moment the code was executed.
 
 ---
 
-### Additional Information:
+### Extracting Different Parts of the Date
 
-- The **`auth.uid()`** function is usually part of **PostgREST** or **auth system**; it retrieves the **current authenticated user's id**.
-- Ensure your table has **appropriate access policies** enabled:
+You can extract specific parts of the date, such as the year, month, and day using built-in methods:
 
-```sql
-ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
+```javascript
+const year = today.getFullYear(); // 4-digit year, e.g., 2024
+const month = today.getMonth() + 1; // Month index starts at 0 (January), so add 1
+const day = today.getDate(); // Day of the month
 ```
 
-- Make sure your **policy** is correctly applied after creation:
-
-```sql
-ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
-```
+- **`getFullYear()`**: Returns the year as a four-digit number.
+- **`getMonth()`**: Returns the month as a zero-based index (0 for January, 11 for December); adding 1 makes it more human-readable.
+- **`getDate()`**: Gets the day of the month (1-31).
 
 ---
 
-## Practical Example:
+### Formatting the Date as a String
 
-Suppose a user with ID 42 wants to delete their profile. The policy:
+To format the date as a string in a common format like `YYYY-MM-DD`:
 
-```sql
-USING ("User Id" = auth.uid());
+```javascript
+const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 ```
 
-**Filters the delete operation** to only affect the row where `"User Id"` is **42**.
+- **`padStart(2, '0')`**: Ensures that month and day are always two digits, adding a leading zero when necessary.
 
 ---
 
-## References:
+### Complete Practical Example
 
-## https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+```javascript
+const today = new Date();
+const year = today.getFullYear();
+const month = (today.getMonth() + 1).toString().padStart(2, '0');
+const day = today.getDate().toString().padStart(2, '0');
+
+const currentDate = `${year}-${month}-${day}`;
+console.log(currentDate); // Output: e.g., 2024-04-27
+```
+
+This code outputs the current date in `YYYY-MM-DD` format.
+
+---
+
+### References:
+## MDN Web Docs - Date ##
