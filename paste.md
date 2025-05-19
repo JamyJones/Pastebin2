@@ -1,19 +1,39 @@
-## PostgreSQL Error 42601: WITH CHECK Cannot Be Applied to SELECT or DELETE
+## Summary
+Understanding the error related to PostgreSQL row-level security policies, specifically the misuse of `WITH CHECK` in delete operations.
 
 ---
 
-### Explanation:
+### Explanation
 
-#### **1. Understanding Error 42601**
-PostgreSQL error **42601** is a **syntax error** that occurs when an SQL statement is incorrectly structured. In this case, the error message states that `WITH CHECK` cannot be applied to `SELECT` or `DELETE` operations.
+**ERROR: 42601: WITH CHECK cannot be applied to SELECT or DELETE**
 
-#### **2. Why Does This Error Occur?**
-- The `WITH CHECK` clause is used in **row-level security policies** to enforce conditions on **INSERT** and **UPDATE** operations.
-- However, `WITH CHECK` **does not apply** to `SELECT` or `DELETE` operations because these operations do not modify data in a way that requires validation.
-- When defining a policy for `DELETE`, PostgreSQL expects a `USING` clause instead of `WITH CHECK`.
+This error occurs because PostgreSQL's **row-level security policies** are implemented differently for **SELECT**, **UPDATE**, and **DELETE** operations.
 
-#### **3. Correcting the Policy Definition**
-To fix this error, replace `WITH CHECK` with `USING`, which is the correct clause for `DELETE` operations:
+- **`WITH CHECK`**: Defines the condition for **inserting** or **updating** rows in a table.
+- **`USING`**: Defines the condition for **selecting** or **deleting** rows.
+
+In other words, for **DELETE** operations, only the `USING` clause can be used to specify who can delete a particular row. The `WITH CHECK` clause is **not applicable** to `DELETE` statements, which is why PostgreSQL throws this error.
+
+---
+
+### Why the Error Occurs in Your Script
+
+Your policy:
+
+```sql
+CREATE POLICY "Allow authenticated users to delete their profile"
+ON "public"."User Profiles"
+FOR DELETE
+WITH CHECK ("User Id" = auth.uid());
+```
+
+- **Incorrect Usage**: You are trying to apply `WITH CHECK` for a `DELETE` operation, which is **not valid** in PostgreSQL.
+
+### How to Correct It
+
+- Use the `USING` clause for `DELETE` policies instead of `WITH CHECK`.
+  
+**Corrected version:**
 
 ```sql
 CREATE POLICY "Allow authenticated users to delete their profile"
@@ -22,30 +42,35 @@ FOR DELETE
 USING ("User Id" = auth.uid());
 ```
 
-#### **4. Explanation of the Fix**
-- `USING ("User Id" = auth.uid());` ensures that only the authenticated user can delete their own profile.
-- The `USING` clause is evaluated **before** the deletion occurs, ensuring that only rows meeting the condition are deleted.
+**Explanation of Changes:**
+
+- Replaces `WITH CHECK` with `USING`.
+- Ensures only the owner (`"User Id" = auth.uid()`) can delete their profile.
+- This is the **correct approach** for `DELETE` policies.
 
 ---
 
-### Example:
+### Practical Example
 
-If you wanted to create a policy for **INSERT** or **UPDATE**, you would use `WITH CHECK`:
+Suppose:
+
+- There is a table `"public"."User Profiles"` with columns: `"User Id"` and others.
+- A user is authenticated, and `auth.uid()` fetches the current user's ID.
+- Only the owner should be able to delete their profile.
+
+**Correct policy:**
 
 ```sql
-CREATE POLICY "Allow authenticated users to update their profile"
+CREATE POLICY "Allow users to delete their profile"
 ON "public"."User Profiles"
-FOR UPDATE
-WITH CHECK ("User Id" = auth.uid());
+FOR DELETE
+USING ("User Id" = auth.uid());
 ```
 
-This ensures that only authenticated users can update their own profile.
+This policy applies when a delete action is attempted, granting permission **only if** the `"User Id"` matches the current authenticated user.
 
 ---
 
-### References:
-## https://bobcares.com/blog/postgresql-error-42601/ ##
-## https://philipmcclarence.com/how-to-diagnose-and-fix-the-42601-syntax_error-error-code-in-postgres/ ##
-## https://stackoverflow.com/questions/24251831/postgresql-sql-state-42601 ##
+### References
 
-Let me know if you need further clarification! 🚀
+##https://www.postgresql.org/docs/current/ddl-rowsecurity.html
