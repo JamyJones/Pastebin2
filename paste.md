@@ -1,83 +1,55 @@
-## Fetching a Row from Supabase Database Using JavaScript Client
-
+## Fetching a Row from Supabase Database Using JavaScript Client <br>
 ---
-
-### **Connecting to Supabase**
-To interact with Supabase, you need to initialize the client using your project's URL and API key.
+### **Connecting to Supabase** <br>
+To interact with Supabase using JavaScript, you first need to initialize the Supabase client. This requires your **Supabase URL** and **Anon Key**, which you can find in your Supabase dashboard.
 
 ```javascript
+// Import the Supabase client
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
-
+// Initialize Supabase
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 ```
-- `createClient()` initializes the Supabase client.
-- Replace `'your-project.supabase.co'` and `'your-anon-key'` with your actual Supabase credentials.
-
 ---
-
-### **Fetching a Specific Row**
-To retrieve a row from a table, use the `.select()` method with a filter.
+### **Fetching a Specific Row from a Table** <br>
+To retrieve a row from a table, use the `.select()` method along with a filter condition such as `.eq()` to match a specific column value.
 
 ```javascript
-async function getRow() {
+async function getRow(tableName, columnName, value) {
     const { data, error } = await supabase
-        .from('your_table_name')
-        .select('*')
-        .eq('id', 1) // Replace 'id' and value with your actual column and row identifier
+        .from(tableName) // Specify the table name
+        .select('*') // Select all columns
+        .eq(columnName, value) // Filter by column value
+        .single(); // Ensure only one row is returned
 
     if (error) {
-        console.error('Error fetching data:', error);
-        return;
+        console.error('Error fetching row:', error);
+        return null;
     }
 
-    console.log('Fetched row:', data);
+    return data; // Return the fetched row
 }
-
-getRow();
 ```
-- `.from('your_table_name')`: Specifies the table to query.
-- `.select('*')`: Retrieves all columns.
-- `.eq('id', 1)`: Filters the row where `id` equals `1`.
-- `data` contains the fetched row, while `error` holds any errors encountered.
-
 ---
-
-### **Handling Errors**
-Always check for errors when querying Supabase.
-
+### **Breaking Down the Code** <br>
+- **`.from(tableName)`** → Specifies the table to query.
+- **`.select('*')`** → Retrieves all columns from the row.
+- **`.eq(columnName, value)`** → Filters the row based on a column's value.
+- **`.single()`** → Ensures only one row is returned (useful when expecting a unique match).
+- **Error Handling** → If an error occurs, it is logged and `null` is returned.
+---
+### **Example Usage** <br>
 ```javascript
-if (error) {
-    console.error('Error fetching data:', error);
+async function fetchData() {
+    const row = await getRow('users', 'id', 123); // Fetch row where id = 123
+    console.log('Fetched Row:', row);
 }
+
+fetchData();
 ```
-- This ensures that any issues (e.g., incorrect table name, missing permissions) are logged.
-
 ---
-
-### **Example Output**
-If the table contains:
-
-| id | name  | age |
-|----|-------|-----|
-| 1  | Alice | 25  |
-
-The console output will be:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Alice",
-    "age": 25
-  }
-]
-```
-
----
-
-### **References**
+### **References** <br>
 ## https://supabase.com/docs/reference/javascript/select ##
 ## https://onebite.dev/play-with-supabase-database-in-website-with-javascript/ ##
