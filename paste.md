@@ -1,76 +1,73 @@
-## Summary
-Understanding the error related to PostgreSQL row-level security policies, specifically the misuse of `WITH CHECK` in delete operations.
+## Summary: PostgreSQL Row Level Security Policy Error and Solution
 
 ---
 
-### Explanation
+**Explanation:**
 
-**ERROR: 42601: WITH CHECK cannot be applied to SELECT or DELETE**
-
-This error occurs because PostgreSQL's **row-level security policies** are implemented differently for **SELECT**, **UPDATE**, and **DELETE** operations.
-
-- **`WITH CHECK`**: Defines the condition for **inserting** or **updating** rows in a table.
-- **`USING`**: Defines the condition for **selecting** or **deleting** rows.
-
-In other words, for **DELETE** operations, only the `USING` clause can be used to specify who can delete a particular row. The `WITH CHECK` clause is **not applicable** to `DELETE` statements, which is why PostgreSQL throws this error.
+The error **"ERROR: 42601: WITH CHECK cannot be applied to SELECT or DELETE"** occurs because **PostgreSQL's row level security policies** apply different rules for **ALL**, **SELECT**, **INSERT**, **UPDATE**, and **DELETE** commands. In particular, **WITH CHECK** clauses are only valid for **INSERT** and **UPDATE** policies. They are **not applicable** for **SELECT** or **DELETE** policies.
 
 ---
 
-### Why the Error Occurs in Your Script
+**Detailed Breakdown:**
 
-Your policy:
+### What is the Error About?
+
+- The error indicates that the **WITH CHECK** clause has been used in a **DELETE policy**.
+- According to PostgreSQL documentation, **WITH CHECK** constraints **define access** for **INSERT** and **UPDATE** operations, **not** for **DELETE**.
+- **DELETE policies** only require a condition without the **WITH CHECK** clause.
+
+---
+
+### Correct Policy Structure for DELETE
+
+- For delete operations, only the `USING` clause is needed.
+- The `USING` clause **determines which rows** a user is **allowed to delete**.
+- The `WITH CHECK` clause **cannot** be used in delete policies.
+
+### Corrected Policy Example:
 
 ```sql
 CREATE POLICY "Allow authenticated users to delete their profile"
 ON "public"."User Profiles"
 FOR DELETE
-WITH CHECK ("User Id" = auth.uid());
+USING ("User Id" = auth.uid());
 ```
 
-- **Incorrect Usage**: You are trying to apply `WITH CHECK` for a `DELETE` operation, which is **not valid** in PostgreSQL.
-
-### How to Correct It
-
-- Use the `USING` clause for `DELETE` policies instead of `WITH CHECK`.
+- **This** policy allows **authenticated users** to delete **only their own profile** based on the condition that their **"User Id"** matches the **current user id (`auth.uid()`)**.
   
-**Corrected version:**
-
-```sql
-CREATE POLICY "Allow authenticated users to delete their profile"
-ON "public"."User Profiles"
-FOR DELETE
-USING ("User Id" = auth.uid());
-```
-
-**Explanation of Changes:**
-
-- Replaces `WITH CHECK` with `USING`.
-- Ensures only the owner (`"User Id" = auth.uid()`) can delete their profile.
-- This is the **correct approach** for `DELETE` policies.
+- Notice that **`WITH CHECK`** is removed because it is invalid in this context.
 
 ---
 
-### Practical Example
+### Additional Information:
 
-Suppose:
-
-- There is a table `"public"."User Profiles"` with columns: `"User Id"` and others.
-- A user is authenticated, and `auth.uid()` fetches the current user's ID.
-- Only the owner should be able to delete their profile.
-
-**Correct policy:**
+- The **`auth.uid()`** function is usually part of **PostgREST** or **auth system**; it retrieves the **current authenticated user's id**.
+- Ensure your table has **appropriate access policies** enabled:
 
 ```sql
-CREATE POLICY "Allow users to delete their profile"
-ON "public"."User Profiles"
-FOR DELETE
-USING ("User Id" = auth.uid());
+ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
 ```
 
-This policy applies when a delete action is attempted, granting permission **only if** the `"User Id"` matches the current authenticated user.
+- Make sure your **policy** is correctly applied after creation:
+
+```sql
+ALTER TABLE "public"."User Profiles" ENABLE ROW LEVEL SECURITY;
+```
 
 ---
 
-### References
+## Practical Example:
 
-##https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+Suppose a user with ID 42 wants to delete their profile. The policy:
+
+```sql
+USING ("User Id" = auth.uid());
+```
+
+**Filters the delete operation** to only affect the row where `"User Id"` is **42**.
+
+---
+
+## References:
+
+## https://www.postgresql.org/docs/current/ddl-rowsecurity.html
