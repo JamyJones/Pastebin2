@@ -1,41 +1,80 @@
-Certainly! Below is a CSS animation class that you can apply to your button when submitting a form. This animation gives a subtle "loading" effect by making the button scale slightly and change opacity.
+Certainly! Here's a professional CSS animation class you can add to a Bootstrap button to give it a polished animated effect when clicked or in a loading state, commonly used for submitting forms.
 
-### CSS Code:
+### Example: Loading Spinner Animation on Button
+
+This class creates a loading spinner that appears when the button is in a loading state, providing visual feedback during form submission.
+
+#### 1. CSS Animation Classes
+
 ```css
-@keyframes buttonLoading {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(0.95);
-        opacity: 0.7;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+/* Keyframes for spinning animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.button-submit {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+/* Loader styles */
+.btn-loading {
+  position: relative;
+  pointer-events: none; /* Disable click during loading */
+  opacity: 0.6;         /* Slightly fade the button to indicate disabled state */
 }
 
-.button-submit:active {
-    animation: buttonLoading 1s infinite;
+/* Spinner element inside button */
+.btn-loading::after {
+  content: "";
+  display: inline-block;
+  margin-left: 8px; /* Space between text and spinner */
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: spin 0.8s linear infinite;
 }
 ```
-### Explanation:
-- The `@keyframes buttonLoading` defines the animation steps.
-- The button shrinks (`scale(0.95)`) and becomes slightly transparent (`opacity: 0.7`) at 50% of the animation.
-- The button returns to normal (`scale(1)`, `opacity: 1`) by the end of the animation cycle.
-- When the button is clicked (`:active`), the animation runs infinitely until released.
 
-This ensures a sleek visual cue that the form is being submitted. Let me know if you need further adjustments!
+#### 2. Usage in HTML
+
+Apply the `btn-loading` class dynamically via JavaScript when form is submitting.
+
+```html
+<button id="submitBtn" type="submit" class="btn btn-primary">
+  Submit
+</button>
+```
+
+#### 3. JavaScript to toggle loading state
+
+```js
+const submitBtn = document.getElementById('submitBtn');
+
+submitBtn.addEventListener('click', function() {
+  // Add loading class
+  this.classList.add('btn-loading');
+  
+  // Disable the button to prevent multiple submits
+  this.disabled = true;
+  
+  // Simulate form submission (replace with your AJAX/blocking call)
+  setTimeout(() => {
+    // Remove loading class after submission completes
+    this.classList.remove('btn-loading');
+    this.disabled = false;
+  }, 3000); // simulate 3 seconds delay
+});
+```
+
+---
+
+### Summary
+- The `@keyframes spin` creates a continuous rotation.
+- The `.btn-loading` class disables the button and adds a spinning indicator after the button text.
+- You can toggle this class dynamically during form processing.
+
+### Notes:
+- Adjust the size of the spinner (`width`, `height`) and border color as needed.
+- For accessibility, consider adding `aria-busy` attributes or visually hidden text indicating a loading state.
+
+Would you like a more advanced animation or a different effect?
