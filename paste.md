@@ -1,46 +1,47 @@
-Certainly! Here's a professional example of a policy to allow only read access (e.g., `select`) to JPEG files (`.jpg`) in a Supabase storage bucket for any authenticated user, and restrict access to other file types or write operations.
+In JavaScript, you can work with the DOM (Document Object Model) to manipulate HTML elements, including `<img>` elements. To set properties such as the `src` attribute of an image, you can use JavaScript’s `.src` property.
 
-### Assumptions:
-- The bucket name is `user-photos`.
-- Only `select` (read) operations are permitted.
-- Access is granted to all authenticated users (not just anonymous).
-- Files are stored with their extensions recognized by `storage.extension(name)`.
+### Example:
 
-### Policy for Read Access to JPG Files for Authenticated Users
+```javascript
+// Select the image element
+let imgElement = document.getElementById("myImage");
 
-```sql
-CREATE POLICY "read_jpg_files_for_authenticated_users"
-ON storage.objects
-FOR SELECT
-USING (
-  bucket_id = 'user-photos'
-  AND storage."extension"(name) = 'jpg'
-  AND auth.role() = 'authenticated'
-);
+// Set the 'src' attribute
+imgElement.src = "https://example.com/image.jpg";
+
+// You can also modify other properties
+imgElement.alt = "Example Image";
+imgElement.width = 300;
+imgElement.height = 200;
 ```
 
-### Explanation:
-- `FOR SELECT`: This policy applies to read operations.
-- `USING`: Defines the condition under which a user can read objects.
-  - `bucket_id = 'user-photos'`: Restrict to a specific bucket.
-  - `storage."extension"(name) = 'jpg'`: Limit to JPG files.
-  - `auth.role() = 'authenticated'`: Ensure only authenticated users can access.
+### Creating a New Image Element:
 
----
+```javascript
+// Create a new image element
+let newImage = document.createElement("img");
 
-### Additional considerations:
-- To prevent access to other file types, do **not** include any policies permitting `INSERT`, `UPDATE`, or `DELETE`.
-- Make sure to set default policies to revoke unauthorized access. For example:
+// Set attributes
+newImage.src = "https://example.com/new-image.jpg";
+newImage.alt = "New Image";
+newImage.width = 250;
+newImage.height = 150;
 
-```sql
-REVOKE ALL ON storage.objects FROM public, authenticated;
+// Append it to the document
+document.body.appendChild(newImage);
 ```
 
-- Apply the read policy after revoking defaults or explicit denials for clarity.
+### Best Practices:
+1. **Ensure the image URL is valid** to avoid broken links.
+2. **Use `alt` attributes** for accessibility and SEO.
+3. **Optimize image sizes** to enhance page load speed.
+4. **Lazy loading (`loading="lazy"`)** can improve performance.
+5. **Event Listeners** can be used to handle image loading errors:
 
-### Final note:
-Verify the role name used (`auth.role()`) matches your setup. In some configurations, roles could be `'anon'`, `'authenticated'`, or custom.
+```javascript
+imgElement.onerror = function() {
+    console.log("Image failed to load. Please check the URL.");
+};
+```
 
----
-
-**If you'd like, I can also generate additional policies—such as for upload restrictions or specific user-based access.**
+These techniques help manage images dynamically within a web application efficiently! Let me know if you need further clarification.
