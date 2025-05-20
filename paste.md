@@ -1,55 +1,49 @@
-To attach your own listener that executes *only* when the form is fully valid (i.e., all validation checks pass), you can modify your existing event listener logic. Specifically, you can add your custom callback **inside** the check where `form.checkValidity()` returns `true`, ensuring it only runs on valid submission.
+To attach your own listener that triggers *only* when all the Bootstrap form validations pass (i.e., the form is valid), you should:
+- Check for validity using `form.checkValidity()`.
+- If valid, call your custom logic or listener.
+- Prevent form submission when invalid.
 
-Here's a professional way to do that with Bootstrap forms:
+Here's a professional way to structure this, including attaching your custom callback:
 
-```javascript
-// Select all forms with class 'needs-validation'
+```js
 var forms = document.getElementsByClassName('needs-validation');
 
-// Loop over each form
-Array.prototype.forEach.call(forms, function(form) {
+Array.prototype.filter.call(forms, function(form) {
   form.addEventListener('submit', function(event) {
-    // Check if form is valid
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+      // Mark form as validated (Bootstrap styling)
+      form.classList.add('was-validated');
     } else {
-      // Form is valid - attach your custom logic here
-      // For example, call your custom listener function
+      // Form is valid, perform your custom logic
+      event.preventDefault(); // Optional: prevent default if you handle submission via JS
+      form.classList.add('was-validated');
+
+      // Call your custom listener/function
       onFormValid(form);
     }
-    // Add Bootstrap validation class
-    form.classList.add('was-validated');
   }, false);
 });
 
-// Your custom function to execute on valid form submission
+// Your custom validation success handler
 function onFormValid(form) {
-  // Place your custom logic here
-  // E.g., submit via AJAX, show success message, etc.
-  console.log('Form is valid! Do custom actions.');
-  // Example: Prevent default submission and do AJAX
-  // event.preventDefault();
+  // Example: console log or initiate AJAX submission
+  console.log('Form is valid! Triggering custom behavior.');
+
+  // Example AJAX submission (if needed)
   // submitFormViaAjax(form);
 }
 ```
 
----
+### Key points:
+- When the form checks as `checkValidity() === true`, the form is valid.
+- At this point, you invoke your custom listener or function (`onFormValid`).
+- Make sure `event.preventDefault()` is called if you are handling the submission via JavaScript (prevent the default submit behavior).
 
-### Explanation:
-- **Looping over forms**: Using `Array.prototype.forEach.call()` for a cleaner iteration over `HTMLCollection`.
-- **Form validation check**: Inside the `submit` event, if `form.checkValidity()` returns `true`, the form is fully valid.
-- **Trigger custom logic**: When valid, call your custom function `onFormValid(form)` which you can customize to fit your needs.
-- **Prevent submission on invalid**: Standard Bootstrap validation logic is preserved.
-- **Add class for validation styling**: `was-validated` provides visual feedback per Bootstrap guidelines.
+### Additional Tips:
+- You might also want to disable the native submit button once the form is valid, or handle the actual data submission via AJAX.
+- To improve code separation, you can encapsulate the validation logic and listener attachment in separate functions.
+- Remember to adjust for accessibility and progressive enhancement when manipulating form behaviors.
 
----
-
-### Note:
-- Depending on your needs, you might want to prevent the default submit event when the form is valid **and** submit via AJAX in your `onFormValid()` function to avoid full page reloads.
-- Ensure that your custom listener (`onFormValid`) can access the form element for further validation, data gathering, or submission.
-
-If you want this pattern to run **only once** per form or on specific events, consider using custom events or further conditionals.
-
----
-Boost your Bootstrap form handling with clean, professional validation and custom listeners—[learn how](https://pollinations.ai/redirect/1826593).
+Let me know if you'd like a more complex example involving AJAX, or form reset, etc.
