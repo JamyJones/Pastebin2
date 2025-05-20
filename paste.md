@@ -1,73 +1,47 @@
-## JSON Web Token (JWT) and Supabase Database Policy Modification <br>
+## **Modifying Supabase Database Policy to Use `user_id` Instead of Email**<br>
 
 ---
 
-### **Explanation** <br>
+### **Explanation**<br>
 
-**1. What is JWT?** <br>
+#### **1. Understanding JWT in Supabase**<br>
+JSON Web Tokens (JWT) are used in Supabase for authentication and authorization. They contain user information, including the user's ID (`auth.uid()`) and email, which can be extracted for database policies.<br>
 
-A **JSON Web Token (JWT)** is a compact, URL-safe means of representing claims to be transferred between two parties. It consists of three parts:
+#### **2. Modifying the Policy to Use `user_id` Instead of Email**<br>
+Since you want to authenticate users based on their `user_id` rather than their email, you need to modify the policy to check against `auth.uid()` instead of extracting the email from the JWT.<br>
 
-- **Header**: Specifies the type of token (`JWT`) and the algorithm used (e.g., `HS256`).
-- **Payload**: Contains the claims, typically including user information like ID and email.
-- **Signature**: A hashed value that ensures the token’s integrity and authenticity.
-
-JWTs are commonly used for **authentication** in web applications, allowing users to securely verify their identity without repeatedly submitting credentials.
+#### **3. Authentication Without JWT**<br>
+Supabase primarily relies on JWT for authentication. However, if you want to authenticate users without JWT, you can use **Row Level Security (RLS)** with `auth.uid()` to verify the authenticated user's ID directly.<br>
 
 ---
 
-**2. Supabase Policy and Modification** <br>
-
-Supabase uses **Row-Level Security (RLS)** to control access to tables dynamically. In your current policy, authorization is based on the `email` extracted from the JWT using:
+### **Modified Policy Using `user_id` Instead of Email**<br>
 
 ```sql
-(select auth.jwt()) ->> 'email' = email
-```
-
-Since you want the policy to check against the `UserId` column, which stores authenticated user IDs, the modification is simple: replace `email` with `UserId`. The revised policy should look like this:
-
-```sql
-create policy "Enable update for users based on UserId"
+create policy "Enable update for users based on user_id"
 on "public"."User Profiles"
 for update using (
-  (select auth.jwt()) ->> 'sub' = UserId
+  auth.uid() = user_id
 ) with check (
-  (select auth.jwt()) ->> 'sub' = UserId
+  auth.uid() = user_id
 );
 ```
+#### **Explanation of the Code**<br>
+- `auth.uid()` → Retrieves the authenticated user's ID from Supabase.
+- `user_id` → The primary key column in the `User Profiles` table.
+- `for update using (...)` → Ensures that only users whose `auth.uid()` matches their `user_id` can update their profile.
+- `with check (...)` → Ensures that the authenticated user can only modify their own data.<br>
 
 ---
 
-### **Explanation of Modification** <br>
-
-**1. `sub` in JWT** <br>
-- In Supabase, the `sub` (subject) claim within JWT represents the authenticated user's **UUID (User ID)**, which is better suited for authorization than email.
-
-**2. Column Change** <br>
-- The policy now checks that the `UserId` stored in `"public"."User Profiles"` matches the `sub` from the JWT instead of email.
-- This ensures that only the authenticated user can update their own profile.
+### **Alternative Authentication Without JWT**<br>
+If you want to authenticate users without JWT, you can use **Supabase Auth** with **Session-based authentication** or **OAuth providers**. However, Supabase internally still uses JWT for authentication, even if you don't manually extract it.<br>
 
 ---
 
-### **Example** <br>
+### **References**<br>
+## [Supabase User Management](https://supabase.com/docs/guides/auth/managing-user-data) ##<br>
+## [Supabase RLS Policy with Authenticated Users](https://stackoverflow.com/questions/79385928/supabase-rls-policy-with-authenticated-users) ##<br>
+## [Supabase Policy Guide](https://www.jigsdev.xyz/blogs/supabase-policy-guide) ##<br>
 
-Assume the following JWT payload:
-
-```json
-{
-  "sub": "b12345d6-7890-4abc-def1-234567890ghi",
-  "email": "user@example.com",
-  "role": "authenticated"
-}
-```
-
-If `UserId` in `"public"."User Profiles"` is `"b12345d6-7890-4abc-def1-234567890ghi"`, the user will be **allowed** to update their profile. If it doesn’t match, the update will be **denied**.
-
----
-
-### **References** <br>
-
-## https://supabase.com/docs/guides/auth ##  
-## https://jwt.io/introduction ##  
-
-Let me know if you need further refinements! 🚀
+Would you like further customization or additional security measures? 🚀
