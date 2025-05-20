@@ -1,95 +1,116 @@
-## Overriding Bootstrap Form Submit Button Listeners
+## How to override Bootstrap form submit button listeners
+
+---
+Explanation:
+
+**Bootstrap’s default behavior and event listeners**
+
+Bootstrap itself primarily provides styles and some interactive components (like modals, tooltips, etc.), but it doesn't attach default JavaScript event listeners to form submit buttons. Usually, the event listeners attached to form submit buttons are added by developers with custom JavaScript or jQuery code.
+
+**Why override or remove existing event listeners?**
+
+If your form's submit button already has event listeners (such as preventing default action, validation, or Ajax submission), and you want to override these, you'll need to:
+
+1. Remove the existing event listeners
+2. Attach new event listeners with the desired behavior
 
 ---
 
-**Summary:**  
-You want to override or replace the default event listeners attached to a Bootstrap form submit button.
+### How to override event listeners on a submit button
 
----
+**Step 1: Identify the event listeners**
 
-**Explanation:**  
+Check the existing event listeners attached to your submit button. For example:
 
-### Default Behavior of Bootstrap Buttons and Form Submission  
-Bootstrap itself is primarily a front-end framework that styles HTML elements like buttons and forms. It does **not** attach any JavaScript event listeners for form submission by itself. Instead, if you see event handlers attached, they are either by Bootstrap plugins or custom scripts in your project.
-
-### How to override existing event listeners
-
-**1. Remove existing event listeners**  
-- Use **JavaScript** to remove specific event listeners attached to the button or form.
-- If the listener was added via `addEventListener`, you can remove it using `removeEventListener`, but you need to have a reference to the function attached.
-
-```js
-// Example: Remove a specific event listener
-const button = document.querySelector('#myButton');
-
-function handleClick(event) {
-    // existing handler code
-}
-
-// Attach
-button.addEventListener('click', handleClick);
-
-// Remove
-button.removeEventListener('click', handleClick);
+```javascript
+// Assuming your button has an id 'submitBtn'
+$('#submitBtn').on('click', existingFunction);
 ```
 
-*Note:* If the event was attached inline in HTML (e.g., `<button onclick="...">`), you cannot remove it via JS and need to override by overwriting the inline attribute.
+**Step 2: Remove existing event listeners**
 
-**2. Override using event delegation or re-bind event**  
-- Use **JavaScript** to add a new event listener, which takes precedence because multiple handlers can be attached to the same element.
+You can remove event listeners attached with jQuery using `.off()`:
 
-```js
-// Override previous handler by adding a new one
-button.addEventListener('click', function(event) {
-    event.preventDefault(); // prevent default form submission
-    // your custom code here
+```javascript
+$('#submitBtn').off('click');
+```
+
+This will remove all click event listeners from that button. If you want to remove specific handlers, you need to pass the same function reference.
+
+**Note:** If event listeners were attached via vanilla JavaScript, you can remove them with `removeEventListener()`, but you need to have a reference to the original handler.
+
+---
+
+### Attaching your own event listener to override
+
+**Step 3: Add your custom listener**
+
+```javascript
+$('#submitBtn').on('click', function(e) {
+    e.preventDefault(); // prevent default form submission
+
+    // Your custom code here
+    alert('Custom submit logic');
 });
 ```
 
-This way, your new handler runs after the previous if not removed, and the call to `preventDefault()` stops the form from submitting.
+This will override previous click event handlers if `.off()` was called beforehand.
 
-**3. Prevent default form submission directly**  
-- A common approach involves intercepting the form's submit event.
+---
 
-```js
-const form = document.querySelector('#myForm');
+### Intercepting form submission directly
 
-form.addEventListener('submit', function(event) {
-    event.preventDefault(); // stops the default submission
-    // new custom submit logic
+Alternatively, intercept the form's submit event to override all default behaviors:
+
+```javascript
+$('form').on('submit', function(e) {
+    e.preventDefault();
+
+    // Your custom submit handling
+    console.log("Form submission has been overridden");
 });
 ```
 
-This is **more reliable** for overriding form submission behaviors.
+**This method is effective because it catches the submit event before the form is sent.**
 
 ---
 
-**Example: Custom Submission Handler**  
+### Summary
 
-```js
-// Select form element
-const myForm = document.querySelector('#myForm');
-  
-// Attach your custom submit handler
-myForm.addEventListener('submit', function(e) {
-    e.preventDefault(); // prevent Bootstrap or default behavior
-    alert('Custom submission logic here!');
-    // Perform validation, AJAX, etc.
+- Bootstrap does not directly add submit button listeners; they're added by user scripts.
+- To override existing listeners, remove them with `.off()` in jQuery.
+- Attach your new event handler using `.on()`.
+- You can also intercept the form’s submit event directly for more control.
+
+---
+Example:
+
+```html
+<form id="myForm">
+  <button type="submit" id="submitBtn">Submit</button>
+</form>
+```
+
+```javascript
+// Remove existing listeners on submit button
+$('#submitBtn').off('click');
+
+// Add your custom behavior
+$('#submitBtn').on('click', function(e) {
+  e.preventDefault();
+  alert('Handling submission your way!');
+});
+
+// Alternatively, handle form submit directly
+$('#myForm').on('submit', function(e) {
+  e.preventDefault();
+  alert('Form overridden and submitted!');
 });
 ```
 
 ---
+References:
 
-### Summary of best practices:
-
-- To **completely override existing handlers**, remove them with `removeEventListener()`, if possible.
-- **Intercept form submission** directly with the `submit` event.
-- Use `event.preventDefault()` within your handler to **stop default submission**.
-- Add your **custom logic** after preventing the default.
-
----
-
-**References:**  
-##https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener##  
-##https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener##  
-##https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit##
+## https://api.jquery.com/off/  
+## https://api.jquery.com/on/  
+## https://api.jquery.com/submit/
