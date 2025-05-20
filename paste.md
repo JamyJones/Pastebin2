@@ -1,86 +1,89 @@
-Certainly! Here's a professional CSS animation class that you can add to a button to give it a sleek, attention-grabbing effect during form submission.
+Certainly! Here's a professional CSS animation class you can add to a button used for submitting a form. This example uses a subtle "loading" or "processing" animation to indicate that the form submission is in progress.
 
-### Example: Button Submission Loading Animation
-
-This example creates a pulsating effect to indicate the form is being submitted.
+### Example: Submit Button with Loading Animation
 
 ```css
-/* Define keyframes for the pulsating effect */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Animation class for the button */
-.btn-submit-loading {
+/* Base button styles (optional) */
+.btn-submit {
+  padding: 0.75em 1.5em;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   position: relative;
-  overflow: hidden;
-  cursor: not-allowed; /* Change cursor to indicate disabled state */
-  animation: pulse 1s infinite; /* Apply pulsate animation infinitely */
-  opacity: 0.8; /* Slightly reduce opacity for disabled aesthetic */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
 }
 
-/* Optional: Add a spinner inside the button for better UX */
-.btn-submit-loading::after {
-  content: "";
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-left: 8px;
-  border: 2px solid #fff;
-  border-top-color: transparent;
-  border-radius: 50%;
-  vertical-align: middle;
-  animation: spin 0.8s linear infinite;
+/* Hover state */
+.btn-submit:hover {
+  background-color: #0069d9;
 }
 
-/* Define spin keyframes for spinner */
+/* Animation for loading indicator */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Loader styles */
+.btn-submit.loading {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Adding a spinner inside the button during loading */
+.btn-submit.loading::after {
+  content: "";
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  animation: spin 1s linear infinite;
 }
 ```
 
-### Usage:
+### Usage in HTML and JavaScript:
 
 ```html
-<button id="submitBtn" class="btn">Submit</button>
+<button type="submit" class="btn-submit" id="submitBtn">Submit</button>
+
+<script>
+  const form = document.querySelector('form'); // assuming you have a form
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Add loading class
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
+    // Simulate form submission process
+    setTimeout(() => {
+      // Remove loading state after process (e.g., after AJAX call)
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+
+      // Optionally, submit form
+      // form.submit();
+    }, 3000); // simulate 3 seconds delay
+  });
+</script>
 ```
 
-### JavaScript to toggle the loading class:
-
-```js
-const button = document.getElementById('submitBtn');
-
-button.addEventListener('click', () => {
-  // Add loading class when submitting the form
-  button.classList.add('btn-submit-loading');
-
-  // Simulate async submission (replace with your actual form submission logic)
-  setTimeout(() => {
-    // Remove loading class after submission completes
-    button.classList.remove('btn-submit-loading');
-  }, 3000); // 3 seconds delay
-});
-```
+---
 
 ### Summary:
-- The `.btn-submit-loading` class applies a pulsating animation.
-- An optional spinner is added via `::after` pseudo-element to improve UX.
-- The class can be toggled during form submission to provide visual feedback.
+- The `.btn-submit` class styles the button.
+- The `.loading` class adds a spinner next to the button text using a pseudo-element `::after`.
+- The spinner uses CSS animations (`@keyframes spin`) for rotation.
+- JavaScript toggles the class on form submission to indicate the loading state.
 
-Feel free to customize the colors, animation duration, or add other animations as needed!
+This approach provides a clean, responsive, and professional user experience during form submission.
