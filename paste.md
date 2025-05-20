@@ -1,45 +1,60 @@
-## Modify Supabase Policy to Check UserId Instead of Email <br>
+## updating Supabase Policy to use UserId instead of email
+
+--- 
+
+**Summary:**  
+This guide shows how to modify a Supabase row-level security (RLS) policy to verify the user's identity using the `UserId` column (containing user IDs) instead of email, for the `public.User Profiles` table.
+
 ---
-### **Explanation** <br>
 
-#### **Understanding the Existing Policy**
-- The original policy checks whether the authenticated user's email (`auth.jwt() ->> 'email'`) matches the `email` column in the `User Profiles` table.
-- The `auth.jwt()` function retrieves the JSON Web Token (JWT) of the currently authenticated user, allowing access to the user's claims.
+**Explanation:**
 
-#### **Modifying the Policy to Check Using `UserId`**
-- Instead of checking the email, we need to ensure that the authenticated user's `UserId` matches the `UserId` column in the table.
-- The `UserId` is stored as a claim in the JWT and is also the primary key of the `User Profiles` table.
+**Original Policy Purpose:**  
+The existing policy verifies that the email in the JWT token matches the email in the row for update permission. It performs this for both `using` (permission check) and `with check` (validation on update).
 
-#### **Updated Policy**
+---
+
+**Step-by-step Modification:**
+
+- **Identify the JWT claim:**  
+  The JWT payload contains various claims. Right now, the policy extracts `'email'` with `(select auth.jwt()) ->> 'email'`.
+
+- **Replace email verification with UserId:**  
+  The primary key `UserId` (which is also the unique user ID) should be used for verification.  
+  Assuming your JWT contains `'sub'` (subject), which in Supabase by default is the user's UUID, or `'UserId'`, depending on how your JWT is configured.
+
+- **Assuming JWT contains `'sub'` claim:**  
+  The default claim for user identity in Supabase is `'sub'`. It typically contains the UUID of the user.
+
+- **Modified policy snippet:**  
+  Replace all `'email'` references with `'sub'`, and compare it with `UserId` column.
+
+---
+
+**Modified Policy Code:**
+
 ```sql
 create policy "Enable update for users based on UserId"
 on "public"."User Profiles"
 for update using (
-  (select auth.jwt()) ->> 'UserId' = "UserId"
-) with check (
-  (select auth.jwt()) ->> 'UserId' = "UserId"
+  (select auth.jwt()) ->> 'sub' = UserId
+)
+with check (
+  (select auth.jwt()) ->> 'sub' = UserId
 );
 ```
 
-#### **Breakdown of Changes**
-- Replaced `(select auth.jwt()) ->> 'email' = email` with `(select auth.jwt()) ->> 'UserId' = "UserId"` to compare the `UserId`.
-- This ensures that only users whose `UserId` matches the row's primary key can update that row.
+- **Explanation of the changes:**  
+  - The policy title is updated for clarity.
+  - `(select auth.jwt()) ->> 'sub'` extracts the user's UUID from the JWT token.
+  - The comparison checks whether this UUID matches the `UserId` column in the row, which is the primary key and should be the same as the JWT `'sub'`.
 
 ---
-### **Example Scenario**
-Imagine a row in `User Profiles`:
-```sql
-UserId | Name    | Email
------- | ------ | ------------
-123    | Alice  | alice@email.com
-456    | Bob    | bob@email.com
-```
-- If Alice logs in and her JWT contains `"UserId": "123"`, she can update her profile, but **not** Bob's.
-- If Bob logs in and his JWT contains `"UserId": "456"`, he can update his own profile.
+
+**Note:**  
+Ensure that in your database, `UserId` is stored as text compatible with the `'sub'` claim (usually UUID strings). If `UserId` is stored differently, adjust accordingly.
 
 ---
-### **References** <br>
-## https://supabase.com/docs/guides/auth/jwt ##  
-## https://supabase.com/docs/guides/database/policies ##  
 
-Would you like me to refine this further or clarify any part?
+**References:**  
+##https://supabase.com/docs/guides/auth/auth-rows-and-roles##
