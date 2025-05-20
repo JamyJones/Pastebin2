@@ -1,60 +1,56 @@
-## updating Supabase Policy to use UserId instead of email
+## Modify Supabase Policy to Check User ID <br>
+---
 
---- 
-
-**Summary:**  
-This guide shows how to modify a Supabase row-level security (RLS) policy to verify the user's identity using the `UserId` column (containing user IDs) instead of email, for the `public.User Profiles` table.
+### Explanation: <br>
+In Supabase, Row-Level Security (RLS) policies use PostgreSQL functions to determine access control. The original policy checks the authenticated user's email from the JWT (`auth.jwt()`) and compares it to the email column in the `User Profiles` table. To modify this policy to check against the `UserId` column (which is the primary key), we need to extract the `user_id` from the JWT token instead.
 
 ---
 
-**Explanation:**
-
-**Original Policy Purpose:**  
-The existing policy verifies that the email in the JWT token matches the email in the row for update permission. It performs this for both `using` (permission check) and `with check` (validation on update).
-
----
-
-**Step-by-step Modification:**
-
-- **Identify the JWT claim:**  
-  The JWT payload contains various claims. Right now, the policy extracts `'email'` with `(select auth.jwt()) ->> 'email'`.
-
-- **Replace email verification with UserId:**  
-  The primary key `UserId` (which is also the unique user ID) should be used for verification.  
-  Assuming your JWT contains `'sub'` (subject), which in Supabase by default is the user's UUID, or `'UserId'`, depending on how your JWT is configured.
-
-- **Assuming JWT contains `'sub'` claim:**  
-  The default claim for user identity in Supabase is `'sub'`. It typically contains the UUID of the user.
-
-- **Modified policy snippet:**  
-  Replace all `'email'` references with `'sub'`, and compare it with `UserId` column.
-
----
-
-**Modified Policy Code:**
+### Updated Policy:<br>
+Here’s how to modify the policy to check against the `UserId` column instead of the email:
 
 ```sql
 create policy "Enable update for users based on UserId"
 on "public"."User Profiles"
 for update using (
   (select auth.jwt()) ->> 'sub' = UserId
-)
-with check (
+) with check (
   (select auth.jwt()) ->> 'sub' = UserId
 );
 ```
 
-- **Explanation of the changes:**  
-  - The policy title is updated for clarity.
-  - `(select auth.jwt()) ->> 'sub'` extracts the user's UUID from the JWT token.
-  - The comparison checks whether this UUID matches the `UserId` column in the row, which is the primary key and should be the same as the JWT `'sub'`.
+---
+
+### Explanation of Changes:<br>
+
+1. **Extracting `UserId` from JWT:**  
+   - The `auth.jwt()` function retrieves the user's authentication token.  
+   - The `->>` operator extracts a specific field from the JSON object.  
+   - In Supabase, the authenticated user's ID is stored in the `sub` field of the JWT.  
+   - Instead of checking the `'email'` field, we now extract `'sub'` (subject) to match the `UserId`.  
+
+2. **Matching Against `UserId`:**  
+   - The `UserId` column in the `User Profiles` table holds the user's unique ID.  
+   - We ensure that only rows where the authenticated user's ID matches this column can be updated.  
+
+3. **Applying `with check` Condition:**  
+   - Ensures users can only update rows where their own `UserId` matches the row in the database.  
+   - Prevents unauthorized changes by other users.  
 
 ---
 
-**Note:**  
-Ensure that in your database, `UserId` is stored as text compatible with the `'sub'` claim (usually UUID strings). If `UserId` is stored differently, adjust accordingly.
+### Example Scenario:<br>
+- If a user is authenticated with Supabase and their `user_id` is `"1234"`, then:
+  - The JWT contains `{ "sub": "1234" }`
+  - The policy will allow updates only on rows where `UserId = '1234'`.  
+  - Users cannot modify profiles that don’t match their authenticated ID.
 
 ---
 
-**References:**  
-##https://supabase.com/docs/guides/auth/auth-rows-and-roles##
+### References:  
+## [https://supabase.com/docs/guides/auth/auth-helpers](https://supabase.com/docs/guides/auth/auth-helpers) ##  
+## [https://supabase.com/docs/guides/auth/jwt](https://supabase.com/docs/guides/auth/jwt) ##  
+## [https://supabase.com/docs/guides/database/security](https://supabase.com/docs/guides/database/security) ##  
+---
+
+This ensures a proper authentication-based access control using `UserId`. 🚀 Let me know if you need more details or adjustments!
