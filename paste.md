@@ -1,47 +1,50 @@
-## **Modifying Supabase Database Policy to Use `user_id` Instead of Email**<br>
+## JSON Web Token (JWT) and Supabase Authentication Policy Modification
 
 ---
 
-### **Explanation**<br>
+### Explanation
 
-#### **1. Understanding JWT in Supabase**<br>
-JSON Web Tokens (JWT) are used in Supabase for authentication and authorization. They contain user information, including the user's ID (`auth.uid()`) and email, which can be extracted for database policies.<br>
-
-#### **2. Modifying the Policy to Use `user_id` Instead of Email**<br>
-Since you want to authenticate users based on their `user_id` rather than their email, you need to modify the policy to check against `auth.uid()` instead of extracting the email from the JWT.<br>
-
-#### **3. Authentication Without JWT**<br>
-Supabase primarily relies on JWT for authentication. However, if you want to authenticate users without JWT, you can use **Row Level Security (RLS)** with `auth.uid()` to verify the authenticated user's ID directly.<br>
+#### 1. What is JWT?
+JWT (JSON Web Token) is a compact, URL-safe means of representing claims between two parties. It is commonly used for authentication and authorization in web applications. Supabase uses JWT to authenticate users and manage access control.
 
 ---
 
-### **Modified Policy Using `user_id` Instead of Email**<br>
+#### 2. Modifying Supabase Policy to Use `user_id`
+Instead of checking authentication via email, you can modify the policy to verify users based on their `user_id`, which is the primary key in your database.
+
+Here’s the modified policy:
 
 ```sql
 create policy "Enable update for users based on user_id"
 on "public"."User Profiles"
 for update using (
-  auth.uid() = user_id
+  (select auth.uid()) = user_id
 ) with check (
-  auth.uid() = user_id
+  (select auth.uid()) = user_id
 );
 ```
-#### **Explanation of the Code**<br>
-- `auth.uid()` → Retrieves the authenticated user's ID from Supabase.
-- `user_id` → The primary key column in the `User Profiles` table.
-- `for update using (...)` → Ensures that only users whose `auth.uid()` matches their `user_id` can update their profile.
-- `with check (...)` → Ensures that the authenticated user can only modify their own data.<br>
+
+**Explanation of Changes:**
+- `auth.uid()` returns the authenticated user's unique identifier (`user_id`).
+- The policy ensures that only the authenticated user can update their own profile.
 
 ---
 
-### **Alternative Authentication Without JWT**<br>
-If you want to authenticate users without JWT, you can use **Supabase Auth** with **Session-based authentication** or **OAuth providers**. However, Supabase internally still uses JWT for authentication, even if you don't manually extract it.<br>
+#### 3. Authenticating Without JWT
+Supabase primarily relies on JWT for authentication. However, if you want to authenticate users without JWT, you may need to:
+- Use **Row Level Security (RLS)** with `auth.uid()` for direct user verification.
+- Implement **third-party authentication providers** (OAuth, Magic Links, etc.).
+- Use **database triggers** to manage user access without relying on JWT.
 
 ---
 
-### **References**<br>
-## [Supabase User Management](https://supabase.com/docs/guides/auth/managing-user-data) ##<br>
-## [Supabase RLS Policy with Authenticated Users](https://stackoverflow.com/questions/79385928/supabase-rls-policy-with-authenticated-users) ##<br>
-## [Supabase Policy Guide](https://www.jigsdev.xyz/blogs/supabase-policy-guide) ##<br>
+### Example
+If a user with `user_id = '1234-5678'` is authenticated, the policy ensures that only this user can update their profile.
 
-Would you like further customization or additional security measures? 🚀
+---
+
+### References
+## https://supabase.com/docs/guides/auth/managing-user-data ##
+## https://stackoverflow.com/questions/79385928/supabase-rls-policy-with-authenticated-users ##
+
+Would you like further customization or additional details? 🚀
