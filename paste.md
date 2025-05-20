@@ -1,43 +1,39 @@
-Certainly! Since you're using Bootstrap, you can enhance the submit button's interaction by adding a simple CSS animation. Below is a CSS animation that creates a subtle scaling effect when the button is clicked:
+Certainly! Below is a professional CSS animation class that smoothly animates a button when hovered over. This class can be applied to your Bootstrap-based form submission button.
 
 ```css
-@keyframes buttonPress {
+/* Define the animation */
+@keyframes pulse {
   0% {
     transform: scale(1);
   }
   50% {
-    transform: scale(0.95);
+    transform: scale(1.05);
   }
   100% {
     transform: scale(1);
   }
 }
 
-.submit-btn {
-  animation: buttonPress 0.3s ease-in-out;
+/* Apply animation to the button */
+.btn-animate {
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-animate:hover {
+  animation: pulse 0.6s infinite;
 }
 ```
 
-### How to Use It:
-1. Add the `submit-btn` class to your button element.
-2. Use Bootstrap's built-in classes for styling and responsiveness.
-
-Here's an example of how your button might look:
+### How to Use:
+Add the `btn-animate` class alongside your Bootstrap button class (e.g., `btn-primary` or `btn-success`) in your HTML:
 
 ```html
-<button type="submit" class="btn btn-primary submit-btn">Submit</button>
+<button type="submit" class="btn btn-primary btn-animate">Submit</button>
 ```
 
 ### Explanation:
-- The `@keyframes buttonPress` animation scales the button slightly smaller when clicked and then returns it to its original size.
-- The animation runs for `0.3s` with an `ease-in-out` transition to give it a smooth effect.
+- The `@keyframes` rule defines a smooth "pulse" animation that enlarges the button slightly when hovered.
+- The `.btn-animate` class ensures smooth transition effects for the hover state.
+- The animation runs infinitely while the button is hovered, creating an eye-catching effect.
 
-If you want the animation to trigger only when clicked, consider adding it dynamically using JavaScript:
-
-```js
-document.querySelector(".submit-btn").addEventListener("click", function () {
-  this.style.animation = "buttonPress 0.3s ease-in-out";
-});
-```
-
-Would you like to refine the animation further or add additional effects?
+Let me know if you need modifications!
