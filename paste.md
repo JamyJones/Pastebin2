@@ -1,64 +1,27 @@
-Your SQL policy syntax appears close to the style used in PostgreSQL Row Level Security (RLS) policies, but there are some issues to address:
+Your SQL policy syntax has a few issues that should be addressed to ensure correctness:
 
-1. **Policy Context:**  
-   - The syntax for creating a policy in PostgreSQL RLS requires `CREATE POLICY` with a specific classification of `FOR` (e.g., `SELECT`, `INSERT`, `UPDATE`, `DELETE`, or `USING/WITH CHECK` expressions).  
-   - For UPSERT (i.e., insert or update), you generally need to create policies for both `UPDATE` and `INSERT`. PostgreSQL does not have an explicit `UPSERT` policy, but it allows defining policies that govern both operations.
+1. **The `{USING | WITH CHECK}` clause isn't valid SQL syntax**—you likely meant to use either `USING` or `WITH CHECK` rather than both.
+2. **Authorization checks:** `auth.uid()` is a Supabase function that returns the authenticated user's ID. However, `(select auth.uid()::text) = auth.user.id` is redundant and likely incorrect.
+3. **String concatenation:** Instead of `auth.uid()::text + '/profile.jpg'`, you should use `auth.uid() || '/profile.jpg'`, as `||` is the correct operator for string concatenation in PostgreSQL.
+4. **`WITH CHECK` Clause Misuse:** If you want to restrict inserts, use `WITH CHECK`, and for updates, use `USING`. They perform different validations.
 
-2. **Placement of `USING` and `WITH CHECK`:**  
-   - In PostgreSQL, each policy can specify both `USING` (which filters rows for update/delete/select) and `WITH CHECK` (which verifies data validity during insert/update).  
-   - When creating a policy that governs `INSERT` and `UPDATE`, you set criteria appropriate for both.
-
-3. **Current syntax issues:**  
-   - `CREATE POLICY` statement requires specifying the targeted table/view.  
-   - The clause `FOR UPSERT` is invalid; instead, you should create separate policies for `INSERT` and `UPDATE`, or create one with `FOR ALL` and specify rules accordingly.  
-   - The code snippet provided is a bit ambiguous in how it applies to UPSERT.
-
----
-
-### Corrected Example for PostgreSQL RLS Policies
-
-Assuming you want to allow authenticated users to only insert or update their own profile picture in `storage.objects`, the policy might look like this:
-
+### Corrected SQL Policy
 ```sql
--- Enable row-level security on the table if not already enabled
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- Policy for INSERT operations
-CREATE POLICY "Allow insert for profile pictures"
+CREATE POLICY "Give user update and insert permission"
 ON storage.objects
-FOR INSERT
-WHEN (
-    bucket_id = 'profile-pictures'
-    AND name = auth.uid()::text || '/profile.jpg'
-    AND auth.uid()::text = auth.user.id
-)
-TO authenticated_users;
-
--- Policy for UPDATE operations
-CREATE POLICY "Allow update for profile pictures"
-ON storage.objects
-FOR UPDATE
+FOR UPSERT 
 USING (
     bucket_id = 'profile-pictures'
-    AND name = auth.uid()::text || '/profile.jpg'
-    AND auth.uid()::text = auth.user.id
+    AND name = auth.uid() || '/profile.jpg'
 )
-TO authenticated_users;
+WITH CHECK (
+    bucket_id = 'profile-pictures'
+    AND name = auth.uid() || '/profile.jpg'
+);
 ```
 
-### Notes:
-- Replace `auth.uid()` and `auth.user.id` with your actual authentication context.
-- Joining multiple policies allows precise control: one for `INSERT` and another for `UPDATE`.
-- Use `USING` for controlling read/deletion permissions; use `WITH CHECK` for insert/update validation. If needed, include `WITH CHECK` as well.
+### Explanation
+- The `USING` clause ensures that only authenticated users can update records where their `auth.uid()` matches the `name` format.
+- The `WITH CHECK` clause ensures that only records meeting this condition can be inserted.
 
----
-
-### Summary:
-- PostgreSQL policies are associated with tables or views.
-- Policies specify `FOR INSERT`, `FOR UPDATE`, etc.
-- Use `USING` for row filtering (read, delete, update), and `WITH CHECK` for validation during insert/update.
-- `UPSERT` is handled via separate policies for `INSERT` and `UPDATE`.
-
----
-
-Let me know if you want the full combined policy or if you’re using a specific SQL dialect or extension (e.g., Supabase policies).
+This should work properly in Supabase's row-level security (RLS) model. Make sure to test it with actual user authentication in place! 🚀
