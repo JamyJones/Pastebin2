@@ -1,125 +1,64 @@
-## Customizing Bootstrap Form Submit Button Event Listeners
+## How to override Bootstrap form submit button listeners<br>
+---<br>
+Explanation: When you use Bootstrap, it often relies on JavaScript for certain behaviors, and form submit buttons may have default event listeners attached, especially if you're using Bootstrap's JavaScript components or plugins. Overriding or adding your own listeners requires understanding how event propagation works in JavaScript, as well as managing event listeners properly to prevent conflicts or multiple triggers.<br>
 
----
+---<br>
+**Standard Approach to Override Bootstrap Button Listeners**<br>
 
-**Explanation:**
+### 1. Remove Existing Event Listeners<br>
+- First, identify if the existing listeners are attached via JavaScript that you have access to or through Bootstrap's internal scripts.<br>
+- Use JavaScript's `removeEventListener()` method to detach specific event handlers if you have references to those functions.<br>
+- If you do not have direct references, you can clear event listeners by replacing the button's `onclick` attribute or resetting event bindings.<br>
+- Alternatively, **use event delegation** with event `.stopImmediatePropagation()` to prevent other handlers from firing.<br>
 
-**Using JavaScript or jQuery to override default event listeners of a Bootstrap form submit button**.
-
----
-
-### Understanding the Context
-
-- Bootstrap **does not** add intrinsic event listeners to form submit buttons.
-- Typically, **event listeners** are attached **by your JavaScript code** or by third-party libraries.
-- If you want to override or remove existing listeners, you need to understand what is attaching them.
-
-### How to override event listeners
-
----
-
-### Removing existing event listeners
-
-- **Use the `removeEventListener` method** if the listener was added via JavaScript.
-  - Example:
-
-```js
-const button = document.getElementById('submitBtn');
-button.removeEventListener('click', originalHandler);
-```
-
-- **Note**: To successfully remove, you must reference the **same function** used during attaching.
-
----
-
-### Overriding or adding new event listeners
-
-- To **add your own** event handler **that overrides existing behavior**:
-
-```js
-// Select the button
-const submitBtn = document.querySelector('#submitBtn');
-
-// Remove existing listeners if possible
-// (If they were added via JavaScript and accessible)
-
-// Attach your own event listener
+### 2. Adding Your Custom Event Listener<br>
+- Use `addEventListener()` to attach your own listener to the button.<br>
+- Example: <br>
+```javascript
+const submitBtn = document.querySelector('#yourButtonId');
 submitBtn.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default submission if needed
-    // Your custom code here
+  event.preventDefault(); // prevent default form submission
+  // Your custom code here
 });
 ```
 
----
+### 3. Prevent Default Bootstrap Behavior<br>
+- Use `event.preventDefault()` in your handler if you want to stop Bootstrap or other scripts from performing their default submission action.<br>
+- Make sure your script runs **after** Bootstrap's scripts load.<br>
 
-### Using **jQuery** (common with Bootstrap projects)
-
-```js
-$('#submitBtn').off('click'); // Remove all previous click handlers
-$('#submitBtn').on('click', function(e) {
-    e.preventDefault(); // Prevent form from submitting
-    // Your custom code
+### 4. Use Event Delegation for Dynamic Elements<br>
+- If buttons are added dynamically, attach listeners to a parent element to control all child buttons.<br>
+```javascript
+document.querySelector('#parentElement').addEventListener('click', function(e){
+    if(e.target && e.target.matches('button#yourButtonId')){
+        e.preventDefault();
+        // Your override code
+    }
 });
 ```
 
-- `.off()` removes previous handlers
-- `.on()` attaches **new** event handler
-
----
-
-### Important notes:
-
-- **Ensure** your script runs **after** the event listeners are attached.
-- Place your script **after** the button HTML, or inside a DOMContentLoaded event.
-  
----
-
-### Example:
-
-Suppose your HTML:
-
+---<br>
+**Example**: Overriding Bootstrap button listener<br>
 ```html
 <form id="myForm">
-  <button type="submit" id="submitBtn" class="btn btn-primary">Submit</button>
+  <button type="submit" id="customBtn" class="btn btn-primary">Submit</button>
 </form>
+<script>
+  // Remove default or existing Bootstrap listeners (if accessible)
+  const button = document.getElementById('customBtn');
+
+  // Remove all existing event listeners (if any were attached via addEventListener)
+  // Note: JavaScript doesn't provide a way to remove anonymous handlers; you must keep references
+  // For this case, override by adding a new listener
+  button.addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent existing submission
+    // Your custom code
+    alert('Custom submit logic');
+  });
+</script>
 ```
 
-Your script:
-
-```js
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('submitBtn');
-
-    // Remove all existing click event listeners
-    btn.replaceWith(btn.cloneNode(true));
-    const newBtn = document.getElementById('submitBtn'); // Clone removes listeners
-
-    // Add your custom event
-    newBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Custom submit handler');
-        // Additional logic
-    });
-});
-```
-
-### Why clone node?
-- When you clone an element with `.cloneNode(true)`, all attached event listeners are **removed**.
-- Replacing the original with the clone effectively **resets** event listeners.
-
----
-
-**Summary:**
-
-- Bootstrap doesn't add event listeners to submit buttons by default.
-- To override existing listeners, **remove or replace** them using JavaScript/jQuery.
-- Use `.removeEventListener()`, `.off()`, or clone the button to clear event handlers.
-- Attach your own handlers with `.addEventListener()` or `.on()`.
-
----
-
-**References:**
-
-## https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
-## https://api.jquery.com/off/
-## https://api.jquery.com/on/
+---<br>
+**References**:## 
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Events#Event_listeners
+- https://getbootstrap.com/docs/5.0/getting-started/javascript/#event-handling
