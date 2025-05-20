@@ -1,4 +1,4 @@
-Sure! You can modify your policy to check against the `UserId` column instead of `email`. Here’s the updated version:
+Sure! Here's the modified policy that checks the `"UserId"` column instead of email:
 
 ```sql
 create policy "Enable update for users based on UserId"
@@ -10,6 +10,8 @@ for update using (
 );
 ```
 
-In Supabase, the `sub` (subject) field in the JWT typically holds the user's unique identifier. By replacing `email` with `UserId` and using `sub`, you ensure the policy verifies the authenticated user’s ID correctly.
+In Supabase, `auth.jwt()` returns the JWT of the authenticated user. Instead of `'email'`, I used `'sub'`, which typically represents the user's unique identifier (User ID) in the JWT.
 
-Let me know if you need further adjustments!
+Make sure that `"UserId"` in the `"public"."User Profiles"` table correctly stores the unique identifier for each authenticated user. If needed, you can verify the claims in the JWT structure via [Supabase documentation](https://supabase.com/docs).
+
+Let me know if you need further refinements!
