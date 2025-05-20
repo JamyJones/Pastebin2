@@ -1,69 +1,73 @@
-## Summary
-**Understanding JWT and modifying Supabase database policy to use UserId for authentication checks**
+## JSON Web Token (JWT) and Supabase Database Policy Modification <br>
 
 ---
 
-### What is JWT?
+### **Explanation** <br>
 
-**JWT (JSON Web Token)** is a compact, URL-safe means of representing claims between two parties. It is widely used for authentication and authorization purposes in modern web applications:
+**1. What is JWT?** <br>
 
-- Composed of **three parts**: Header, Payload, and Signature
-- **Header** specifies the token type and signing algorithm
-- **Payload** contains the claims, such as user identity and permissions
-- **Signature** ensures the token's integrity, created using the header and payload with a secret or private key
+A **JSON Web Token (JWT)** is a compact, URL-safe means of representing claims to be transferred between two parties. It consists of three parts:
 
-**JWTs** are issued by an authentication server after login and can be passed with each request, allowing stateless verification of user identity.
+- **Header**: Specifies the type of token (`JWT`) and the algorithm used (e.g., `HS256`).
+- **Payload**: Contains the claims, typically including user information like ID and email.
+- **Signature**: A hashed value that ensures the token’s integrity and authenticity.
+
+JWTs are commonly used for **authentication** in web applications, allowing users to securely verify their identity without repeatedly submitting credentials.
 
 ---
 
-### Modifying Supabase Policy to use UserId Instead of Email
+**2. Supabase Policy and Modification** <br>
 
-Supabase policies use PostgreSQL functions like `auth.jwt()` to extract information from the JWT token. Your current policy checks the email:
+Supabase uses **Row-Level Security (RLS)** to control access to tables dynamically. In your current policy, authorization is based on the `email` extracted from the JWT using:
 
 ```sql
-select auth.jwt() ->> 'email'
+(select auth.jwt()) ->> 'email' = email
 ```
 
-You want to **modify it to use "UserId"** (which is the primary key), assuming the JWT contains a claim like `"sub"` or `"UserId"` representing the user identity. Typically, in JWT standards:
-
-- The claim `"sub"` (subject) is used to store the user ID or principal
-- Alternatively, custom claims can be added and checked
-
----
-
-### Revised Policy Using "UserId"
-
-Assuming the JWT contains a claim `"sub"` with the user ID matching `UserId`, the policy should be:
+Since you want the policy to check against the `UserId` column, which stores authenticated user IDs, the modification is simple: replace `email` with `UserId`. The revised policy should look like this:
 
 ```sql
 create policy "Enable update for users based on UserId"
 on "public"."User Profiles"
-for update
-using (
+for update using (
   (select auth.jwt()) ->> 'sub' = UserId
-)
-with check (
+) with check (
   (select auth.jwt()) ->> 'sub' = UserId
 );
 ```
 
 ---
 
-### Explanation:
+### **Explanation of Modification** <br>
 
-- **Policy Name**: Changed to reflect usage of UserId.
-- **`using`**: Allows the update if the `sub` claim matches the `UserId` in the table.
-- **`with check`**: Ensures the user can only update their own profile.
+**1. `sub` in JWT** <br>
+- In Supabase, the `sub` (subject) claim within JWT represents the authenticated user's **UUID (User ID)**, which is better suited for authorization than email.
 
----
-
-### Important Notes:
-- Make sure **`auth.jwt()`** is correctly configured and includes the **`sub`** claim.
-- If your JWT uses a different claim like `"UserId"` directly instead of `"sub"`, replace `'sub'` with `'UserId'`.
-- Confirm the JWT payload contains the necessary claim by decoding your token or inspecting it in your auth setup.
+**2. Column Change** <br>
+- The policy now checks that the `UserId` stored in `"public"."User Profiles"` matches the `sub` from the JWT instead of email.
+- This ensures that only the authenticated user can update their own profile.
 
 ---
 
-### References:
-##https://supabase.com/docs/auth/auth-helpers/postgrest#policies-and-permissions  
-##https://datatracker.ietf.org/doc/html/rfc7519 (JWT Standard Claims)
+### **Example** <br>
+
+Assume the following JWT payload:
+
+```json
+{
+  "sub": "b12345d6-7890-4abc-def1-234567890ghi",
+  "email": "user@example.com",
+  "role": "authenticated"
+}
+```
+
+If `UserId` in `"public"."User Profiles"` is `"b12345d6-7890-4abc-def1-234567890ghi"`, the user will be **allowed** to update their profile. If it doesn’t match, the update will be **denied**.
+
+---
+
+### **References** <br>
+
+## https://supabase.com/docs/guides/auth ##  
+## https://jwt.io/introduction ##  
+
+Let me know if you need further refinements! 🚀
