@@ -1,35 +1,68 @@
-Your SQL policy syntax contains a few issues that need revision to work properly. Let’s go through some improvements:
+The error you're encountering:
 
-### Issues & Fixes:
-1. **`USING` vs `WITH CHECK` Clause**
-   - The `{USING | WITH CHECK}` syntax is incorrect—it’s likely a placeholder you need to replace with either `USING` or `WITH CHECK`. 
-   - `USING`: Controls row-level filtering for `SELECT`, `UPDATE`, and `DELETE`.
-   - `WITH CHECK`: Controls row-level filtering for `INSERT`.
+```
+ERROR: 42601: syntax error at or near "UPSERT"
+LINE 3: FOR UPSERT
+            ^
+```
 
-2. **Incorrect Expression for `auth.uid()`**
-   - `auth.uid()` already returns the authenticated user's UID as a `text` type in Supabase. Explicitly casting it (`::text`) is redundant.
-   - The condition `(select auth.uid()::text) = auth.user.id` is problematic and doesn’t work as expected.
+indicates that the `FOR UPSERT` clause in your policy definition is invalid in PostgreSQL, which is what Supabase uses under the hood.
 
-### Suggested Corrected SQL:
+### Correct Policy Syntax
+
+PostgreSQL policy syntax supports the following `FOR` options:
+
+- `ALL` — for all operations (SELECT, INSERT, UPDATE, DELETE)
+- `SELECT` — for SELECT statements
+- `INSERT` — for inserts
+- `UPDATE` — for updates
+- `DELETE` — for delete statements
+
+**Note:** There is no `UPSERT` operation explicitly; `UPSERT` (or `INSERT ... ON CONFLICT`) combines insert and update but in policies, you only specify `INSERT`, `UPDATE`, etc.
+
+### Solution
+
+If your intent is to allow both insertions and updates — i.e., upsert behavior — you need to set policies for both `INSERT` and `UPDATE`. 
+
+Here's what your policy should look like:
+
 ```sql
 CREATE POLICY "Give user update and insert permission"
-ON storage.objects 
-FOR UPSERT 
+ON storage.objects
+FOR ALL  -- covers INSERT, UPDATE, DELETE, and SELECT if needed
 USING (
-    bucket_id = 'profile-pictures' 
+    bucket_id = 'profile-pictures'
     AND name = auth.uid() || '/profile.jpg'
 )
 WITH CHECK (
-    bucket_id = 'profile-pictures' 
+    bucket_id = 'profile-pictures'
     AND name = auth.uid() || '/profile.jpg'
 );
 ```
 
-### Explanation:
-- I replaced `{USING | WITH CHECK}` with **separate `USING` and `WITH CHECK` conditions**, as required by Supabase row-level security (RLS).
-- Used the correct string concatenation syntax (`||` instead of `+`).
-- Removed redundant subqueries (`SELECT auth.uid()::text`).
+Or, if you want to be more specific, for insert and update separately:
 
-This ensures that only **authenticated users** can perform UPSERT operations on objects within the `profile-pictures` bucket, restricted to their own profile images.
+```sql
+CREATE POLICY "Allow user to insert profile picture"
+ON storage.objects
+FOR INSERT
+WITH CHECK (
+    bucket_id = 'profile-pictures'
+    AND name = auth.uid() || '/profile.jpg'
+);
 
-Would you like additional validation strategies to further secure this policy?
+CREATE POLICY "Allow user to update profile picture"
+ON storage.objects
+FOR UPDATE
+USING (
+    bucket_id = 'profile-pictures'
+    AND name = auth.uid() || '/profile.jpg'
+);
+```
+
+### Summary
+
+- Replace `FOR UPSERT` with `FOR ALL` or `FOR INSERT` and `FOR UPDATE` as needed.
+- Confirm that your policies exactly match your intended access control.
+
+Let me know if you'd like further assistance on policy configurations or best practices for securing your storage!
