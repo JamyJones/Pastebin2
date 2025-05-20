@@ -1,53 +1,86 @@
-To remove a file that has been added to an `<input type="file">` element using JavaScript, you can simply reset its value. Here's how you can do it:
+Certainly! Here's a professional CSS animation class that you can add to a button to give it a sleek, attention-grabbing effect during form submission.
 
-### Using JavaScript
-```javascript
-document.getElementById("fileInput").value = "";
-```
-This method works well for clearing a selected file from an input field.
+### Example: Button Submission Loading Animation
 
-### Full Example
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remove File from Input</title>
-</head>
-<body>
+This example creates a pulsating effect to indicate the form is being submitted.
 
-    <input type="file" id="fileInput">
-    <button onclick="clearFile()">Remove File</button>
+```css
+/* Define keyframes for the pulsating effect */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
-    <script>
-        function clearFile() {
-            document.getElementById("fileInput").value = "";
-        }
-    </script>
+/* Animation class for the button */
+.btn-submit-loading {
+  position: relative;
+  overflow: hidden;
+  cursor: not-allowed; /* Change cursor to indicate disabled state */
+  animation: pulse 1s infinite; /* Apply pulsate animation infinitely */
+  opacity: 0.8; /* Slightly reduce opacity for disabled aesthetic */
+}
 
-</body>
-</html>
-```
-### Important Notes:
-1. The `.value` property of a file input can be set to an empty string to clear the selected file.
-2. This approach may not work in some older browsers due to security restrictions, so an alternative is to **replace the element dynamically**:
+/* Optional: Add a spinner inside the button for better UX */
+.btn-submit-loading::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: spin 0.8s linear infinite;
+}
 
-```javascript
-function resetFileInput() {
-    const fileInput = document.getElementById("fileInput");
-    const newInput = document.createElement("input");
-    newInput.type = "file";
-    newInput.id = "fileInput";
-    fileInput.parentNode.replaceChild(newInput, fileInput);
+/* Define spin keyframes for spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 ```
-This method ensures a fresh `<input>` element is used, removing any restrictions related to `.value` manipulations.
 
-Would you like further improvements or explanations? [[0]](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md) [[1]](https://github.com/ValonJashari/FE21-PHP-DAY04-ValiJashari/tree/03185eea8c9935612841fa4ccb1b2960dbd3e981/delete.php)
+### Usage:
 
+```html
+<button id="submitBtn" class="btn">Submit</button>
+```
 
+### JavaScript to toggle the loading class:
 
-> [0] [](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md)
->
-> [1] [](https://github.com/ValonJashari/FE21-PHP-DAY04-ValiJashari/tree/03185eea8c9935612841fa4ccb1b2960dbd3e981/delete.php)
+```js
+const button = document.getElementById('submitBtn');
+
+button.addEventListener('click', () => {
+  // Add loading class when submitting the form
+  button.classList.add('btn-submit-loading');
+
+  // Simulate async submission (replace with your actual form submission logic)
+  setTimeout(() => {
+    // Remove loading class after submission completes
+    button.classList.remove('btn-submit-loading');
+  }, 3000); // 3 seconds delay
+});
+```
+
+### Summary:
+- The `.btn-submit-loading` class applies a pulsating animation.
+- An optional spinner is added via `::after` pseudo-element to improve UX.
+- The class can be toggled during form submission to provide visual feedback.
+
+Feel free to customize the colors, animation duration, or add other animations as needed!
