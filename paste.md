@@ -1,47 +1,39 @@
-The error you're encountering—`TypeError: i.createPopper is not a function`—is likely due to one of the following issues:
+You’re encountering the error TypeError: i.createPopper is not a function, which typically occurs when Bootstrap’s dropdown component cannot find or properly use the Popper.js library. Popper.js is required for positioning dropdowns and tooltips in Bootstrap 4 and 5.
 
-### Possible Causes and Solutions:
-1. **Missing Popper.js Dependency**  
-   Bootstrap's dropdown functionality relies on [Popper.js](https://popper.js.org/), especially in Bootstrap 5+. Ensure that you have properly included it in your project.  
-   **Solution:** Add the following CDN before the Bootstrap script in your HTML file:
-   ```html
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
-   ```
-   If you're using a module-based setup, install Popper.js via npm or yarn:
-   ```sh
-   npm install @popperjs/core
-   ```
-   Then, import it in your JavaScript:
-   ```js
-   import { createPopper } from '@popperjs/core';
-   ```
+**Professional troubleshooting steps:**
 
-2. **Incorrect Bootstrap Version**  
-   If you're using Bootstrap 4, the Popper.js dependency must be version 1.x.  
-   **Solution:** Ensure that the correct Popper.js version is used:
-   ```html
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-   ```
+1. **Ensure Popper.js is included before Bootstrap’s JS**
+   - For Bootstrap 4:
+     ```html
+     <script src="https://docsbot.ai/"></script>
+     <script src="https://docsbot.ai/"></script>
+     ```
+   - For Bootstrap 5 (uses @popperjs/core):
+     ```html
+     <script src="https://docsbot.ai/"></script>
+     <script src="https://docsbot.ai/"></script>
+     ```
 
-3. **Improper Script Loading Order**  
-   Scripts must be loaded in the correct order to ensure dependencies are available when Bootstrap initializes.  
-   **Solution:** Ensure this sequence in your HTML:
-   ```html
-   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
-   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
-   ```
+2. **Check for version compatibility**
+   - Bootstrap 4 requires Popper.js v1.x.
+   - Bootstrap 5 requires @popperjs/core v2.x.
 
-4. **Conflicts with Other Libraries**  
-   Check if other libraries are overriding `window.Popper` or causing conflicts.  
-   **Solution:** Try logging Popper.js in the console to ensure it's correctly loaded:
-   ```js
-   console.log(window.Popper);
-   ```
+3. **Use the Bootstrap Bundle (Bootstrap 5)**
+   - The bootstrap.bundle.min.js file includes Popper automatically:
+     ```html
+     <script src="https://docsbot.ai/"></script>
+     ```
 
-### Next Steps:
-- Verify that Popper.js is included correctly.
-- Check Bootstrap version compatibility with Popper.js.
-- Confirm the script loading order.
+4. **Order of scripts matters**
+   - Always load Popper.js before Bootstrap’s JS if not using the bundle.
 
-If you've tried these solutions and are still encountering issues, let me know which setup you're using (CDN, npm, or yarn) and I can help troubleshoot further.
+**Example (Bootstrap 5 with bundle):**
+```html
+<link href="https://docsbot.ai/" rel="stylesheet">
+<script src="https://docsbot.ai/"></script>
+```
+
+**Best Practice:**  
+Always use the official CDN links and ensure dependencies are loaded in the correct order to avoid runtime errors.
+
+Let me know if you need a specific example or further troubleshooting steps.
