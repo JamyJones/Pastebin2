@@ -1,42 +1,80 @@
-The error message you're encountering indicates that you're trying to access the `caller`, `callee`, or `arguments` properties of a function that is in strict mode. In JavaScript, strict mode is a way to opt into a restricted variant of JavaScript, which helps catch common coding errors and "unsafe" actions.
+This `TypeError` occurs because, starting with ECMAScript 5 strict mode, accessing `caller`, `callee`, or `arguments` properties on functions or the `arguments` object is restricted. These properties are considered security-sensitive and potentially problematic for optimization, hence their usage is generally disallowed in strict mode.
 
-Here are some key points regarding this error:
+### Why does this happen?
+- When your code runs in strict mode (`'use strict';`), attempting to access `function.caller`, `arguments.callee`, or `arguments.caller` throws a `TypeError`.
+- These properties were deprecated because they can lead to unpredictable behavior, break optimizations, and introduce security concerns.
 
-1. **Strict Mode**: When a function is defined in strict mode (either by using `"use strict";` at the top of the script or by defining the function with strict mode), it disallows certain actions, including accessing the `caller`, `callee`, and `arguments` properties.
+### Typical Scenario
+You might have code like:
+```js
+'use strict';
 
-2. **Accessing `arguments`**: In strict mode, you can still use the `arguments` object to access the arguments passed to the function, but you cannot access the `arguments.callee` property, which refers to the currently executing function.
-
-3. **Solution**: If you need to access the function's arguments, you can simply use the `arguments` object without trying to access `arguments.callee`. If you need to reference the function itself, consider using a named function expression or an arrow function.
-
-Here’s an example of how to define a function in strict mode without causing this error:
-
-```javascript
-"use strict";
-
-function myFunction() {
-    // You can access arguments normally
-    console.log(arguments);
-
-    // Do not use arguments.callee
-    // console.log(arguments.callee); // This will throw an error in strict mode
+function someFunction() {
+  console.log(arguments.callee); // causes TypeError in strict mode
 }
-
-// Call the function
-myFunction(1, 2, 3);
 ```
 
-If you need to reference the function itself, you can do it like this:
+### How to resolve this?
+The best approach is **to avoid using `arguments.callee`, `caller`, and `arguments.caller`** altogether. Instead, use modern alternatives:
 
-```javascript
-"use strict";
+1. **Replace `arguments.callee` with named functions or function expressions:**
+   
+   - Named functions are self-referential:
+   ```js
+   const factorial = function fact(n) {
+     if (n <= 1) return 1;
+     return n * fact(n - 1);
+   };
+   ```
 
-const myFunction = function innerFunction() {
-    console.log(arguments);
-    // You can call innerFunction here if needed
-};
+2. **Use named functions for recursion instead of `arguments.callee`:**
+   
+   ```js
+   'use strict';
 
-// Call the function
-myFunction(1, 2, 3);
+   function recursiveFunction() {
+     // recursive options:
+     // - call itself directly by name
+     // - pass references explicitly
+   }
+   ```
+
+3. **Refactor code to avoid reliance on `arguments.callee`.**
+
+### Example: Correct Recursive Function
+**Incorrect (using `arguments.callee`):**
+```js
+'use strict';
+
+function factorial() {
+  if (arguments.length === 0) {
+    return 1;
+  }
+  if (arguments[0] <= 1) {
+    return 1;
+  }
+  return arguments[0] * arguments.callee(arguments[0] - 1);
+}
 ```
 
-By following these guidelines, you should be able to avoid the TypeError related to strict mode functions.
+**Corrected (using named function):**
+```js
+'use strict';
+
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+```
+
+### Summary:
+- Do **not** access `caller`, `callee`, or `arguments.caller` in strict mode.
+- Use **named functions** for recursion or iterative approaches instead.
+- Modern JavaScript features like **rest parameters** (`...args`) make handling arguments cleaner and more explicit.
+
+### Additional tip:
+If you're working with frameworks or third-party code that relies on these properties, consider refactoring or updating to newer versions that follow current standards.
+
+---
+
+If you have a specific code snippet that's causing this error, feel free to share it, and I can help refactor or troubleshoot!
