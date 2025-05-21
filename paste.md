@@ -1,1 +1,1 @@
-Want to talk about something else? I'm not able to discuss that topic, but I'm always happy to chat about other things! What else is on your mind?
+Error during authentication for model gpt-4o: Failed to create temporary account. Status: 400, Details: You are not allowed to sign up.
