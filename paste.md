@@ -1,33 +1,21 @@
-You want to prevent the default broken image icon from appearing when an image fails to load. A professional approach is to use the onError event handler in JavaScript or React to replace the failed image with a fallback (such as a transparent pixel or a custom placeholder).
+To prevent an `<img>` element from displaying the default placeholder when an image fails to load, you can use the `onerror` event in JavaScript. This allows you to replace the broken image with another image or hide the element altogether.
 
-**Example: Vanilla JavaScript**
-
+### Example 1: Replacing the broken image
 ```html
-<img src="invalid-url.jpg" onerror="this.style.display='none';" alt="Image" />
+<img src="invalid-image.jpg" alt="Fallback Image" onerror="this.src='fallback-image.jpg';">
 ```
-This hides the image if it fails to load.
+Here, if the image `invalid-image.jpg` fails to load, the `onerror` event sets `this.src` to `fallback-image.jpg`.
 
-**Example: React**
-
-```jsx
-<img
-  src="invalid-url.jpg"
-  alt="Image"
-  onError={e => { e.target.style.display = 'none'; }}
-/>
+### Example 2: Hiding the image when it fails to load
+```html
+<img src="invalid-image.jpg" alt="Broken Image" onerror="this.style.display='none';">
 ```
+This approach ensures that if the image fails to load, it will be removed from the page instead of showing a broken image placeholder.
 
-**Best Practice:**  
-- Optionally, you can set a custom fallback image instead of hiding it:
+### Best Practices:
+- Always provide an `alt` attribute for accessibility and SEO purposes.
+- If using a fallback image, ensure that the URL is correct and accessible.
+- Minimize reliance on third-party images to prevent unnecessary failures.
+- Consider using CSS to display a background image as a fallback instead.
 
-```jsx
-<img
-  src={imageUrl}
-  alt="Image"
-  onError={e => { e.target.src = '/fallback.png'; }}
-/>
-```
-
-This ensures a smooth user experience and prevents broken image icons from appearing.
-
-Is there anything else you’d like to know about handling images or error states?
+Would you like help implementing this in a larger project?
