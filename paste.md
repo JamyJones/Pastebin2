@@ -1,74 +1,56 @@
-In Supabase, when signing up a new user, you can include custom user metadata—commonly referred to as `user_metadata`—by passing it as part of the `additional fields` parameter during the sign-up process. This metadata is stored within the user object and can hold custom information such as user roles, preferences, or any other application-specific data.
+In Supabase, you can set raw metadata for a new user during signup by using the `data` parameter in the `signUp` function. Supabase allows you to pass custom metadata as part of the user's profile, which can then be retrieved later.
 
-### How to set raw user metadata during signup
+Here's an example using Supabase's JavaScript client:
 
-#### 1. Using the Supabase JavaScript Client
-
-Suppose you want to sign up a user with email and password and also attach custom metadata, for example, `display_name` and `role`.
-
-```js
+```javascript
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://your-project.supabase.co';
-const supabaseKey = 'public-anonymous-key';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Initialize Supabase client
+const supabase = createClient('https://your-project-url.supabase.co', 'your-public-anon-key');
 
-async function signUpUser(email, password, displayName, role) {
-  const { user, session, error } = await supabase.auth.signUp(
-    {
-      email,
-      password,
-    },
-    {
+async function signUpUser(email, password) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
       data: {
-        display_name: displayName,
-        role: role,
+        role: 'admin', // Custom metadata
+        preferences: {
+          theme: 'dark',
+        },
       },
-    }
-  );
+    },
+  });
 
   if (error) {
-    console.error('Error during sign-up:', error);
-    return null;
+    console.error('Error signing up:', error.message);
+  } else {
+    console.log('User signed up:', data);
   }
-  
-  console.log('User signed up:', user);
-  return user;
 }
+
+signUpUser('user@example.com', 'securepassword');
 ```
 
-> **Note:** The `data` object in the second parameter corresponds to `user_metadata`.
+### Explanation:
+- The `data` parameter inside `options` allows you to store custom user metadata.
+- In this example, metadata includes `role` and `preferences`, which can be accessed later.
+- Ensure your Supabase project's authentication settings allow custom metadata storage.
 
-#### 2. Using the REST API directly
+Later, you can retrieve the metadata using `supabase.auth.getUser()`:
 
-You can also send a POST request to the `/auth/v1/signup` endpoint with the user data, including `user_metadata` in the request body.
+```javascript
+async function getUserMetadata() {
+  const { data, error } = await supabase.auth.getUser();
 
-```bash
-curl -X POST "https://your-project.supabase.co/auth/v1/signup" \
--H "Content-Type: application/json" \
--H "apikey: your_public_api_key" \
--d '{
-  "email": "newuser@example.com",
-  "password": "password123",
-  "options": {
-    "data": {
-      "display_name": "John Doe",
-      "role": "editor"
-    }
+  if (error) {
+    console.error('Error fetching user:', error.message);
+  } else {
+    console.log('User metadata:', data.user?.user_metadata);
   }
-}'
+}
+
+getUserMetadata();
 ```
 
-### Important considerations:
-- The `user_metadata` is stored in the `user.user_metadata` object.
-- Metadata fields are flexible but best to keep to a predictable schema.
-- Sensitive data should **not** be stored in `user_metadata` as it is exposed client-side.
-
-### Best Practices
-- Validate the metadata before setting it.
-- Remember that `user_metadata` is accessible on the client side, so avoid storing sensitive information there.
-- Use server-side functions or security rules if you need to modify metadata after signup or guard the data access.
-
----
-
-Let me know if you want an example of setting or updating user metadata post-signup or integrating with specific backend functions!
+Would you like a more detailed breakdown or additional considerations for securing metadata?
