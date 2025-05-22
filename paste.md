@@ -1,42 +1,34 @@
-The SQL code you provided is attempting to alter a table named `leaderboard` by adding a foreign key constraint. Here's a breakdown of how it works:
+The error message `ERROR: 42830: there is no unique constraint matching given keys for referenced table "User Profiles"` indicates that PostgreSQL requires a unique or primary key constraint on the referenced column of the foreign key. In this case, the column `streak` in the `"User Profiles"` table does not have a unique constraint.
 
-1. **ALTER TABLE leaderboard**: This command specifies that you want to modify the `leaderboard` table.
+### Solution:
+To resolve this issue, you need to ensure that the `streak` column in the `"User Profiles"` table has a `UNIQUE` constraint or is part of the `PRIMARY KEY`. Here’s how you can do it:
 
-2. **ADD CONSTRAINT fk_streak**: This part of the command is adding a new constraint to the table. The constraint is named `fk_streak`.
-
-3. **FOREIGN KEY (streak)**: This specifies that the `streak` column in the `leaderboard` table will be a foreign key.
-
-4. **REFERENCES User Profiles(streak)**: This indicates that the `streak` column in the `leaderboard` table references the `streak` column in the `User  Profiles` table. This means that the values in the `streak` column of `leaderboard` must match values in the `streak` column of `User  Profiles`.
-
-### Handling Spaces in Table Names
-
-Since the table name `User  Profiles` contains a space, you need to use double quotes to properly reference it in SQL. The corrected line would look like this:
-
+#### Option 1: Add a Unique Constraint
+If the `streak` column should allow duplicate values but must be uniquely referenced, you can add a `UNIQUE` constraint:
 ```sql
-REFERENCES "User  Profiles"(streak);
+ALTER TABLE "User Profiles"
+ADD CONSTRAINT unique_streak UNIQUE (streak);
 ```
 
-### Adding a New Column
+#### Option 2: Ensure It’s a Primary Key
+If the `streak` column is meant to uniquely identify a row, it should be a primary key:
+```sql
+ALTER TABLE "User Profiles"
+ADD PRIMARY KEY (streak);
+```
+_(Ensure that `streak` uniquely identifies rows before making it a primary key.)_
 
-If the `streak` column does not exist in the `leaderboard` table, you need to add it before you can create the foreign key constraint. You can do this with the following SQL command:
-
+#### Option 3: Use a Different Referencing Column
+If `streak` is not supposed to be unique, consider referencing a different column that has a unique constraint or primary key, such as `user_id`:
 ```sql
 ALTER TABLE leaderboard
-ADD COLUMN streak INT8;
+ADD CONSTRAINT streak FOREIGN KEY (user_id)
+REFERENCES "User Profiles"(user_id);
 ```
 
-### Complete SQL Code
+### Summary:
+- PostgreSQL requires foreign key references to have a `UNIQUE` constraint or `PRIMARY KEY` on the referenced column.
+- Fix it by adding a `UNIQUE` constraint or making `streak` a `PRIMARY KEY`.
+- If `streak` should allow duplicates, use an alternative column like `user_id`.
 
-Putting it all together, if you want to add the `streak` column and then add the foreign key constraint, you would do it in two steps:
-
-```sql
-ALTER TABLE leaderboard
-ADD COLUMN streak INT8;
-
-ALTER TABLE leaderboard
-ADD CONSTRAINT fk_streak
-FOREIGN KEY (streak)
-REFERENCES "User  Profiles"(streak);
-```
-
-This sequence first adds the `streak` column of type `INT8` to the `leaderboard` table and then establishes the foreign key constraint referencing the `streak` column in the `User  Profiles` table.
+Let me know if you need further clarification!
