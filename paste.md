@@ -1,35 +1,38 @@
-In PostgreSQL, you can achieve ranking of rows based on a column using the `RANK()`, `DENSE_RANK()`, or `ROW_NUMBER()` window functions. These functions allow you to assign a rank to each row based on the values in a specified column, such as your "points" column.
+AWS (Amazon Web Services) offers a range of services with a free tier, but it is not entirely free. Here's a clear breakdown of how the AWS free tier works:
 
-Here’s how you can do it:
+### AWS Free Tier Overview
 
-1. **Using `RANK()`**: This function assigns a unique rank to each distinct value in the specified column, with gaps in the ranking for ties.
+**1. Free Tier Types:**
+- **Always Free:** Services that are free forever, within specific usage limits (e.g., AWS Lambda, Amazon DynamoDB, Amazon S3, etc.).
+- **12-Month Free Tier:** New AWS accounts receive free usage for 12 months from the sign-up date (e.g., EC2 t2.micro or t3.micro instances, S3 storage, etc.).
+- **Trials:** Short-term free trials for specific features and services.
 
-2. **Using `DENSE_RANK()`**: This function also assigns a unique rank to each distinct value, but it does not leave gaps in the ranking for ties.
+### Key Points:
+- **Activation:** You must create an AWS account and provide billing details, but you won't be charged if you stay within the free tier limits.
+- **Limits:** The free tier has specific usage limits (e.g., 750 hours/month of EC2 t2.micro instance, 5 GB of S3 storage, 1 million Lambda requests, etc.). Exceeding these limits incurs charges.
+- **Billing:** AWS provides detailed billing and usage monitoring to help prevent unexpected charges.
 
-3. **Using `ROW_NUMBER()`**: This function assigns a unique sequential integer to rows, regardless of ties.
+### Example of Free Tier Usage (12-Months):
 
-Here’s an example SQL query that demonstrates how to use `RANK()` to assign positions based on the "points" column:
+| Service          | Free Usage Limit                                   | Duration                |
+|------------------|-----------------------------------------------------|-------------------------|
+| EC2              | 750 hours/month of t2.micro or t3.micro instances | 12 months from sign-up|
+| S3               | 5 GB standard storage                              | 12 months              |
+| Lambda           | 1 million requests                                | 12 months              |
+| DynamoDB         | 25 GB storage, 200 million requests/month        | 12 months              |
+| CloudWatch       | Basic monitoring free                             | Always                  |
 
-```sql
-WITH RankedPoints AS (
-    SELECT 
-        points,
-        RANK() OVER (ORDER BY points DESC) AS position
-    FROM 
-        your_table_name
-)
-UPDATE your_table_name
-SET position = RankedPoints.position
-FROM RankedPoints
-WHERE your_table_name.points = RankedPoints.points;
-```
+### Important:
+- **Cost Control:** Always review your usage to avoid charges.
+- **Service Availability:** Not all services are free, and some features within services may incur charges.
 
-### Explanation:
-- The `WITH` clause creates a Common Table Expression (CTE) named `RankedPoints` that selects the `points` and calculates the rank based on the `points` column in descending order.
-- The `UPDATE` statement then updates the `position` column in your original table with the calculated ranks from the CTE.
+---
 
-Make sure to replace `your_table_name` with the actual name of your table.
+### Summary:
+- **Is AWS free?** Partly, through the Free Tier with usage limits.
+- **Will you be charged?** Only if you exceed those limits or use paid features beyond the free offerings.
+- **Best Practice:** Use AWS Cost Explorer and set up billing alerts to monitor your usage.
 
-### Note:
-- If you want to avoid gaps in the ranking for ties, you can replace `RANK()` with `DENSE_RANK()`.
-- If you want each row to have a unique position regardless of ties, use `ROW_NUMBER()`.
+---
+
+If you'd like, I can help you set up your AWS free tier account, configure billing alerts, or optimize your resource usage to stay within the free tier!
