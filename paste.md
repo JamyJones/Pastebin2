@@ -15,11 +15,11 @@ FROM
 
 **Best Practices:**
 
-- Use ORDER BY inside the OVER clause to specify the ranking criteria.
-- If you want to handle ties (same points get the same rank), use RANK() or DENSE_RANK() instead of ROW_NUMBER().
-- Always specify the ordering direction (ASC or DESC) for clarity.
+- Use ORDER BY inside the OVER() clause to specify ranking criteria.
+- For handling ties (same points), consider using RANK() or DENSE_RANK() instead of ROW_NUMBER().
+- Always specify an explicit ORDER BY to ensure consistent results.
 
-**Handling Ties Example:**
+**Alternative for Ties:**
 
 ```sql
 SELECT
@@ -31,4 +31,4 @@ FROM
   scores;
 ```
 
-Let me know if you need more details or examples for your specific use case.
+Let me know if you need an example with a specific table or want to handle ties differently!
