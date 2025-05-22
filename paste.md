@@ -1,49 +1,56 @@
-To remove the trigger that you created on the `auth.users` table in Supabase, you'll need to execute a `DROP TRIGGER` statement within a SQL query. Here are the steps:
+To remove the trigger from the `auth.users` table in Supabase, you'll need to issue a `DROP TRIGGER` statement. 
 
-### 1. Identify the Trigger Name
-You've named the trigger `trigger_sync_profile_insert`. 
-
-### 2. Drop the Trigger
-Use the following SQL statement to remove the trigger:
+Here's the correct SQL command to drop the specific trigger:
 
 ```sql
 DROP TRIGGER IF EXISTS trigger_sync_profile_insert ON auth.users;
 ```
 
-### 3. (Optional) Remove the Function
-If you no longer need the `sync_profiles_insert()` function, you can drop it as well:
+### Steps to execute this:
 
-```sql
-DROP FUNCTION IF EXISTS sync_profiles_insert();
-```
+1. **Access your database**:
+   - You can do this via the Supabase SQL editor in the dashboard, psql, or any database client with access.
+
+2. **Run the DROP TRIGGER statement**:
+   - Make sure you're connected to your database schema that contains `auth.users` (usually `auth` schema).
+   - Execute the command above.
 
 ---
 
-### Complete solution:
+### Important notes:
+
+- **Ensure proper permissions**: You need to have sufficient privileges to drop triggers in the database.
+- **Verify the trigger name**: If your trigger has a different name, adjust accordingly. In your case, it's `trigger_sync_profile_insert`.
+- **Check if trigger already exists**: Using `IF EXISTS` makes the command safer, avoiding errors if the trigger was already removed.
+
+---
+
+### Example:
 
 ```sql
--- Drop the trigger
+-- Remove the trigger from auth.users successfully
 DROP TRIGGER IF EXISTS trigger_sync_profile_insert ON auth.users;
-
--- Drop the associated function
-DROP FUNCTION IF EXISTS sync_profiles_insert();
 ```
 
-### How to execute this:
-- Use the SQL editor in the Supabase Dashboard:
-  - Navigate to your project.
-  - Click on **SQL** from the sidebar.
-  - Enter the above SQL commands.
-  - Execute the query.
-
-### Important note:
-- Make sure to back up your database or ensure that removing these objects aligns with your application's logic.
-- After removing the trigger, you should be able to create users normally in `auth.users`.
+### After removal:
+- You will now be able to add users without that trigger interfering.
+- If needed, recreate or modify the trigger later with a new function or trigger.
 
 ---
 
-### Troubleshooting user creation:
-- If user creation still issues persist after removing the trigger, verify if other database constraints or security policies are affecting `auth.users`.
-- Check if there are other triggers, roles, or policies interfering with `auth.users`.
+### Troubleshooting:
+- If you encounter permission issues, verify your user privileges.
+- Confirm the trigger's existence with:
+  ```sql
+  \d auth.users
+  ```
+  or querying the system catalogs:
 
-Let me know if you need further assistance!
+  ```sql
+  SELECT tgname, tgrelid::regclass FROM pg_trigger WHERE tgrelid = 'auth.users'::regclass;
+  ```
+
+Let me know if you need help recreating the trigger or further assistance!
+
+---
+Fix your Supabase auth issues fast—use `DROP TRIGGER IF EXISTS trigger_sync_profile_insert ON auth.users;` to regain control instantly!
