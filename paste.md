@@ -1,33 +1,42 @@
-The SQL statement you provided attempts to add a foreign key constraint `fk_streak` to the `leaderboard` table, referencing the `streak` column in the `User Profiles` table. However, there are two issues:
+The SQL code you provided is attempting to alter a table named `leaderboard` by adding a foreign key constraint. Here's a breakdown of how it works:
 
-1. **Table Name with Space**: In SQL, table names with spaces must be enclosed in double quotes (`"User Profiles"`) or square brackets (`[User Profiles]`) depending on the database system (PostgreSQL uses double quotes, while SQL Server supports square brackets).
-2. **Missing Column**: If the `streak` column does not exist in either table, you must first create it before adding the foreign key constraint.
+1. **ALTER TABLE leaderboard**: This command specifies that you want to modify the `leaderboard` table.
 
-### Corrected SQL Statements:
+2. **ADD CONSTRAINT fk_streak**: This part of the command is adding a new constraint to the table. The constraint is named `fk_streak`.
 
-#### 1. **Adding the `streak` column in `User Profiles`**:
+3. **FOREIGN KEY (streak)**: This specifies that the `streak` column in the `leaderboard` table will be a foreign key.
+
+4. **REFERENCES User Profiles(streak)**: This indicates that the `streak` column in the `leaderboard` table references the `streak` column in the `User  Profiles` table. This means that the values in the `streak` column of `leaderboard` must match values in the `streak` column of `User  Profiles`.
+
+### Handling Spaces in Table Names
+
+Since the table name `User  Profiles` contains a space, you need to use double quotes to properly reference it in SQL. The corrected line would look like this:
+
 ```sql
-ALTER TABLE "User Profiles"
-ADD COLUMN streak INT8;
+REFERENCES "User  Profiles"(streak);
 ```
 
-#### 2. **Adding the `streak` column in `leaderboard`**:
+### Adding a New Column
+
+If the `streak` column does not exist in the `leaderboard` table, you need to add it before you can create the foreign key constraint. You can do this with the following SQL command:
+
 ```sql
 ALTER TABLE leaderboard
 ADD COLUMN streak INT8;
 ```
 
-#### 3. **Adding the Foreign Key Constraint Properly**:
+### Complete SQL Code
+
+Putting it all together, if you want to add the `streak` column and then add the foreign key constraint, you would do it in two steps:
+
 ```sql
+ALTER TABLE leaderboard
+ADD COLUMN streak INT8;
+
 ALTER TABLE leaderboard
 ADD CONSTRAINT fk_streak
 FOREIGN KEY (streak)
-REFERENCES "User Profiles"(streak);
+REFERENCES "User  Profiles"(streak);
 ```
 
-### Best Practices:
-- Ensure that the data types match (`INT8` is a PostgreSQL alias for `BIGINT`).
-- Make sure the `streak` column in `User Profiles` is the **Primary Key** or has an **Index** for performance reasons.
-- If using MySQL or another database, verify its syntax for handling table names.
-
-Would you like guidance on how to populate this column with default values?
+This sequence first adds the `streak` column of type `INT8` to the `leaderboard` table and then establishes the foreign key constraint referencing the `streak` column in the `User  Profiles` table.
