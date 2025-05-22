@@ -1,43 +1,18 @@
-Certainly! Below is a professional SQL code template to reference a column from an existing table and insert or update data in a new table. The approach depends on your specific task, such as inserting new rows with referenced data or updating existing rows.
+Your SQL statement contains a couple of issues that could cause errors:
 
----
+1. **Quotation Marks Around Table Name**: SQL expects table names to be referenced without quotes unless you're using a specific database system that requires quoted identifiers.
+2. **Foreign Key Column Naming**: A foreign key constraint must reference an existing primary key or unique column in the `User Profiles` table. Ensure that `streak` in `User Profiles` is indexed properly.
 
-### Scenario 1: Insert data into the new table referencing columns from existing table
-
+Here's the corrected SQL version:
 ```sql
--- Insert data into new_table by selecting from existing_table
-INSERT INTO new_table (column1, column2, referenced_column)
-SELECT
-    ot.columnA,               -- columns from existing table
-    ot.columnB,
-    ot.referenced_column    -- referencing column from existing table
-FROM
-    existing_table ot
-WHERE
-    -- optional filtering conditions
-    ot.some_condition = 'value';
+ALTER TABLE leaderboard
+ADD CONSTRAINT fk_streak
+FOREIGN KEY (streak)
+REFERENCES User_Profiles(streak);
 ```
-
----
-
-### Scenario 2: Update the new table to set a column based on data from the existing table
-
-```sql
--- Update new_table with data from existing_table
-UPDATE new_table nt
-SET nt.referenced_column = ot.referenced_column
-FROM existing_table ot
-WHERE nt.id = ot.id; -- assuming there's a common key to join on
-```
-
----
-
 ### Best Practices:
-- Always specify the columns explicitly rather than using `SELECT *`.
-- Use table aliases for clarity.
-- Include proper `WHERE` conditions to avoid unintended data modifications.
-- Wrap operations in a transaction if performing multiple related updates/inserts to ensure atomicity.
+- Always check that the referenced column in `User Profiles` has a primary key or unique constraint.
+- Use meaningful constraint names (`fk_streak` instead of just `streak`) to avoid confusion when debugging.
+- Ensure both tables have matching data types for the `streak` column.
 
----
-
-If you'd like a more specific example, please provide the schema details or the exact task.
+Would you like me to check if the `streak` column meets the necessary constraints before applying this change?
