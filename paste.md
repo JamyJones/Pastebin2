@@ -1,32 +1,26 @@
-You asked about the purpose of the WHERE clause in the provided SQL code:
+Certainly! Below is a SQL code template that demonstrates how to create a new table that references a column from another table using a foreign key constraint.
+
+### SQL Code Template
 
 ```sql
-WITH RankedPoints AS (
-    SELECT 
-        points,
-        RANK() OVER (ORDER BY points DESC) AS position
-    FROM 
-        your_table_name
-)
-UPDATE your_table_name
-SET position = RankedPoints.position
-FROM RankedPoints
-WHERE your_table_name.points = RankedPoints.points;
+-- Create the parent table
+CREATE TABLE ParentTable (
+    ParentID INT PRIMARY KEY,
+    ParentName VARCHAR(100)
+);
+
+-- Create the child table that references the parent table
+CREATE TABLE ChildTable (
+    ChildID INT PRIMARY KEY,
+    ChildName VARCHAR(100),
+    ParentID INT,
+    FOREIGN KEY (ParentID) REFERENCES ParentTable(ParentID)
+);
 ```
 
-**Explanation:**
+### Explanation:
+1. **ParentTable**: This is the table that contains the primary key (`ParentID`).
+2. **ChildTable**: This is the new table that includes a column (`ParentID`) which references the `ParentID` from the `ParentTable`.
+3. **FOREIGN KEY Constraint**: This ensures that the `ParentID` in the `ChildTable` must match an existing `ParentID` in the `ParentTable`, maintaining referential integrity.
 
-The WHERE clause in this UPDATE statement:
-
-```sql
-WHERE your_table_name.points = RankedPoints.points;
-```
-
-is used to match each row in your_table_name with its corresponding row in the RankedPoints CTE (Common Table Expression) based on the points column. This ensures that the correct position (rank) is assigned to each row in your_table_name.
-
-**Professional Practice:**
-- When performing an UPDATE with a JOIN (using FROM), always use a WHERE clause to specify how rows from the target table and the source table relate. This prevents unintended updates and ensures data integrity.
-- In this example, if multiple rows have the same points value, they will receive the same rank due to the RANK() window function.
-
-**Summary:**  
-The WHERE clause ensures that only rows with matching points values between your_table_name and RankedPoints are updated with the correct position.
+You can modify the column names and data types as per your requirements.
