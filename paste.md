@@ -1,55 +1,74 @@
-In Supabase, when signing up a new user via the Auth API, you can include custom metadata by passing the `user_metadata` parameter. This allows you to attach custom key-value pairs that will be stored alongside the user record, accessible through the `user_metadata` property in the user object.
+In Supabase, when signing up a new user, you can include custom user metadata—commonly referred to as `user_metadata`—by passing it as part of the `additional fields` parameter during the sign-up process. This metadata is stored within the user object and can hold custom information such as user roles, preferences, or any other application-specific data.
 
-### How to set raw user metadata during signup:
+### How to set raw user metadata during signup
 
-**Using the Supabase JavaScript client:**
+#### 1. Using the Supabase JavaScript Client
+
+Suppose you want to sign up a user with email and password and also attach custom metadata, for example, `display_name` and `role`.
 
 ```js
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
-// Initialize your Supabase client
-const supabaseUrl = 'https://your-project.supabase.co'
-const supabaseKey = 'public-anonymous-key'
+const supabaseUrl = 'https://your-project.supabase.co';
+const supabaseKey = 'public-anonymous-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function signUpUser(email, password, userMetadata) {
-  const { user, session, error } = await supabase.auth.signUp({
-    email,
-    password,
-  }, {
-    data: userMetadata // This is where you pass custom metadata
-  });
+async function signUpUser(email, password, displayName, role) {
+  const { user, session, error } = await supabase.auth.signUp(
+    {
+      email,
+      password,
+    },
+    {
+      data: {
+        display_name: displayName,
+        role: role,
+      },
+    }
+  );
 
   if (error) {
-    console.error('Error during sign up:', error);
-  } else {
-    console.log('User signed up:', user);
+    console.error('Error during sign-up:', error);
+    return null;
   }
+  
+  console.log('User signed up:', user);
+  return user;
 }
+```
 
-// Example usage:
-signUpUser('newuser@example.com', 'securePassword123', {
-  first_name: 'John',
-  last_name: 'Doe',
-  role: 'member'
-});
+> **Note:** The `data` object in the second parameter corresponds to `user_metadata`.
+
+#### 2. Using the REST API directly
+
+You can also send a POST request to the `/auth/v1/signup` endpoint with the user data, including `user_metadata` in the request body.
+
+```bash
+curl -X POST "https://your-project.supabase.co/auth/v1/signup" \
+-H "Content-Type: application/json" \
+-H "apikey: your_public_api_key" \
+-d '{
+  "email": "newuser@example.com",
+  "password": "password123",
+  "options": {
+    "data": {
+      "display_name": "John Doe",
+      "role": "editor"
+    }
+  }
+}'
 ```
 
 ### Important considerations:
-- The second argument to `signUp` can include a `data` object which is stored as `user_metadata`.
-- Make sure your Supabase project’s authentication configuration allows `user_metadata` to be set and retrieved.
+- The `user_metadata` is stored in the `user.user_metadata` object.
+- Metadata fields are flexible but best to keep to a predictable schema.
+- Sensitive data should **not** be stored in `user_metadata` as it is exposed client-side.
 
-### Additional notes:
-- **Custom metadata cannot contain nested objects:** As per current Supabase behavior, nested objects in `user_metadata` might not serialize properly — stick to flat key-value pairs.
-- **After sign-up, you can access `user_metadata` from the user object:**
+### Best Practices
+- Validate the metadata before setting it.
+- Remember that `user_metadata` is accessible on the client side, so avoid storing sensitive information there.
+- Use server-side functions or security rules if you need to modify metadata after signup or guard the data access.
 
-```js
-console.log(user.user_metadata); // { first_name: 'John', last_name: 'Doe', role: 'member' }
-```
+---
 
-### Summary:
-- Pass a `data` object as the second parameter for `signUp` to include raw metadata.
-- Use plain key-value pairs, preferably flat structures.
-- Ensure your Supabase settings permit user_metadata to be written.
-
-Let me know if you want a code snippet for server-side signup (using SDKs in other languages) or further customization!
+Let me know if you want an example of setting or updating user metadata post-signup or integrating with specific backend functions!
