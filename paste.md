@@ -1,51 +1,81 @@
-In Supabase, you can automate copying rows from one table to another using **database triggers**. Triggers allow you to execute SQL statements whenever an event (such as an `INSERT`, `UPDATE`, or `DELETE`) occurs on a table. Given your use case, a trigger will help ensure that new records or updates in the main table are automatically reflected in the new table.
+To copy all rows from one table to another in Supabase and automate the process so that updates in the main table reflect in the new table, you can use a combination of SQL triggers and functions. Here’s how you can achieve this:
 
-### Steps to Automate Table Synchronization:
-1. **Create a Trigger Function** – This function will copy the data from the main table to the new table.
-2. **Create a Trigger** – Attach the function to the main table so it runs every time a new row is inserted.
+### Step 1: Create the New Table
 
-### Example SQL Implementation
-#### 1. Create a Function to Copy Data
+Assuming you have already created the new table with the same column names as the main table, ensure that the structure matches.
+
+### Step 2: Create a Function to Copy Data
+
+You need to create a PostgreSQL function that will handle the insertion of data from the main table to the new table. Here’s an example function:
+
 ```sql
-CREATE OR REPLACE FUNCTION copy_to_new_table()
+CREATE OR REPLACE FUNCTION copy_data_to_new_table()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO new_table (column1, column2, column3) 
-    VALUES (NEW.column1, NEW.column2, NEW.column3);
+    INSERT INTO new_table (column1, column2, column3)  -- Replace with your actual column names
+    VALUES (NEW.column1, NEW.column2, NEW.column3);   -- Replace with your actual column names
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 ```
 
-#### 2. Create a Trigger
-```sql
-CREATE TRIGGER sync_data
-AFTER INSERT ON main_table
-FOR EACH ROW
-EXECUTE FUNCTION copy_to_new_table();
-```
-### Explanation:
-- The function `copy_to_new_table()` takes the newly inserted row (`NEW`) and inserts the corresponding data into `new_table`.
-- The `AFTER INSERT` trigger ensures that every new row added to `main_table` is automatically copied to `new_table`.
-- If you also want updates to propagate, create another trigger with `AFTER UPDATE`.
+### Step 3: Create a Trigger
 
-#### Handling Updates:
-If you want updates in `main_table` to reflect in `new_table`, modify your function:
+Next, you need to create a trigger that will call this function whenever a new row is inserted into the main table.
+
+```sql
+CREATE TRIGGER after_insert_main_table
+AFTER INSERT ON main_table  -- Replace with your actual main table name
+FOR EACH ROW
+EXECUTE FUNCTION copy_data_to_new_table();
+```
+
+### Step 4: Handle Updates (Optional)
+
+If you also want to update the new table when the main table is updated, you can create another function and trigger for updates:
+
 ```sql
 CREATE OR REPLACE FUNCTION update_new_table()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE new_table
-    SET column1 = NEW.column1, column2 = NEW.column2, column3 = NEW.column3
-    WHERE id = NEW.id;
+    SET column1 = NEW.column1, column2 = NEW.column2, column3 = NEW.column3  -- Replace with your actual column names
+    WHERE id = OLD.id;  -- Assuming you have an 'id' column to match rows
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER sync_updates
-AFTER UPDATE ON main_table
+CREATE TRIGGER after_update_main_table
+AFTER UPDATE ON main_table  -- Replace with your actual main table name
 FOR EACH ROW
 EXECUTE FUNCTION update_new_table();
 ```
 
-This will ensure that changes in `main_table` are synchronized with `new_table`. Let me know if you need additional logic, such as handling deletions!
+### Step 5: Handle Deletions (Optional)
+
+If you want to delete corresponding rows in the new table when rows are deleted from the main table, you can create a delete trigger as well:
+
+```sql
+CREATE OR REPLACE FUNCTION delete_from_new_table()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM new_table
+    WHERE id = OLD.id;  -- Assuming you have an 'id' column to match rows
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_delete_main_table
+AFTER DELETE ON main_table  -- Replace with your actual main table name
+FOR EACH ROW
+EXECUTE FUNCTION delete_from_new_table();
+```
+
+### Summary
+
+1. Create a new table with the same structure as the main table.
+2. Create a function to copy data from the main table to the new table.
+3. Create a trigger to call this function on insertions.
+4. Optionally, create additional functions and triggers for updates and deletions.
+
+This setup will ensure that your new table is automatically updated whenever there are changes in the main table.
