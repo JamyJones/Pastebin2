@@ -1,26 +1,24 @@
-Certainly! In SQL, if you want to reference a column from another table in a new one, you typically use **foreign keys** to maintain referential integrity between tables. Here's a professional SQL template demonstrating this:
+You’d like a SQL code template to reference a column from another table in a new one. This is typically done using a foreign key constraint. Here’s a professional template for creating two tables, where the second table references a column from the first:
 
 ```sql
--- Create the referenced table (parent table)
-CREATE TABLE Users (
-    user_id INT PRIMARY KEY,  -- Unique identifier for users
-    username VARCHAR(100) NOT NULL
+-- Create the referenced table (parent)
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL
 );
 
--- Create the new table (child table) referencing the 'user_id' column from 'Users'
-CREATE TABLE Orders (
-    order_id INT PRIMARY KEY,  -- Unique identifier for orders
-    user_id INT,  -- Foreign key referencing 'Users'
-    order_date DATE NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+-- Create the referencing table (child) with a foreign key
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    user_id INT,
+    order_date DATE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
 
-### Explanation:
-- The `Users` table has a `user_id` column, which serves as the **primary key**.
-- The `Orders` table includes a `user_id` column that **references** the `user_id` column from `Users`, establishing a **relationship** between the two tables.
-- The `FOREIGN KEY` constraint ensures data integrity by linking rows in `Orders` to existing rows in `Users`.
-- The `ON DELETE CASCADE` ensures that if a user is deleted from `Users`, their associated orders in `Orders` are automatically deleted.
+**Best Practices:**
+- Ensure referenced columns are indexed (usually primary keys).
+- Use appropriate data types and constraints.
+- Name foreign keys clearly for maintainability.
 
-Would you like to add indexes or optimize queries based on this relationship?
+Let me know if you need an example for a specific SQL dialect or use case!
