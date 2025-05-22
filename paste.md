@@ -1,72 +1,90 @@
-In Supabase, which uses PostgreSQL under the hood, copying all rows from one table to another can be efficiently achieved using an SQL `INSERT INTO ... SELECT` statement. Here's the step-by-step process:
+To achieve this in Supabase, you can use database triggers to automatically copy and update rows in your new table whenever changes occur in the main table. Here’s how you can set it up:
 
-### Assumptions:
-- Both tables (`table_source` and `table_destination`) exist.
-- The destination table has a compatible schema with the source table.
-  
-### Basic SQL Query:
+### 1. **Copy all rows initially**
+To populate the new table with the existing data from the main table, you can run an SQL `INSERT INTO ... SELECT` statement:
 
 ```sql
-INSERT INTO table_destination
-SELECT * FROM table_source;
+INSERT INTO new_table (column1, column2, column3)
+SELECT column1, column2, column3 FROM main_table;
 ```
 
-### Example with column selection (recommended for clarity and safety):
+### 2. **Automate Updates Using Triggers**
+Supabase, built on PostgreSQL, allows you to use triggers and functions to automatically copy data whenever changes happen.
 
-If the table schemas are identical, you can use:
+#### Create a function for INSERT
+You need to create a function that will insert data into the new table whenever a new row is added to the main table:
 
 ```sql
-INSERT INTO table_destination (column1, column2, column3)
-SELECT column1, column2, column3 FROM table_source;
+CREATE OR REPLACE FUNCTION copy_to_new_table()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO new_table (column1, column2, column3)
+  VALUES (NEW.column1, NEW.column2, NEW.column3);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 ```
 
-### Using Supabase JavaScript Client:
-
-You can execute this SQL statement via Supabase's `rpc` or `query` method. The recommended way is to use the `sql` method with the PostgreSQL `query` execution:
-
-```js
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://your-project.supabase.co';
-const supabaseKey = 'public-anonymous-key';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-async function copyTableRows() {
-  const { error } = await supabase
-    .rpc('execute_sql', { sql: `
-      INSERT INTO table_destination (column1, column2, column3)
-      SELECT column1, column2, column3 FROM table_source;
-    ` });
-
-  if (error) {
-    console.error('Error copying data:', error);
-  } else {
-    console.log('Data copied successfully.');
-  }
-}
-```
-
-**Note:** Supabase does not directly support executing raw SQL via client SDK for security reasons. To execute raw SQL, you typically use the SQL editor in the Supabase dashboard or via a server environment with elevated privileges, or you set up a stored procedure or API route that executes the SQL.
-
-### Secure and recommended approach:
-
-- **Use SQL in the Supabase dashboard** or your backend environment with privileged access:
+#### Create a trigger for INSERT
+Attach a trigger to the main table so that the function runs automatically on every new insertion:
 
 ```sql
-INSERT INTO table_destination (column1, column2, column3)
-SELECT column1, column2, column3 FROM table_source;
+CREATE TRIGGER after_insert_main_table
+AFTER INSERT ON main_table
+FOR EACH ROW
+EXECUTE FUNCTION copy_to_new_table();
 ```
 
-- **Automate via API or Backend:** If you want to trigger the copy operation programmatically, implement an API route (e.g., in your backend server) that runs this SQL command securely.
+### 3. **Automate Updates and Deletions**
+If you also want updates in the main table to reflect in the new table, create another function and trigger for updates:
 
----
+#### Function for UPDATE
+```sql
+CREATE OR REPLACE FUNCTION update_new_table()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE new_table
+  SET column1 = NEW.column1,
+      column2 = NEW.column2,
+      column3 = NEW.column3
+  WHERE id = NEW.id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+```
 
-### Best practices:
-- Ensure data types are compatible.
-- Wrap the copy in a transaction if copying large data to ensure atomicity.
-- Index the destination table if needed for performance.
-- Validate the data after copying.
+#### Trigger for UPDATE
+```sql
+CREATE TRIGGER after_update_main_table
+AFTER UPDATE ON main_table
+FOR EACH ROW
+EXECUTE FUNCTION update_new_table();
+```
 
-**Summary:**
-The most straightforward way is to run an `INSERT INTO ... SELECT` SQL command within your PostgreSQL environment or Supabase SQL Editor for large data sets or regular tasks. When integrating with your app, consider creating API endpoints that run such SQL commands server-side for security reasons.
+#### Handling DELETE (if required)
+To ensure deletions in the main table reflect in the new table:
+
+```sql
+CREATE OR REPLACE FUNCTION delete_from_new_table()
+RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM new_table WHERE id = OLD.id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+```sql
+CREATE TRIGGER after_delete_main_table
+AFTER DELETE ON main_table
+FOR EACH ROW
+EXECUTE FUNCTION delete_from_new_table();
+```
+
+### Summary
+- Run the initial `INSERT INTO ... SELECT` query to copy all rows.
+- Use **triggers** to keep the new table updated whenever inserts, updates, or deletions occur in the main table.
+
+This method ensures the new table mirrors the main table automatically without needing manual intervention.
+
+Would you like any modifications to this approach, such as filtering certain columns or conditions before copying data?
