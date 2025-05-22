@@ -1,30 +1,28 @@
-It looks like you are running into an issue because your `leaderboard` table already exists, and you are trying to create a view with the same name. A `VIEW` in SQL is essentially a virtual table that dynamically represents the results of a query, meaning it is not stored physically but updates automatically based on changes in the referenced table.
+It looks like you're trying to create a `VIEW` called `leaderboard`, but it already exists as a table in your database, which is causing the error. In Supabase and PostgreSQL, you can't create a view with the same name as an existing table.
 
-### Solutions:
-#### 1. **Using a View (Preferred Approach)**
-Instead of manually copying data, if you just need a dynamic table that updates when `User Profiles` changes, you should drop the existing `leaderboard` table and create a view:
+### Solution 1: Use a Materialized View
+A possible alternative to using a standard view is a **materialized view**, which can be refreshed periodically rather than being dynamic. If you **don't need real-time updates** but want to periodically refresh your leaderboard table, you can use this:
 
 ```sql
-DROP TABLE leaderboard; -- Remove existing table
-CREATE VIEW leaderboard AS
+CREATE MATERIALIZED VIEW leaderboard AS
 SELECT user_id, username, streak
 FROM "User Profiles";
 ```
-Now, `leaderboard` will automatically reflect any changes made in `User Profiles`, including insertions, updates, and deletions.
 
-#### 2. **Using a Trigger (If Physical Copy is Needed)**
-If you require a separate physical table (`leaderboard`) that automatically updates when `User Profiles` changes, use **triggers**. Triggers will ensure that any insert, update, or delete operation in `User Profiles` also affects `leaderboard`.
+To refresh it manually:
 
-1. **Ensure the `leaderboard` table exists:**
 ```sql
-CREATE TABLE IF NOT EXISTS leaderboard (
-    user_id UUID PRIMARY KEY,
-    username TEXT NOT NULL,
-    streak INT NOT NULL
-);
+REFRESH MATERIALIZED VIEW leaderboard;
 ```
 
-2. **Create a trigger function to automatically update `leaderboard`:**
+However, this requires manual refreshing or a scheduled job.
+
+### Solution 2: Use a Trigger for Automatic Updates
+If you need **automatic updates whenever a row is inserted, updated, or deleted** in the `User Profiles` table, using a **trigger** might be a better approach.
+
+#### Step 1: Create a Trigger Function
+Create a function that will insert or update rows in the `leaderboard` table whenever there’s a change in `User Profiles`.
+
 ```sql
 CREATE OR REPLACE FUNCTION update_leaderboard()
 RETURNS TRIGGER AS $$
@@ -32,22 +30,35 @@ BEGIN
     INSERT INTO leaderboard (user_id, username, streak)
     VALUES (NEW.user_id, NEW.username, NEW.streak)
     ON CONFLICT (user_id) DO UPDATE 
-    SET username = EXCLUDED.username, streak = EXCLUDED.streak;
+    SET username = EXCLUDED.username, 
+        streak = EXCLUDED.streak;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 ```
 
-3. **Create a trigger to execute the function when `User Profiles` changes:**
+#### Step 2: Create the Trigger
+Attach the function as a trigger to `User Profiles` so it updates the leaderboard whenever a row is inserted or modified.
+
 ```sql
-CREATE TRIGGER user_profiles_trigger
+CREATE TRIGGER leaderboard_trigger
 AFTER INSERT OR UPDATE ON "User Profiles"
 FOR EACH ROW
 EXECUTE FUNCTION update_leaderboard();
 ```
 
-### Which Method Should You Use?
-- If you need real-time updates and don’t need a separate stored table → **Use a View (Solution 1)**
-- If you need an independent table that gets physically updated → **Use a Trigger (Solution 2)**
+### Solution 3: Use a View with a Different Name
+Since you can't create a view named `leaderboard` (because the table already exists), you could create a view with another name.
 
-Let me know if you need further clarification! 🚀
+```sql
+CREATE VIEW leaderboard_view AS
+SELECT user_id, username, streak
+FROM "User Profiles";
+```
+
+### Summary:
+- **If you want periodic updates**, use a **materialized view**.
+- **If you want automatic updates whenever data changes**, use a **trigger function**.
+- **If you prefer a view**, change the name to avoid conflicts.
+
+Let me know if you need further refinements! 🚀
