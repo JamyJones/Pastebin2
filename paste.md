@@ -1,18 +1,18 @@
-Your SQL statement contains a couple of issues that could cause errors:
+Your SQL statement has a couple of issues:
 
-1. **Quotation Marks Around Table Name**: SQL expects table names to be referenced without quotes unless you're using a specific database system that requires quoted identifiers.
-2. **Foreign Key Column Naming**: A foreign key constraint must reference an existing primary key or unique column in the `User Profiles` table. Ensure that `streak` in `User Profiles` is indexed properly.
+1. **Referencing Table Name Format**: In SQL, table names should not be enclosed in quotes (`"User Profiles"`). If your table name contains spaces, it's best to rename it using underscores (`user_profiles`) or use backticks (`User Profiles`) if you're using MySQL.
 
-Here's the corrected SQL version:
+2. **Foreign Key Reference**: Ensure that `streak` in `"User Profiles"` (or `user_profiles`) is a **primary key** or has an **unique constraint**. Foreign keys reference unique values to maintain referential integrity.
+
+Here’s a corrected version with proper formatting:
+
 ```sql
 ALTER TABLE leaderboard
 ADD CONSTRAINT fk_streak
 FOREIGN KEY (streak)
-REFERENCES User_Profiles(streak);
+REFERENCES user_profiles(streak);
 ```
-### Best Practices:
-- Always check that the referenced column in `User Profiles` has a primary key or unique constraint.
-- Use meaningful constraint names (`fk_streak` instead of just `streak`) to avoid confusion when debugging.
-- Ensure both tables have matching data types for the `streak` column.
 
-Would you like me to check if the `streak` column meets the necessary constraints before applying this change?
+Additionally, if `streak` is **not unique**, consider structuring your relationship differently to avoid integrity issues.
+
+Let me know if you need further clarification!
