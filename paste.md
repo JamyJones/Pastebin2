@@ -1,55 +1,50 @@
-You can achieve this automation in Supabase using PostgreSQL triggers. A trigger will allow you to automatically insert rows into the `leaderboard` table whenever a new row is inserted into the `User Profiles` table. You can also ensure that updates to the main table reflect in the `leaderboard` table.
+To automate the process of copying rows from your `User Profiles` table to your `leaderboard` table in Supabase, you can use a **PostgreSQL trigger**. A trigger ensures that whenever a new row is inserted or updated in `User Profiles`, the corresponding values are automatically reflected in the `leaderboard` table.
 
 ### Steps:
-1. **Ensure Both Tables Exist** – Your `User Profiles` table should already exist, and the `leaderboard` table should have columns (`user_id`, `username`, `streak`).
-2. **Create a PostgreSQL Trigger** – This will automatically insert corresponding rows into `leaderboard` whenever a new row is added to `User Profiles`.
+1. **Ensure Both Tables Exist**  
+   Since you've already created both tables (`User Profiles` and `leaderboard`), verify that the columns you need (`user_id`, `username`, `streak`) exist in both tables.
 
-### Example Trigger:
+2. **Create a Trigger Function**
+   You need a PostgreSQL function that runs whenever a new row is inserted or updated in `User Profiles`:
 
-```sql
-CREATE OR REPLACE FUNCTION update_leaderboard()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO leaderboard (user_id, username, streak)
-    VALUES (NEW.user_id, NEW.username, NEW.streak);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+   ```sql
+   CREATE OR REPLACE FUNCTION update_leaderboard()
+   RETURNS TRIGGER AS $$
+   BEGIN
+       INSERT INTO leaderboard (user_id, username, streak)
+       VALUES (NEW.user_id, NEW.username, NEW.streak)
+       ON CONFLICT (user_id) 
+       DO UPDATE SET username = EXCLUDED.username, streak = EXCLUDED.streak;
+       RETURN NEW;
+   END;
+   $$ LANGUAGE plpgsql;
+   ```
 
-CREATE TRIGGER user_profiles_insert_trigger
-AFTER INSERT ON "User Profiles"
-FOR EACH ROW
-EXECUTE FUNCTION update_leaderboard();
-```
+   - This function inserts the new row into `leaderboard` and updates existing records if a `user_id` already exists.
+
+3. **Create the Trigger**
+   Attach this function to the `User Profiles` table so that it automatically runs whenever an insert or update occurs:
+
+   ```sql
+   CREATE TRIGGER user_profiles_trigger
+   AFTER INSERT OR UPDATE ON "User Profiles"
+   FOR EACH ROW
+   EXECUTE FUNCTION update_leaderboard();
+   ```
 
 ### Explanation:
-- `update_leaderboard()`: A function that automatically inserts a row into `leaderboard` when a new entry is added to `User Profiles`.
-- `AFTER INSERT ON "User Profiles"`: Ensures the trigger runs after a new row is added to `User Profiles`.
-- `EXECUTE FUNCTION update_leaderboard()`: Calls the function whenever a row is inserted.
+- The **trigger function** ensures that every time a new entry is added or updated in `User Profiles`, the corresponding row in `leaderboard` is updated.
+- The `ON CONFLICT` clause ensures updates occur if the `user_id` already exists.
 
-### Keeping the Tables Updated:
-If you want updates in `User Profiles` to reflect in `leaderboard`, you can create another trigger for `UPDATE` operations:
+### Alternative Approach:
+If you want to pull data dynamically instead of storing it separately, you can use a **VIEW**:
 
 ```sql
-CREATE OR REPLACE FUNCTION sync_leaderboard()
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE leaderboard
-    SET username = NEW.username,
-        streak = NEW.streak
-    WHERE user_id = NEW.user_id;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER user_profiles_update_trigger
-AFTER UPDATE ON "User Profiles"
-FOR EACH ROW
-EXECUTE FUNCTION sync_leaderboard();
+CREATE VIEW leaderboard AS
+SELECT user_id, username, streak
+FROM "User Profiles";
 ```
 
-### Summary:
-- **Inserts** will copy data from `User Profiles` to `leaderboard` automatically.
-- **Updates** will ensure changes in `User Profiles` are synchronized with `leaderboard`.
+This ensures `leaderboard` always reflects `User Profiles` **without needing a trigger**.
 
-Using triggers in Supabase ensures that the data in your `leaderboard` table stays consistent with your `User Profiles`. Let me know if you need additional enhancements!
+Let me know if you need modifications! 🚀
