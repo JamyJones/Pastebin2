@@ -1,90 +1,86 @@
-To achieve automatic synchronization between your `User Profiles` table and your `leaderboard` table, the recommended approach is to use **PostgreSQL triggers**. Views are read-only and do not support automatic updates or insertions into other tables when data changes, unless they are **materialized views**, which still do not automatically update other tables unless refreshed manually.
+To achieve your goal of copying all rows from the "User  Profiles" table to the "leaderboard" table and keeping the "leaderboard" table updated automatically, you can use a combination of triggers and functions in Supabase (which is built on PostgreSQL).
 
-### Solution overview:
+### Step 1: Insert Existing Data
 
-1. **Insert existing data into `leaderboard`** to initialize your data.
-2. **Create a trigger function** that runs on `INSERT` (and possibly `UPDATE` or `DELETE`) on `User Profiles`.
-3. **Create a trigger** that invokes this function, so that when a row is added or modified in `User Profiles`, the `leaderboard` table is updated accordingly.
-
----
-
-### Step 1: Populate the `leaderboard` table
-
-Since the table already exists, you can copy the current data via:
+First, you need to copy the existing data from the "User  Profiles" table to the "leaderboard" table. You can do this with an `INSERT INTO ... SELECT` statement:
 
 ```sql
 INSERT INTO leaderboard (user_id, username, streak)
 SELECT user_id, username, streak
-FROM "User Profiles"
-ON CONFLICT (user_id) DO UPDATE SET 
-  username = EXCLUDED.username,
-  streak = EXCLUDED.streak;
+FROM "User  Profiles";
 ```
 
-*Note*: If `leaderboard` has a primary key or unique constraint on `user_id`, you may want to handle conflicts via `ON CONFLICT`.
+### Step 2: Create a Trigger Function
 
----
-
-### Step 2: Create a trigger function
-
-This function will ensure that any insert, update, or delete on the main table is reflected in the `leaderboard`.
+Next, you need to create a trigger function that will automatically insert a new row into the "leaderboard" table whenever a new row is inserted into the "User  Profiles" table.
 
 ```sql
-CREATE OR REPLACE FUNCTION sync_leaderboard()
+CREATE OR REPLACE FUNCTION update_leaderboard()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF (TG_OP = 'INSERT') THEN
-    -- Insert new row into leaderboard
     INSERT INTO leaderboard (user_id, username, streak)
-    VALUES (NEW.user_id, NEW.username, NEW.streak)
-    ON CONFLICT (user_id) DO UPDATE SET
-      username = EXCLUDED.username,
-      streak = EXCLUDED.streak;
+    VALUES (NEW.user_id, NEW.username, NEW.streak);
     RETURN NEW;
-    
-  ELSIF (TG_OP = 'UPDATE') THEN
-    -- Update existing row in leaderboard
-    UPDATE leaderboard
-    SET username = NEW.username,
-        streak = NEW.streak
-    WHERE user_id = NEW.user_id;
-    RETURN NEW;
-    
-  ELSIF (TG_OP = 'DELETE') THEN
-    -- Optionally, delete from leaderboard if user profile is deleted
-    DELETE FROM leaderboard WHERE user_id = OLD.user_id;
-    RETURN OLD;
-  END IF;
-  RETURN NULL; -- should not reach here
 END;
 $$ LANGUAGE plpgsql;
 ```
 
----
+### Step 3: Create a Trigger
 
-### Step 3: Attach trigger to your main table
+Now, you need to create a trigger that will call the function you just created whenever a new row is inserted into the "User  Profiles" table.
 
 ```sql
-CREATE TRIGGER trigger_sync_leaderboard
-AFTER INSERT OR UPDATE OR DELETE ON "User Profiles"
+CREATE TRIGGER insert_leaderboard
+AFTER INSERT ON "User  Profiles"
 FOR EACH ROW
-EXECUTE FUNCTION sync_leaderboard();
+EXECUTE FUNCTION update_leaderboard();
 ```
 
----
+### Step 4: (Optional) Update and Delete Triggers
 
-### Additional Notes:
+If you also want to keep the "leaderboard" table updated when rows are updated or deleted in the "User  Profiles" table, you can create additional triggers for those actions.
 
-- Ensure the `leaderboard` table has a `PRIMARY KEY` on `user_id`.
-- If you want the `leaderboard` to always reflect the latest state, this approach keeps it synchronized in real-time.
-- You can extend this logic to handle bulk operations additionally with a schedule or batch process if needed.
+#### Update Trigger
 
----
+```sql
+CREATE OR REPLACE FUNCTION update_leaderboard_on_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE leaderboard
+    SET username = NEW.username, streak = NEW.streak
+    WHERE user_id = NEW.user_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-### Summary:
+CREATE TRIGGER update_leaderboard
+AFTER UPDATE ON "User  Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION update_leaderboard_on_update();
+```
 
-- Initialize `leaderboard` with existing data.
-- Use a trigger to automate updates on data changes.
-- This ensures your `leaderboard` is always up-to-date with minimal manual effort.
+#### Delete Trigger
 
-Would you like me to help you write the full SQL commands to execute for your specific setup?
+```sql
+CREATE OR REPLACE FUNCTION delete_leaderboard()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM leaderboard
+    WHERE user_id = OLD.user_id;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER delete_leaderboard
+AFTER DELETE ON "User  Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION delete_leaderboard();
+```
+
+### Summary
+
+1. Use the `INSERT INTO ... SELECT` statement to copy existing data.
+2. Create a trigger function to handle new inserts.
+3. Create triggers for updates and deletes if needed.
+
+This setup will ensure that your "leaderboard" table is automatically updated whenever there are changes in the "User  Profiles" table.
