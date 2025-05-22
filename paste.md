@@ -1,72 +1,38 @@
-## Summary
-Adding **SECURITY DEFINER** to the PostgreSQL trigger function to bypass Row-Level Security (RLS) restrictions during execution.
+To include a security definer in your trigger function that allows it to bypass Row Level Security (RLS), you need to ensure that the function is defined with the `SECURITY DEFINER` attribute. This allows the function to execute with the privileges of the user who created the function, rather than the user who is invoking it.
 
----
-
-### Explanation:
-
-**1. Background**  
-In PostgreSQL, **Row-Level Security (RLS)** restricts access to table rows based on policies defined. By default, when a function is executed, it runs with the privileges of the caller (invoker rights). Sometimes, you need the function to execute with **owner privileges** (definer rights), especially when RLS policies would otherwise block necessary operations.
-
-**2. Security Definer**  
-Adding `SECURITY DEFINER` to your function makes it execute with the privileges of the user who created the function, **bypassing RLS policies** if necessary.
-
-**3. Implementation**  
-Modify your function's header:
+Here’s your modified SQL code with the necessary adjustments:
 
 ```sql
-create function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  -- Function logic
-end;
-$$;
-```
-
-This step ensures that when the trigger executes, the function runs with the privileges of the function owner instead of the caller, **enabling it to bypass RLS restrictions**.
-
-**4. Additional Considerations**  
-- **Function Owner Privileges:** Ensure the owner of the function has appropriate permissions on the target table (`public.profiles`), including **INSERT** privileges.
-- **Security Risks:** Using `SECURITY DEFINER` introduces security risks if not managed carefully; only assign this privilege to trusted functions and users.
-- **Search Path:** Setting `search_path` to empty ensures the function executes in a known namespace, avoiding accidental or malicious access to unintended schemas.
-
----
-
-### Final Example
-
-```sql
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  insert into "User Profiles" 
-  (user_id, username, streak, created_on, about, profile_image_url, topics)
-  values (
-    new.id,
-    new.raw_user_meta_data ->> 'username',
-    new.raw_user_meta_data ->> 'streak',
-    new.created_at,
-    new.raw_user_meta_data ->> 'about',
-    new.raw_user_meta_data ->> 'profile_image_url',
-    new.raw_user_meta_data ->> 'topics'
+-- Inserts a row into public.profiles
+CREATE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  INSERT INTO "User  Profiles" (user_id, username, streak, created_on, about, profile_image_url, topics)
+  VALUES (
+    NEW.id,
+    NEW.raw_user_meta_data ->> 'username',
+    NEW.raw_user_meta_data ->> 'streak',
+    NEW.created_at,
+    NEW.raw_user_meta_data ->> 'about',
+    NEW.raw_user_meta_data ->> 'profile_image_url',
+    NEW.raw_user_meta_data ->> 'topics'
   );
-  return new;
-end;
+  RETURN NEW;
+END;
 $$;
+
+-- Trigger the function every time a user is created
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
 
----
+### Key Changes:
+1. **SECURITY DEFINER**: This keyword is added to the function definition to ensure it runs with the privileges of the function owner.
+2. **Formatting**: The SQL code is formatted for better readability.
 
-### References:
-## PostgreSQL Documentation on Security Definer ##
-https://www.postgresql.org/docs/current/plpgsql-statements.html#PLPGSQL-SECURITY-COAL
-
-## Row-Level Security (RLS) Policies ##
-https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+Make sure that the user who creates this function has the necessary permissions to insert into the `User  Profiles` table, as the function will execute with their privileges.
