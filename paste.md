@@ -1,57 +1,60 @@
-In Supabase, you can set raw metadata when signing up a new user by utilizing the `data` field within the `signUp` method of the Supabase Auth client. The `data` field allows you to store custom user attributes that will be accessible within the `auth.users` table.
+In PostgreSQL (and by extension Supabase), when referencing columns with spaces in their names, you need to escape the column name using double quotes `"`. 
 
-Here's an example of how to set raw metadata when signing up a user in Supabase using JavaScript:
+### How to reference a column with spaces:
+Suppose you have a column `"Created at"` in the `auth.users` table, and you want to select or filter based on it.
 
-```javascript
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_ANON_KEY';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-async function signUpUser() {
-  const { data, error } = await supabase.auth.signUp({
-    email: 'user@example.com',
-    password: 'securepassword',
-    options: {
-      data: {
-        role: 'admin',
-        preferences: {
-          theme: 'dark',
-          notifications: true
-        }
-      }
-    }
-  });
-
-  if (error) {
-    console.error('Error signing up:', error.message);
-    return;
-  }
-
-  console.log('User signed up:', data);
-}
-
-signUpUser();
+### Example: Selecting data
+```sql
+SELECT 
+  id,
+  email,
+  "Created at"
+FROM auth.users;
 ```
 
-### Explanation:
-- `signUp` is used to register a new user.
-- The `options` object contains a `data` field where you can store custom metadata.
-- In this example, the metadata includes the user’s `role` and `preferences`.
-- The data will be stored within the `auth.users` table and can be accessed later.
-
-To retrieve the metadata later, you can query the user's session:
-
-```javascript
-const { data: { user } } = await supabase.auth.getUser();
-console.log(user.user_metadata);
+### Example: Filtering based on the `"Created at"` column
+```sql
+SELECT 
+  id,
+  email
+FROM auth.users
+WHERE "Created at" > '2023-01-01';
 ```
 
-### Best Practices:
-1. **Keep metadata minimal**: Avoid storing large objects, as excessive metadata could affect performance.
-2. **Ensure security**: Do not store sensitive data (e.g., passwords or API keys) within metadata.
-3. **Use structured data**: Keep metadata organized and easy to parse.
+### Reference a specific column value (e.g., to join or insert):
+If you're referencing this column in other tables or operations, always enclose the column name in double quotes:
 
-This method allows for flexible user management and customization within Supabase. Let me know if you need further clarification!
+```sql
+-- Example: inserting into another table, referencing "Created at"
+INSERT INTO events (user_id, event_time)
+SELECT 
+  id,
+  "Created at"
+FROM auth.users
+WHERE email = 'example@example.com';
+```
+
+### Important notes:
+- **Consistency:** Always double-quote column names with spaces when used in SQL statements.
+- **Best practice:** It’s generally recommended to avoid spaces in column names for simplicity, but if you're working with existing schema, quoting is necessary.
+
+---
+
+If you need to alias this column in a query:
+```sql
+SELECT 
+  id,
+  email,
+  "Created at" AS created_at
+FROM auth.users;
+```
+
+This will allow you to refer to `"Created at"` as `created_at` in the result set.
+
+---
+
+### Summary
+- Use double quotes `"Created at"` to reference the column.
+- Be consistent in quoting for select, insert, update, delete operations referencing such columns.
+
+Let me know if you'd like an example with a specific use case!
