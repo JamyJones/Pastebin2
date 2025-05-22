@@ -1,24 +1,21 @@
-You’d like a SQL code template to reference a column from another table in a new one. This is typically done using a foreign key constraint. Here’s a professional template for creating two tables, where the second table references a column from the first:
+Certainly! To reference a column from one table in another, you typically use a **foreign key** to establish a relationship between them. Below is a SQL template for adding a foreign key constraint to an existing table:
 
 ```sql
--- Create the referenced table (parent)
-CREATE TABLE users (
-    id INT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL
-);
-
--- Create the referencing table (child) with a foreign key
-CREATE TABLE orders (
-    order_id INT PRIMARY KEY,
-    user_id INT,
-    order_date DATE,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
+ALTER TABLE new_table
+ADD CONSTRAINT fk_new_table_column
+FOREIGN KEY (column_name)
+REFERENCES existing_table(existing_column);
 ```
 
-**Best Practices:**
-- Ensure referenced columns are indexed (usually primary keys).
-- Use appropriate data types and constraints.
-- Name foreign keys clearly for maintainability.
+### Explanation:
+- `ALTER TABLE new_table`: Modifies the new table.
+- `ADD CONSTRAINT fk_new_table_column`: Adds a named foreign key constraint.
+- `FOREIGN KEY (column_name)`: Specifies the column in the new table that will reference the existing table.
+- `REFERENCES existing_table(existing_column)`: Defines the relationship by linking `column_name` in the new table to `existing_column` in the existing table.
 
-Let me know if you need an example for a specific SQL dialect or use case!
+#### Best Practices:
+- Ensure that the `existing_column` is a **primary key** or has a **unique constraint** in the referenced table.
+- Use **INDEXES** on foreign keys for optimized query performance.
+- Choose appropriate **CASCADE** options (`ON DELETE CASCADE`, `ON UPDATE CASCADE`) based on how you want changes in the existing table to affect the referencing table.
+
+Would you like assistance in optimizing constraints or handling edge cases?
