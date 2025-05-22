@@ -1,81 +1,149 @@
-To copy all rows from one table to another in Supabase and automate the process so that updates in the main table reflect in the new table, you can use a combination of SQL triggers and functions. Here’s how you can achieve this:
+To achieve your goal of copying all rows from the `User Profiles` table into the `leaderboard` table and keeping them synchronized (i.e., any insert, update, or delete on the main table reflects on the `leaderboard`), you should use **database triggers**. Supabase is built on PostgreSQL, so you can leverage PostgreSQL’s powerful trigger system.
 
-### Step 1: Create the New Table
+Here's the **step-by-step strategy**:
 
-Assuming you have already created the new table with the same column names as the main table, ensure that the structure matches.
+1. **Bulk copy existing data** from `User Profiles` to `leaderboard` initially.
+2. **Create triggers** that automatically synchronize subsequent changes.
 
-### Step 2: Create a Function to Copy Data
+---
 
-You need to create a PostgreSQL function that will handle the insertion of data from the main table to the new table. Here’s an example function:
+### 1. Bulk Copy Existing Data
+
+You can run a simple SQL query to copy data:
 
 ```sql
-CREATE OR REPLACE FUNCTION copy_data_to_new_table()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO new_table (column1, column2, column3)  -- Replace with your actual column names
-    VALUES (NEW.column1, NEW.column2, NEW.column3);   -- Replace with your actual column names
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+INSERT INTO leaderboard (column1, column2, column3, ...)
+SELECT column1, column2, column3, ...
+FROM "User Profiles";
 ```
 
-### Step 3: Create a Trigger
+Replace `column1, column2, column3, ...` with your actual column names.
 
-Next, you need to create a trigger that will call this function whenever a new row is inserted into the main table.
+### 2. Create Triggers for Automation
 
-```sql
-CREATE TRIGGER after_insert_main_table
-AFTER INSERT ON main_table  -- Replace with your actual main table name
-FOR EACH ROW
-EXECUTE FUNCTION copy_data_to_new_table();
-```
+**Objective:** Whenever a row is inserted, updated, or deleted from `User Profiles`, the corresponding `leaderboard` should reflect that change.
 
-### Step 4: Handle Updates (Optional)
+---
 
-If you also want to update the new table when the main table is updated, you can create another function and trigger for updates:
+### Example Trigger Functions and Triggers
+
+#### a) Handle Inserts
 
 ```sql
-CREATE OR REPLACE FUNCTION update_new_table()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION sync_leaderboard_insert() RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE new_table
-    SET column1 = NEW.column1, column2 = NEW.column2, column3 = NEW.column3  -- Replace with your actual column names
-    WHERE id = OLD.id;  -- Assuming you have an 'id' column to match rows
-    RETURN NEW;
+  INSERT INTO leaderboard (column1, column2, column3, ...)
+  VALUES (NEW.column1, NEW.column2, NEW.column3, ...);
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER after_update_main_table
-AFTER UPDATE ON main_table  -- Replace with your actual main table name
+CREATE TRIGGER trigger_leaderboard_insert
+AFTER INSERT ON "User Profiles"
 FOR EACH ROW
-EXECUTE FUNCTION update_new_table();
+EXECUTE FUNCTION sync_leaderboard_insert();
 ```
 
-### Step 5: Handle Deletions (Optional)
-
-If you want to delete corresponding rows in the new table when rows are deleted from the main table, you can create a delete trigger as well:
+#### b) Handle Updates
 
 ```sql
-CREATE OR REPLACE FUNCTION delete_from_new_table()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION sync_leaderboard_update() RETURNS TRIGGER AS $$
 BEGIN
-    DELETE FROM new_table
-    WHERE id = OLD.id;  -- Assuming you have an 'id' column to match rows
-    RETURN OLD;
+  UPDATE leaderboard
+  SET column1 = NEW.column1,
+      column2 = NEW.column2,
+      column3 = NEW.column3
+  WHERE id = NEW.id; -- assuming 'id' is the primary key
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER after_delete_main_table
-AFTER DELETE ON main_table  -- Replace with your actual main table name
+CREATE TRIGGER trigger_leaderboard_update
+AFTER UPDATE ON "User Profiles"
 FOR EACH ROW
-EXECUTE FUNCTION delete_from_new_table();
+EXECUTE FUNCTION sync_leaderboard_update();
 ```
+
+#### c) Handle Deletes
+
+```sql
+CREATE OR REPLACE FUNCTION sync_leaderboard_delete() RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM leaderboard WHERE id = OLD.id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_leaderboard_delete
+AFTER DELETE ON "User Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION sync_leaderboard_delete();
+```
+
+---
 
 ### Summary
 
-1. Create a new table with the same structure as the main table.
-2. Create a function to copy data from the main table to the new table.
-3. Create a trigger to call this function on insertions.
-4. Optionally, create additional functions and triggers for updates and deletions.
+- Run the initial bulk insert to copy existing data.
+- Create these three triggers to maintain synchronization.
 
-This setup will ensure that your new table is automatically updated whenever there are changes in the main table.
+### Important Notes
+- Ensure the primary key (`id` or other unique identifier) exists in both tables for matching.
+- You might need to adapt column names and trigger logic depending on your schema.
+- Consider wrapping this in a migration or script for automation.
+
+---
+
+### Example in the Supabase SQL Editor:
+
+```sql
+-- Bulk copy existing data
+INSERT INTO leaderboard (id, name, score)
+SELECT id, name, score FROM "User Profiles";
+
+-- Trigger functions
+CREATE OR REPLACE FUNCTION sync_leaderboard_insert() RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO leaderboard (id, name, score)
+  VALUES (NEW.id, NEW.name, NEW.score);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION sync_leaderboard_update() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE leaderboard
+  SET name = NEW.name,
+      score = NEW.score
+  WHERE id = NEW.id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION sync_leaderboard_delete() RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM leaderboard WHERE id = OLD.id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers
+CREATE TRIGGER trigger_leaderboard_insert
+AFTER INSERT ON "User Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION sync_leaderboard_insert();
+
+CREATE TRIGGER trigger_leaderboard_update
+AFTER UPDATE ON "User Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION sync_leaderboard_update();
+
+CREATE TRIGGER trigger_leaderboard_delete
+AFTER DELETE ON "User Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION sync_leaderboard_delete();
+```
+
+---
+
+This approach ensures that `leaderboard` is always an up-to-date replica of key data from `User Profiles`, automatically synchronized via database triggers.
