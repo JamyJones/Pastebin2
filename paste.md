@@ -1,47 +1,45 @@
-In Supabase, when signing up a new user, you can set raw metadata by including it in the `data` parameter while calling the `signUp` method from the Supabase authentication client. This metadata is stored in the `raw_user_meta_data` field.
+In Supabase, you can set raw metadata for a new user during signup using the `data` field in the `auth.signUp` method. This metadata is stored in the `auth.users` table under the `raw_user_meta_data` column.
 
-Here's an example using Supabase's JavaScript client:
+### Example: Setting Raw Metadata During Signup
+Here’s how you can do it using Supabase's JavaScript client:
 
 ```javascript
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+const supabase = createClient('https://your-project-ref.supabase.co', 'your-anon-key');
 
-async function signUpUser(email, password, metadata) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: metadata,  // Set custom metadata
-    },
-  });
+async function signUpUser() {
+    const { data, error } = await supabase.auth.signUp({
+        email: 'newuser@example.com',
+        password: 'strongpassword',
+        options: {
+            data: {
+                first_name: 'John',
+                last_name: 'Doe',
+                role: 'user',
+                subscribed: true
+            }
+        }
+    });
 
-  if (error) {
-    console.error('Error signing up:', error.message);
-  } else {
-    console.log('User signed up successfully:', data.user);
-  }
+    if (error) {
+        console.error('Error signing up:', error);
+    } else {
+        console.log('User signed up successfully:', data);
+    }
 }
 
-const metadata = { role: 'admin', preferences: { theme: 'dark' } };
-signUpUser('test@example.com', 'securepassword', metadata);
+signUpUser();
 ```
 
 ### Explanation:
-- The `signUp` method accepts user credentials along with an `options` parameter.
-- The `options` object includes a `data` field where raw metadata can be stored.
-- The metadata provided (e.g., user role, preferences) will be saved in Supabase's `raw_user_meta_data` field.
+- The `options.data` object allows you to store custom metadata for the user.
+- Metadata is saved in the `auth.users` table under `raw_user_meta_data`.
+- This data remains accessible whenever you fetch the user's session or profile.
 
-After user signup, you can retrieve this metadata using:
+#### Best Practices:
+- Always validate metadata before storing it to prevent unwanted or incorrect data.
+- Consider restricting metadata updates to authenticated users only.
+- Avoid storing sensitive information in metadata fields.
 
-```javascript
-const { data: user } = await supabase.auth.getUser();
-console.log(user.user_metadata);
-```
-
-### Best Practices:
-- Store only necessary metadata to avoid bloating the user's profile.
-- Avoid storing sensitive information in raw metadata, as it may be accessible to the frontend.
-- Ensure metadata follows a structured format for easier retrieval and processing.
-
-Would you like guidance on updating metadata after user signup?
+Would you like a follow-up on retrieving or updating this metadata later?
