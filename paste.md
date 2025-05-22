@@ -1,39 +1,55 @@
-Certainly! You can use PostgreSQL triggers to automatically update the `public.profile` table whenever a new user is added to the `auth.users` table. Below is an example that illustrates how to achieve this using a `BEFORE INSERT` trigger:
+In Supabase, when signing up a new user via the Auth API, you can include custom metadata by passing the `user_metadata` parameter. This allows you to attach custom key-value pairs that will be stored alongside the user record, accessible through the `user_metadata` property in the user object.
 
-### Step 1: Create a Trigger Function
-First, define a function that will insert a new row into `public.profile` whenever a new user is added to `auth.users`.
+### How to set raw user metadata during signup:
 
-```sql
-CREATE FUNCTION public.sync_profile()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    INSERT INTO public.profile (user_id, name, email)
-    VALUES (NEW.id, NEW.name, NEW.email);
-    RETURN NEW;
-END;
-$$;
+**Using the Supabase JavaScript client:**
+
+```js
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize your Supabase client
+const supabaseUrl = 'https://your-project.supabase.co'
+const supabaseKey = 'public-anonymous-key'
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function signUpUser(email, password, userMetadata) {
+  const { user, session, error } = await supabase.auth.signUp({
+    email,
+    password,
+  }, {
+    data: userMetadata // This is where you pass custom metadata
+  });
+
+  if (error) {
+    console.error('Error during sign up:', error);
+  } else {
+    console.log('User signed up:', user);
+  }
+}
+
+// Example usage:
+signUpUser('newuser@example.com', 'securePassword123', {
+  first_name: 'John',
+  last_name: 'Doe',
+  role: 'member'
+});
 ```
 
-### Step 2: Create the Trigger
-Now, set up a trigger to call this function whenever a new row is inserted into `auth.users`.
+### Important considerations:
+- The second argument to `signUp` can include a `data` object which is stored as `user_metadata`.
+- Make sure your Supabase project’s authentication configuration allows `user_metadata` to be set and retrieved.
 
-```sql
-CREATE TRIGGER tr_on_user_insert
-AFTER INSERT ON auth.users
-FOR EACH ROW
-EXECUTE FUNCTION public.sync_profile();
+### Additional notes:
+- **Custom metadata cannot contain nested objects:** As per current Supabase behavior, nested objects in `user_metadata` might not serialize properly — stick to flat key-value pairs.
+- **After sign-up, you can access `user_metadata` from the user object:**
+
+```js
+console.log(user.user_metadata); // { first_name: 'John', last_name: 'Doe', role: 'member' }
 ```
 
-### Explanation:
-- The `sync_profile` function inserts a new row into `public.profile`, using the data from the newly inserted row in `auth.users`.
-- The `AFTER INSERT` trigger ensures that each time a new user is added to `auth.users`, the corresponding profile entry is automatically created.
+### Summary:
+- Pass a `data` object as the second parameter for `signUp` to include raw metadata.
+- Use plain key-value pairs, preferably flat structures.
+- Ensure your Supabase settings permit user_metadata to be written.
 
-### Best Practices:
-1. **Ensure Referential Integrity** – Use `FOREIGN KEY` constraints to maintain consistency between `auth.users` and `public.profile`.
-2. **Handle Errors** – You may want to add error handling inside the trigger function to manage edge cases.
-3. **Optimize Performance** – If a high volume of inserts occurs, consider using batch processing instead of row-by-row triggers.
-
-Would you like me to expand on any part, such as error handling or optimizations?
+Let me know if you want a code snippet for server-side signup (using SDKs in other languages) or further customization!
