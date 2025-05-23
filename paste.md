@@ -1,11 +1,11 @@
-To include a security definer in your trigger function that allows it to bypass Row Level Security (RLS), you need to ensure that the function is defined with the `SECURITY DEFINER` attribute. This allows the function to execute with the privileges of the user who created the function, rather than the user who is invoking it.
+To include a `SECURITY DEFINER` clause in your trigger function to bypass Row Level Security (RLS), you need to ensure that the function is defined with the appropriate privileges. The `SECURITY DEFINER` option allows the function to execute with the privileges of the user who defined the function, rather than the user who calls it.
 
-Here’s your modified trigger function with the necessary security definer and a few adjustments for clarity:
+Here’s your modified trigger function with the `SECURITY DEFINER` clause included:
 
 ```sql
--- Create a function to handle new user inserts into public.profiles
+-- Inserts a row into public.profiles
 CREATE FUNCTION public.handle_new_user()
-RETURNS TRIGGER
+RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
@@ -25,14 +25,14 @@ BEGIN
 END;
 $$;
 
--- Create a trigger that calls the function every time a user is created
+-- Trigger the function every time a user is created
 CREATE TRIGGER on_auth_user_created
-AFTER INSERT ON auth.users
-FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
 
 ### Key Changes:
-1. **SECURITY DEFINER**: This attribute is included in the function definition to ensure it runs with the privileges of the function owner.
-2. **Formatting**: The SQL code is formatted for better readability.
+1. Added `SECURITY DEFINER` to the function definition to ensure it runs with the privileges of the function owner.
+2. Ensured that the function and trigger definitions are properly formatted and maintain the original logic.
 
-Make sure that the user who creates this function has the necessary permissions to insert into the `User  Profiles` table, as the function will execute with their privileges.
+Make sure that the user who creates this function has the necessary permissions to insert into the `User  Profiles` table, as the function will execute with that user's privileges.
