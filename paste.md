@@ -1,85 +1,83 @@
-## Best Table Rendering Library for Leaderboard with Avatar Images
+Certainly! To create a table using **ag-Grid** with three columns—`Usernames`, `Avatar Images`, and `Streaks`—you need to set up your grid with proper column definitions, data, and cell rendering where necessary. Here's an example demonstrating how to do this professionally.
 
----
+### 1. Include ag-Grid in your project
 
-### Explanation:
+Ensure you have included ag-Grid's library in your project. For example, via CDN in HTML:
 
-#### **1. Overview of Table Rendering Libraries**
-Rendering a leaderboard with three columns, including user avatars, requires a table library that supports **image embedding**, **custom styling**, and **efficient data handling**. Several libraries cater to this need, offering flexibility and performance.
+```html
+<!-- Ag-Grid CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
 
----
+<!-- Ag-Grid JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.noStyle.js"></script>
+```
 
-#### **2. Recommended Libraries**
-Here are some of the best table rendering libraries that can handle leaderboard data with avatar images:
+### 2. Set up the HTML container
 
-- **React-Data-Grid**: A highly efficient and adaptable React component designed for displaying large datasets. It supports custom cell rendering, making it ideal for embedding avatars [[0]](https://reactjsexample.com/20-best-react-table-components-and-libraries/).
-- **TanStack Table**: A headless table library that provides full control over markup and styles. It allows developers to customize the table appearance and behavior, including avatar integration [[0]](https://reactjsexample.com/20-best-react-table-components-and-libraries/).
-- **Mantine DataTable**: A lightweight and dependency-free table component within the Mantine UI framework. It supports asynchronous data loading and pagination, making it useful for leaderboard applications [[0]](https://reactjsexample.com/20-best-react-table-components-and-libraries/).
-- **React-Handsontable**: A wrapper for Handsontable, a powerful JavaScript data grid component. It offers extensive customization options, including avatar embedding [[0]](https://reactjsexample.com/20-best-react-table-components-and-libraries/).
-- **Rc-Table**: A versatile React table component with practical features for rendering leaderboard data [[0]](https://reactjsexample.com/20-best-react-table-components-and-libraries/).
+```html
+<div id="myGrid" class="ag-theme-alpine" style="height: 500px; width: 700px;"></div>
+```
 
----
+### 3. JavaScript code to initialize ag-Grid
 
-#### **3. Choosing the Right Library**
-When selecting a table rendering library, consider the following:
-- **Performance**: If handling large datasets, opt for React-Data-Grid or TanStack Table.
-- **Customization**: TanStack Table offers full control over styles and markup.
-- **Ease of Use**: Mantine DataTable is lightweight and easy to integrate.
-- **Avatar Support**: Ensure the library allows custom cell rendering for embedding images.
-
----
-
-### Example:
-Here’s a simple example using **TanStack Table** to render a leaderboard with avatars:
-
-```jsx
-import { useReactTable } from '@tanstack/react-table';
-
-const data = [
-  { rank: 1, name: 'Alice', avatar: 'https://example.com/alice.jpg' },
-  { rank: 2, name: 'Bob', avatar: 'https://example.com/bob.jpg' },
-];
-
-const columns = [
-  { accessorKey: 'rank', header: 'Rank' },
-  { accessorKey: 'name', header: 'Name' },
-  {
-    accessorKey: 'avatar',
-    header: 'Avatar',
-    cell: (info) => <img src={info.getValue()} alt="Avatar" width="50" />,
+```js
+// Column definitions with custom cell renderers for avatar images
+const columnDefs = [
+  { headerName: 'Username', field: 'username', sortable: true, filter: true },
+  { 
+    headerName: 'Avatar', 
+    field: 'avatar', 
+    cellRenderer: params => {
+      return `<img src="${params.value}" alt="avatar" style="width:50px; height:50px; border-radius:50%;">`;
+    }
   },
+  { headerName: 'Streaks', field: 'streaks', sortable: true, filter: true }
 ];
 
-const LeaderboardTable = () => {
-  const table = useReactTable({ data, columns });
+// Sample row data
+const rowData = [
+  {
+    username: 'user1',
+    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    streaks: 5
+  },
+  {
+    username: 'user2',
+    avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+    streaks: 10
+  },
+  {
+    username: 'user3',
+    avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+    streaks: 7
+  }
+];
 
-  return (
-    <table>
-      <thead>
-        <tr>{columns.map((col) => <th key={col.accessorKey}>{col.header}</th>)}</tr>
-      </thead>
-      <tbody>
-        {data.map((row, i) => (
-          <tr key={i}>
-            {columns.map((col) => (
-              <td key={col.accessorKey}>{col.cell ? col.cell({ getValue: () => row[col.accessorKey] }) : row[col.accessorKey]}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
+// Grid options
+const gridOptions = {
+  columnDefs: columnDefs,
+  rowData: rowData,
+  defaultColDef: {
+    flex: 1,
+    minWidth: 100,
+    editable: false,
+  }
 };
 
-export default LeaderboardTable;
+// Initialize the grid
+document.addEventListener('DOMContentLoaded', () => {
+  const gridDiv = document.querySelector('#myGrid');
+  new agGrid.Grid(gridDiv, gridOptions);
+});
 ```
 
 ---
 
-### References:
-## https://reactjsexample.com/20-best-react-table-components-and-libraries/ ##
+### Summary:
+- **Column Definitions**: Include `headerName` and `field`. Use `cellRenderer` for custom rendering (avatar images).
+- **Row Data**: Provide data with appropriate URLs for avatar images.
+- **Grid Initialization**: Instantiate `agGrid.Grid` with container and options.
+- **Styling**: Use CSS for avatar size and border-radius for rounded images.
 
-
-
-
-> [0] [20 Best React Table Components and Libraries In 2024 - React.js Examples](https://reactjsexample.com/20-best-react-table-components-and-libraries/)
+Feel free to customize further — for pagination, sorting, styling, or adding editing capabilities.
