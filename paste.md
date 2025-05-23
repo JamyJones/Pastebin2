@@ -1,97 +1,98 @@
-## Summary
-Best table rendering libraries for displaying leaderboard data with avatars
+## Summary  
+**Best table rendering library for a leaderboard with images**
 
----
-
-### Explanation:
-
-**1. React Table (React.js)**  
-- **Overview:** React Table is a popular lightweight library tailored for React applications, highly customizable, and supports rich features like sorting, pagination, and custom cell rendering.  
-- **Advantages:**  
-  - Easy to customize cells to include avatar images  
-  - No dependency on DOM or CSS frameworks  
-  - Good performance for large datasets  
-- **Usage:**  
-  - Install via `npm install react-table`  
-  - Leverage `columns` configurations to define headers and custom cell renderers  
-
-**2. DataTables (jQuery/JavaScript)**  
-- **Overview:** DataTables is a jQuery plugin providing extensive features such as pagination, filtering, and sorting.  
-- **Advantages:**  
-  - Mature and well-documented  
-  - Custom cell rendering possible with `render` functions  
-  - Supports image embedding within cells  
-- **Usage:**  
-  - Include DataTables CSS/JS files  
-  - Initialize the table with options and column definitions, customizing cell content  
-
-**3. Tabulator (JavaScript)**  
-- **Overview:** A feature-rich, easy-to-use JavaScript table library supporting complex features including custom cell formatting.  
-- **Advantages:**  
-  - Supports custom formatter functions for avatars  
-  - Virtually unlimited customization options  
-  - Supports large datasets efficiently  
-- **Usage:**  
-  - Download or include via CDN  
-  - Define table columns with formatter functions to embed avatar images  
-
-**4. Vuetify Data Table (Vue.js)**  
-- **Overview:** If using Vue.js, Vuetify's `<v-data-table>` component makes rendering complex tables easy.  
-- **Advantages:**  
-  - Built-in support for images in cells  
-  - Custom headers and footer options  
-- **Usage:**  
-  - Requires Vuetify setup  
-  - Use `item.avatar` slot to customize avatar images within rows  
-
----
-
-### Practical Example (React Table with Avatar Rendering):
-
+---  
+**Explanation:**  
+  
+**Popular Libraries for Table Rendering:**  
+- **React Table (React.js):**  
+  - *Features:* Highly customizable, lightweight, supports images within cells, sorting, filtering.  
+  - *Use Case:* Ideal for React projects.  
+  - *Installation:* `npm install react-table`  
+  
+- **AG Grid:**  
+  - *Features:* Enterprise-grade, supports images, extensive features like sorting, filtering, pagination.  
+  - *Use Case:* Suitable for complex data tables, React, Angular, Vue.  
+  - *Installation:* `npm install ag-grid-react`  
+  
+- **DataTables (jQuery):**  
+  - *Features:* Easy to use, supports images, sorting, filtering.  
+  - *Use Case:* When working with jQuery-heavy projects.  
+  - *Installation:* via CDN or npm packages.  
+  
+- **Ant Design Table (Ant Design for React):**  
+  - *Features:* Stylish, rich features, supports images.  
+  - *Use Case:* For React apps with Ant Design framework.  
+  - *Installation:* `npm install antd`  
+  
+**Choosing the Best for Your Use Case:**  
+- For modern React projects focusing on customization, **React Table** is highly recommended.  
+- It allows rendering images smoothly within cells by customizing cell rendering functions.  
+  
+---  
+  
+**Example: React Table with Avatar Images**  
+  
 ```jsx
 import React from 'react';
 import { useTable } from 'react-table';
 
 const data = [
-  { rank: 1, name: 'Alice', score: 1500, avatar: 'alice.jpg' },
-  { rank: 2, name: 'Bob', score: 1400, avatar: 'bob.jpg' },
-  // more data
+  {
+    name: 'Player One',
+    score: 1500,
+    avatar: 'https://example.com/avatar1.png',
+  },
+  {
+    name: 'Player Two',
+    score: 1200,
+    avatar: 'https://example.com/avatar2.png',
+  },
 ];
 
 const columns = [
-  { Header: 'Rank', accessor: 'rank' },
-  { Header: 'User', accessor: 'name' },
-  { Header: 'Score', accessor: 'score' },
   {
     Header: 'Avatar',
     accessor: 'avatar',
     Cell: ({ value }) => <img src={value} alt="avatar" style={{ width: '40px', borderRadius: '50%' }} />,
   },
+  {
+    Header: 'Name',
+    accessor: 'name',
+  },
+  {
+    Header: 'Score',
+    accessor: 'score',
+  },
 ];
 
 function LeaderboardTable() {
-  const { getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headers,
+    rows,
+    prepareRow,
+  } = useTable({ columns, data });
 
   return (
-    <table {...getTableBodyProps()} style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <table {...getTableProps()} style={{ border: '1px solid black', width: '100%' }}>
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              <th style={{ border: '1px solid #ddd', padding: '8px' }} {...column.getHeaderProps()}>
-                {column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
+        <tr>
+          {headers.map((header) => (
+            <th {...header.getHeaderProps()} style={{ padding: '10px', backgroundColor: '#f0f0f0' }}>
+              {header.render('Header')}
+            </th>
+          ))}
+        </tr>
       </thead>
-      <tbody>
-        {rows.map(row => {
+      <tbody {...getTableBodyProps()}>
+        {rows.map((row) => {
           prepareRow(row);
           return (
             <tr {...row.getRowProps()}>
-              {row.cells.map(cell => (
-                <td style={{ border: '1px solid #ddd', padding: '8px' }} {...cell.getCellProps()}>
+              {row.cells.map((cell) => (
+                <td {...cell.getCellProps()} style={{ padding: '10px', textAlign: 'center' }}>
                   {cell.render('Cell')}
                 </td>
               ))}
@@ -102,12 +103,19 @@ function LeaderboardTable() {
     </table>
   );
 }
+
+export default LeaderboardTable;
 ```
 
----
+**Notes:**  
+- This code creates a simple leaderboard with an avatar, name, and score.  
+- The avatar column renders an image element.  
+- Adjust styles as needed for better appearance.
 
-### References  
-##React Table: https://react-table.tanstack.com/##  
-##DataTables: https://datatables.net/##  
-##Tabulator: http://tabulator.info/##  
-##Vuetify Data Table: https://vuetifyjs.com/en/components/data-tables/##
+---  
+  
+**References:**  
+- ##React Table Documentation##  
+- ##AG Grid Documentation##  
+- ##DataTables.net##  
+- ##Ant Design Table Component##
