@@ -1,66 +1,76 @@
-Here’s how you can create a leaderboard table using the AG Grid JavaScript API. This example sets up three columns: usernames, avatar images, and streaks. The avatar column uses `cellRenderer` to display images correctly.
+You’d like to create a leaderboard table using ag-Grid’s JavaScript API with three columns: usernames, avatar images, and streaks. Below is a professional implementation using ag-Grid’s community edition, including custom cell rendering for avatar images.
 
+HTML:
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AG Grid Leaderboard</title>
-    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-grid.css">
-    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-theme-alpine.css">
+  <meta charset="UTF-8">
+  <title>Leaderboard Table</title>
+  <link rel="stylesheet" href="https://docsbot.ai/">
+  <link rel="stylesheet" href="https://docsbot.ai/">
+  <style>
+    .avatar-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .ag-theme-alpine {
+      height: 400px;
+      width: 600px;
+    }
+  </style>
 </head>
 <body>
-    <div id="myGrid" class="ag-theme-alpine" style="height: 400px; width: 600px;"></div>
-    
-    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
-    <script>
-        // Sample leaderboard data
-        const rowData = [
-            { username: "Alice", avatar: "https://example.com/avatar1.png", streak: 15 },
-            { username: "Bob", avatar: "https://example.com/avatar2.png", streak: 10 },
-            { username: "Charlie", avatar: "https://example.com/avatar3.png", streak: 20 }
-        ];
-
-        // Column definitions
-        const columnDefs = [
-            { headerName: "Username", field: "username", sortable: true },
-            { 
-                headerName: "Avatar", 
-                field: "avatar", 
-                cellRenderer: params => `<img src="${params.value}" width="40" height="40" style="border-radius:50%;">`
-            },
-            { headerName: "Streak", field: "streak", sortable: true }
-        ];
-
-        // Grid options
-        const gridOptions = {
-            columnDefs: columnDefs,
-            rowData: rowData,
-            defaultColDef: {
-                resizable: true
-            }
-        };
-
-        // Initialize the grid
-        document.addEventListener("DOMContentLoaded", () => {
-            new agGrid.Grid(document.getElementById("myGrid"), gridOptions);
-        });
-    </script>
+  <div id="myGrid" class="ag-theme-alpine"></div>
+  <script src="https://docsbot.ai/"></script>
+  <script src="leaderboard.js"></script>
 </body>
 </html>
 ```
 
-### Explanation:
-- **AG Grid setup**: Includes styles and script from AG Grid CDN.
-- **Column definitions**:
-  - `username`: Standard text column.
-  - `avatar`: Uses `cellRenderer` to display images in table cells.
-  - `streak`: Numeric values that can be sorted.
-- **Grid options**: Enables resizing for better user experience.
+JavaScript (leaderboard.js):
+```javascript
+// Sample data
+const rowData = [
+  { username: 'alice', avatar: 'https://docsbot.ai/', streak: 12 },
+  { username: 'bob', avatar: 'https://docsbot.ai/', streak: 9 },
+  { username: 'carol', avatar: 'https://docsbot.ai/', streak: 15 }
+];
 
-This approach follows industry best practices by keeping configuration structured and data-driven. Let me know if you need enhancements! [[0]](https://github.com/EleanorEllingson/web-dev/tree/b2f2a382e77a20fd6895677c8b8f402ac4bae352/7-bank-project/1-template-route/translations/README.ko.md)
+// Column definitions
+const columnDefs = [
+  { headerName: 'Username', field: 'username', sortable: true, filter: true },
+  {
+    headerName: 'Avatar',
+    field: 'avatar',
+    cellRenderer: params => `<img class="avatar-img" src="${params.value}" alt="avatar">`,
+    width: 80,
+    suppressMenu: true
+  },
+  { headerName: 'Streak', field: 'streak', sortable: true, filter: true }
+];
 
+// Grid options
+const gridOptions = {
+  columnDefs,
+  rowData,
+  domLayout: 'autoHeight'
+};
 
+// Initialize the grid
+document.addEventListener('DOMContentLoaded', function () {
+  const gridDiv = document.getElementById('myGrid');
+  new agGrid.Grid(gridDiv, gridOptions);
+});
+```
 
-> [0] [](https://github.com/EleanorEllingson/web-dev/tree/b2f2a382e77a20fd6895677c8b8f402ac4bae352/7-bank-project/1-template-route/translations/README.ko.md)
+Best Practices:
+
+- Use cellRenderer for custom cell content (e.g., images).
+- Define columnDefs clearly for maintainability.
+- Enable sorting and filtering for better user experience.
+- Use CSS classes for consistent image styling.
+
+Let me know if you need further customization or integration details.
