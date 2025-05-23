@@ -1,23 +1,23 @@
-Here's your SQL function formatted in a more professional and readable way, following best practices:
+Certainly! Here is the properly formatted PostgreSQL function using standard indentation and best practices for readability:
 
 ```sql
 CREATE OR REPLACE FUNCTION public.sync_leaderboard_insert()
-RETURNS trigger 
+RETURNS trigger
 LANGUAGE plpgsql
 AS $function$
 BEGIN
     INSERT INTO leaderboard (user_id, username, streak)
     VALUES (NEW.user_id, NEW.username, NEW.streak);
-    
+
     RETURN NEW;
 END;
 $function$;
 ```
 
-### Explanation:
-1. **Consistent Formatting**: Ensured the function definition maintains a clean and structured layout for better readability.
-2. **Removed Unnecessary Quotation Marks**: Unless necessary due to special characters or reserved words, it's preferable not to wrap table names in quotes.
-3. **Indentation**: Each statement inside the function is properly indented for clarity.
-4. **Professional Spacing**: Used consistent spacing between keywords to make the query easier to scan.
+**Best Practices:**
+- Use consistent indentation for readability.
+- Place keywords (e.g., CREATE, RETURNS, LANGUAGE) on their own lines.
+- Use the same delimiter (`$function$`) at the start and end of the function body.
+- Always terminate statements with a semicolon.
 
-This function will be triggered whenever a relevant operation is performed on a table, inserting new rows into the `leaderboard` table. Let me know if you'd like further refinements or explanations!
+Let me know if you need an example of how to attach this function to a trigger or have any other questions!
