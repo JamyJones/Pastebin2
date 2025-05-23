@@ -1,9 +1,9 @@
 To include a security definer in your trigger function that allows it to bypass Row Level Security (RLS), you need to ensure that the function is defined with the `SECURITY DEFINER` attribute. This allows the function to execute with the privileges of the user who created the function, rather than the user who is invoking it.
 
-Here’s your modified SQL code with the necessary adjustments:
+Here’s your modified trigger function with the necessary security definer and a few adjustments for clarity:
 
 ```sql
--- Inserts a row into public.profiles
+-- Create a function to handle new user inserts into public.profiles
 CREATE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -25,14 +25,14 @@ BEGIN
 END;
 $$;
 
--- Trigger the function every time a user is created
+-- Create a trigger that calls the function every time a user is created
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
 
 ### Key Changes:
-1. **SECURITY DEFINER**: This keyword is added to the function definition to ensure it runs with the privileges of the function owner.
+1. **SECURITY DEFINER**: This attribute is included in the function definition to ensure it runs with the privileges of the function owner.
 2. **Formatting**: The SQL code is formatted for better readability.
 
 Make sure that the user who creates this function has the necessary permissions to insert into the `User  Profiles` table, as the function will execute with their privileges.
