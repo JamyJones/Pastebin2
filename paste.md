@@ -1,100 +1,70 @@
-## Summary  
-**Best table rendering library for a leaderboard with images**
+## Best Table Rendering Library for Leaderboard with Avatar Images
 
----  
-**Explanation:**  
-  
-**Popular Libraries for Table Rendering:**  
-- **React Table (React.js):**  
-  - *Features:* Highly customizable, lightweight, supports images within cells, sorting, filtering.  
-  - *Use Case:* Ideal for React projects.  
-  - *Installation:* `npm install react-table`  
-  
-- **AG Grid:**  
-  - *Features:* Enterprise-grade, supports images, extensive features like sorting, filtering, pagination.  
-  - *Use Case:* Suitable for complex data tables, React, Angular, Vue.  
-  - *Installation:* `npm install ag-grid-react`  
-  
-- **DataTables (jQuery):**  
-  - *Features:* Easy to use, supports images, sorting, filtering.  
-  - *Use Case:* When working with jQuery-heavy projects.  
-  - *Installation:* via CDN or npm packages.  
-  
-- **Ant Design Table (Ant Design for React):**  
-  - *Features:* Stylish, rich features, supports images.  
-  - *Use Case:* For React apps with Ant Design framework.  
-  - *Installation:* `npm install antd`  
-  
-**Choosing the Best for Your Use Case:**  
-- For modern React projects focusing on customization, **React Table** is highly recommended.  
-- It allows rendering images smoothly within cells by customizing cell rendering functions.  
-  
----  
-  
-**Example: React Table with Avatar Images**  
-  
+---
+
+**Explanation:**
+
+**Choosing the Best Library**  
+The optimal table rendering library depends on your tech stack (web, desktop, or mobile), design preferences, and interactivity needs. Since you're rendering a leaderboard with images, I will focus mainly on web libraries that are well-suited for dynamic data, images, and customization.
+
+**Recommended Libraries:**
+
+### For Web (JavaScript/TypeScript):
+
+**1. React Table (react-table)**  
+- _Type_: React-specific lightweight library  
+- _Features_: Highly customizable, supports rendering images, flexible styling  
+- _Why_: It is very popular with React developers for rendering tables with custom cell contents such as images. It does not come with default styles, so you have full control over appearance.  
+
+**How to Use**:
 ```jsx
-import React from 'react';
 import { useTable } from 'react-table';
 
-const data = [
-  {
-    name: 'Player One',
-    score: 1500,
-    avatar: 'https://example.com/avatar1.png',
-  },
-  {
-    name: 'Player Two',
-    score: 1200,
-    avatar: 'https://example.com/avatar2.png',
-  },
-];
+const data = React.useMemo(() => [
+  { rank: 1, username: 'User1', avatar: 'url_to_avatar1' },
+  { rank: 2, username: 'User2', avatar: 'url_to_avatar2' },
+  // more data
+], []);
 
-const columns = [
+const columns = React.useMemo(() => [
+  {
+    Header: 'Rank',
+    accessor: 'rank',
+  },
   {
     Header: 'Avatar',
     accessor: 'avatar',
-    Cell: ({ value }) => <img src={value} alt="avatar" style={{ width: '40px', borderRadius: '50%' }} />,
+    Cell: ({ value }) => <img src={value} alt="avatar" style={{ width: '50px', borderRadius: '50%' }} />,
   },
   {
-    Header: 'Name',
-    accessor: 'name',
+    Header: 'Username',
+    accessor: 'username',
   },
-  {
-    Header: 'Score',
-    accessor: 'score',
-  },
-];
+], []);
 
-function LeaderboardTable() {
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headers,
-    rows,
-    prepareRow,
-  } = useTable({ columns, data });
-
+function Leaderboard() {
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
   return (
-    <table {...getTableProps()} style={{ border: '1px solid black', width: '100%' }}>
+    <table {...getTableProps()}>
+      {/* Table header */}
       <thead>
-        <tr>
-          {headers.map((header) => (
-            <th {...header.getHeaderProps()} style={{ padding: '10px', backgroundColor: '#f0f0f0' }}>
-              {header.render('Header')}
-            </th>
-          ))}
-        </tr>
+        {headerGroups.map(headerGroup => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map(column => (
+              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+            ))}
+          </tr>
+        ))}
       </thead>
+  
+      {/* Table body */}
       <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
+        {rows.map(row => {
           prepareRow(row);
           return (
             <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => (
-                <td {...cell.getCellProps()} style={{ padding: '10px', textAlign: 'center' }}>
-                  {cell.render('Cell')}
-                </td>
+              {row.cells.map(cell => (
+                <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
               ))}
             </tr>
           );
@@ -103,19 +73,57 @@ function LeaderboardTable() {
     </table>
   );
 }
-
-export default LeaderboardTable;
 ```
+_Note_: This example relies on React, so it's suitable if you're using React.
 
-**Notes:**  
-- This code creates a simple leaderboard with an avatar, name, and score.  
-- The avatar column renders an image element.  
-- Adjust styles as needed for better appearance.
+---
 
----  
-  
+**2. DataTables (jQuery DataTables)**  
+- _Type_: jQuery plugin, highly customizable, supports images, sorting, pagination
+- _Advantages_: Easy integration with HTML tables, extensive features
+- _Usage steps_: Include DataTables assets (CSS/JS), initialize on a plain HTML table, and customize columns as needed to include images.
+
+---
+
+**3. Tabulator**  
+- _Type_: Pure JavaScript, no dependencies, very feature-rich  
+- _Features_: Supports images, sorting, pagination, custom cell renderers  
+- _Why_: Excellent for handling complex tables with images, interactivity, and custom styling
+
+```js
+// Example of setting up with Tabulator
+const table = new Tabulator("#leaderboard-table", {
+  data: leaderboardData, // your data array
+  columns: [
+    { title: "Rank", field: "rank" },
+    {
+      title: "Avatar",
+      field: "avatar",
+      formatter: "image",
+      formatterParams: { height: "50px", width: "50px" },
+    },
+    { title: "Username", field: "username" },
+  ],
+});
+```
+_Note_: Requires including Tabulator library from CDN or npm package.
+
+---
+
+### For Desktop or Mobile Apps:
+- Libraries depend on platform (e.g., DataGrid in WPF, Android RecyclerView, Flutter DataTable).  
+- Many IDEs and platforms support custom cell rendering with images.
+
+---
+
+**Summary:**  
+- For **React-based projects**, **react-table** is highly recommended due to its flexibility and control.  
+- For non-React projects, **DataTables** or **Tabulator** provide robust options supporting images.  
+- Always ensure your images are optimized for performance (size and format).
+
+---
+
 **References:**  
-- ##React Table Documentation##  
-- ##AG Grid Documentation##  
-- ##DataTables.net##  
-- ##Ant Design Table Component##
+##react-table documentation##  
+##DataTables official site##  
+##Tabulator library##
