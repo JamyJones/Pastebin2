@@ -1,119 +1,72 @@
-## Summary: Best Table Rendering Libraries for Leaderboard with Avatar Images
+There are several excellent libraries for rendering tables in web applications, especially for displaying leaderboard data with images. Here are some of the best options:
 
----  
+1. **React Table**:
+   - A lightweight and flexible library for building tables in React applications.
+   - Supports custom cell rendering, which allows you to easily include images in your table cells.
+   - Highly customizable and can handle large datasets efficiently.
 
-### Explanation:
+2. **AG Grid**:
+   - A powerful grid component for frameworks like React, Angular, and Vue.
+   - Supports complex features like sorting, filtering, and pagination.
+   - You can easily render images in cells and customize the appearance of the grid.
 
-**Popular Libraries for Table Rendering**:  
-There are several libraries in JavaScript for rendering tables, especially in web development. The choice depends on the framework you're using and your specific needs like support for images, pagination, styling, etc.
+3. **DataTables**:
+   - A jQuery plugin that provides advanced interaction controls for HTML tables.
+   - Supports features like pagination, sorting, and filtering.
+   - You can include images in table cells using custom rendering functions.
 
----
+4. **Tabulator**:
+   - A feature-rich JavaScript table library that is easy to use and highly customizable.
+   - Supports rendering images, custom cell formatting, and various data types.
+   - Offers built-in support for sorting, filtering, and pagination.
 
-**1. React-Table (React.js)**  
-- **Type**: Headless utility (no built-in styles), highly customizable.  
-- **Features**: Supports custom cell rendering, pagination, sorting, filtering.  
-- **Avatar Support**: **Yes**, you can render images directly in cells.  
-- **Usage**: You define your columns, and for the avatar column, you provide a custom render function to include `<img>` tags with the avatar URL.  
+5. **Handsontable**:
+   - A JavaScript data grid component that provides a spreadsheet-like experience.
+   - Supports custom cell rendering, allowing you to display images alongside text.
+   - Good for applications that require inline editing and complex data manipulation.
 
-*Example snippet:*  
-```jsx
-{
-  Header: 'Avatar',
-  accessor: 'avatarUrl',  // data field for avatar
-  Cell: ({ value }) => <img src={value} alt="avatar" style={{ width: '50px', borderRadius: '50%' }} />
-}
-```
+### Example of Using React Table with Images
 
----
+If you choose to use React Table, here's a simple example of how you might render a leaderboard with user avatars:
 
-**2. Material-UI (MUI) DataGrid**  
-- **Type**: React component for full-featured tables with Material Design.  
-- **Features**: Pagination, sorting, filtering, custom cell rendering.  
-- **Avatar Support**: **Yes**, easy to embed images using `renderCell`.  
-
-*Example:*  
-```jsx
-import { DataGrid } from '@mui/x-data-grid';
-
-const columns = [
-  { 
-    field: 'avatar', 
-    headerName: 'Avatar', 
-    width: 100, 
-    renderCell: (params) => (
-      <img src={params.value} alt="avatar" style={{ width: '50px', borderRadius: '50%' }} />
-    ),
-  },
-  // other columns
-];
-```
-
----
-
-**3. Tabulator (Vanilla JS, React, etc.)**  
-- **Type**: Fully-featured table library with extensive options.  
-- **Features**: Inline editing, pagination, custom formatter support.  
-- **Avatar Support**: **Yes**, by configuring formatter functions to include `<img>` tags.
-
----
-
-### Additional Considerations:  
-- If you prefer **plain JavaScript**, Tabulator or DataTables (jQuery plugin) are good options.  
-- For **React**, React-Table and MUI DataGrid are very popular.  
-- For **Vue.js**, Vuetify's Data Tables or VueGoodTable are strong contenders.  
-
----
-
-### Example: Basic React-Table with Avatar Column
 ```jsx
 import React from 'react';
 import { useTable } from 'react-table';
 
-const data = [
-  {
-    name: 'Player1',
-    score: 1200,
-    avatarUrl: 'https://example.com/avatar1.png'
-  },
-  {
-    name: 'Player2',
-    score: 950,
-    avatarUrl: 'https://example.com/avatar2.png'
-  }
-];
+const Leaderboard = ({ data }) => {
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Rank',
+        accessor: 'rank', // accessor is the "key" in the data
+      },
+      {
+        Header: 'User ',
+        accessor: 'user',
+      },
+      {
+        Header: 'Avatar',
+        accessor: 'avatar',
+        Cell: ({ cell: { value } }) => <img src={value} alt="User  Avatar" style={{ width: '50px', height: '50px' }} />,
+      },
+    ],
+    []
+  );
 
-const columns = [
-  {
-    Header: 'Avatar',
-    accessor: 'avatarUrl',
-    Cell: ({ value }) => (
-      <img src={value} alt="avatar" style={{ width: '50px', borderRadius: '50%' }} />
-    ),
-  },
-  {
-    Header: 'Name',
-    accessor: 'name'
-  },
-  {
-    Header: 'Score',
-    accessor: 'score'
-  }
-];
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
 
-function LeaderboardTable() {
-  const { getTableProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
   return (
     <table {...getTableProps()}>
       <thead>
         {headerGroups.map(headerGroup => (
-           <tr {...headerGroup.getHeaderGroupProps()}>
-             {headerGroup.headers.map(column => (
-               <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-             ))}
-           </tr>
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map(column => (
+              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+            ))}
+          </tr>
         ))}
       </thead>
-      <tbody>
+      <tbody {...getTableBodyProps()}>
         {rows.map(row => {
           prepareRow(row);
           return (
@@ -127,12 +80,11 @@ function LeaderboardTable() {
       </tbody>
     </table>
   );
-}
+};
 
-export default LeaderboardTable;
+export default Leaderboard;
 ```
 
-### References:
-## React-Table: https://react-table.tanstack.com/  
-## Material-UI DataGrid: https://mui.com/x/react-data-grid/  
-## Tabulator: http://tabulator.info/
+### Conclusion
+
+Choose a library based on your specific needs, such as the framework you are using, the complexity of the data, and the features you require. Each of these libraries has its strengths, so consider experimenting with a few to see which one fits your project best.
