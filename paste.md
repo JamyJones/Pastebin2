@@ -1,38 +1,64 @@
-This code snippet is a PostgreSQL function and trigger setup that updates a leaderboard table based on changes in a "User  Profiles" table. Let's break down the components step by step:
+You asked for a professional explanation of how the provided PostgreSQL trigger and function work. Here’s a breakdown of the process and best practices:
 
-### Function: `update_leaderboard`
+### 1. Function Definition
 
-1. **Definition**:
-   - The function is defined with the name `update_leaderboard`, and it returns a `trigger`. It uses the PL/pgSQL language.
+```sql
+CREATE OR REPLACE FUNCTION public.update_leaderboard()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $function$
+BEGIN
+    UPDATE leaderboard
+    SET actual_streak = CASE
+        WHEN split_part(streak, '@', 1) IS NULL THEN 0
+        ELSE split_part(streak, '@', 1)::numeric
+    END
+    WHERE user_id = NEW.id;
 
-2. **Function Body**:
-   - The function begins with the `BEGIN` keyword, indicating the start of the executable part of the function.
-   - It performs an `UPDATE` operation on the `leaderboard` table.
+    RETURN NEW;
+END;
+$function$;
+```
 
-3. **Update Logic**:
-   - The `SET` clause updates the `actual_streak` column in the `leaderboard` table.
-   - The value assigned to `actual_streak` is determined by a `CASE` statement:
-     - It uses the `split_part` function to extract the part of the `streak` string before the '@' character. 
-     - If this part is `NULL`, it sets `actual_streak` to `0`.
-     - Otherwise, it converts the extracted string to a numeric type and assigns that value to `actual_streak`.
-   - The `WHERE` clause specifies that the update should only affect the row in the `leaderboard` table where the `user_id` matches `NEW.id`. Here, `NEW` refers to the new row being inserted into the "User  Profiles" table.
+#### How it works:
+- This function is written in PL/pgSQL and is designed to be used as a trigger.
+- When invoked, it updates the `actual_streak` column in the `leaderboard` table for the user whose ID matches `NEW.id`.
+- The value for `actual_streak` is determined by splitting the `streak` column at the `@` character and taking the first part. If that part is `NULL`, it sets `actual_streak` to 0; otherwise, it casts the value to a numeric type.
+- The function returns the new row (`NEW`) as required for row-level triggers.
 
-4. **Return Statement**:
-   - The function concludes with `RETURN NEW;`, which returns the new record that triggered the function. This is standard practice in trigger functions to indicate that the operation should proceed with the new data.
+### 2. Trigger Removal and Creation
 
-### Trigger: `update_leaderboard_insert_trigger`
+```sql
+DROP TRIGGER IF EXISTS "update_leaderboard_insert_trigger" ON "public"."leaderboard";
 
-1. **Drop Existing Trigger**:
-   - The `DROP TRIGGER IF EXISTS` statement ensures that if a trigger with the same name already exists on the `User  Profiles` table, it is removed before creating a new one. This prevents errors related to duplicate triggers.
+CREATE TRIGGER "update_leaderboard_insert_trigger"
+AFTER INSERT
+ON "public"."User Profiles"
+FOR EACH ROW
+EXECUTE FUNCTION "public"."update_leaderboard"();
+```
 
-2. **Create Trigger**:
-   - The `CREATE TRIGGER` statement defines a new trigger named `update_leaderboard_insert_trigger`.
-   - This trigger is set to fire `AFTER INSERT` on the `User  Profiles` table, meaning it will execute the associated function after a new row is inserted into this table.
-   - The `FOR EACH ROW` clause indicates that the trigger will execute once for each row that is inserted.
+#### How it works:
+- The existing trigger named `update_leaderboard_insert_trigger` on the `leaderboard` table is dropped if it exists, ensuring there are no duplicate triggers.
+- A new trigger with the same name is created on the `"User Profiles"` table.
+- This trigger fires after every insert operation on `"User Profiles"`, executing the `update_leaderboard()` function for each new row.
 
-3. **Execution of Function**:
-   - The `EXECUTE FUNCTION` clause specifies that the `update_leaderboard` function should be called whenever the trigger is activated.
+### Professional Best Practices Demonstrated
 
-### Summary
+- **Atomicity:** The trigger ensures that whenever a new user profile is inserted, the leaderboard is updated accordingly, maintaining data consistency.
+- **Type Casting:** Explicitly casting values (`::numeric`) prevents type errors.
+- **NULL Handling:** Using a `CASE` statement to handle possible `NULL` values avoids unexpected results.
+- **Trigger Management:** Dropping existing triggers before creating new ones prevents duplicate triggers and potential logic errors.
 
-In summary, this setup ensures that whenever a new user profile is inserted into the "User  Profiles" table, the `update_leaderboard` function is called. This function updates the `actual_streak` in the `leaderboard` table based on the `streak` value from the new user profile. The logic handles cases where the streak might not be formatted correctly, ensuring that the leaderboard remains accurate and up-to-date.
+### Example Use Case
+
+Suppose you insert a new user profile:
+
+```sql
+INSERT INTO "User Profiles" (id, ...) VALUES (123, ...);
+```
+
+- The trigger fires after this insert.
+- The function updates the corresponding row in the `leaderboard` table where `user_id = 123`, setting `actual_streak` based on the current value of `streak`.
+
+If you need further clarification or want to see a front-end or back-end integration example, let me know!
