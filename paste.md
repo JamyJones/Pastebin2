@@ -1,72 +1,59 @@
-Here’s a professional implementation using AG Grid to create a leaderboard with usernames, avatar images, and streaks.
+You’d like to create a leaderboard table using the ag-Grid JavaScript API with three columns: usernames, avatar images, and streaks. Here’s a professional approach using plain JavaScript and ag-Grid best practices.
 
-### Steps:
-1. Set up AG Grid in your HTML page.
-2. Define column definitions with appropriate field types.
-3. Use `cellRenderer` to display avatar images properly.
-4. Populate the grid with mock leaderboard data.
-
-### Code Example:
-
+**HTML:**
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
-    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-grid.css">
-    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-theme-alpine.css">
-    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
-</head>
-<body>
-
-    <div id="myGrid" class="ag-theme-alpine" style="height: 400px; width: 600px;"></div>
-
-    <script>
-        // Column Definitions
-        const columnDefs = [
-            { headerName: "Username", field: "username", sortable: true, filter: true },
-            { 
-                headerName: "Avatar", field: "avatar", cellRenderer: (params) => {
-                    return `<img src="${params.value}" width="30" height="30" style="border-radius:50%;">`;
-                }
-            },
-            { headerName: "Streaks", field: "streaks", sortable: true, filter: true }
-        ];
-
-        // Mock Leaderboard Data
-        const rowData = [
-            { username: "Alice", avatar: "https://example.com/avatar1.png", streaks: 10 },
-            { username: "Bob", avatar: "https://example.com/avatar2.png", streaks: 8 },
-            { username: "Charlie", avatar: "https://example.com/avatar3.png", streaks: 15 }
-        ];
-
-        // Grid Options
-        const gridOptions = {
-            columnDefs: columnDefs,
-            rowData: rowData
-        };
-
-        // Initialize Grid
-        document.addEventListener("DOMContentLoaded", function() {
-            new agGrid.Grid(document.querySelector("#myGrid"), gridOptions);
-        });
-
-    </script>
-</body>
-</html>
+<!-- Include ag-Grid styles and scripts -->
+<link rel="stylesheet" href="https://docsbot.ai/" />
+<link rel="stylesheet" href="https://docsbot.ai/" />
+<div id="myGrid" class="ag-theme-alpine" style="height: 400px; width: 600px;"></div>
+<script src="https://docsbot.ai/"></script>
+<script src="leaderboard.js"></script>
 ```
 
-### Best Practices:
-- **Lazy Loading Images:** If the dataset is large, consider loading images efficiently to prevent performance issues.
-- **Sorting & Filtering:** Enabled for usernames and streaks to enhance usability.
-- **Mobile Responsiveness:** Adjust column widths if necessary for optimal viewing on mobile devices.
+**JavaScript (leaderboard.js):**
+```javascript
+// Sample data
+const rowData = [
+  { username: 'alice', avatar: 'https://docsbot.ai/', streak: 15 },
+  { username: 'bob', avatar: 'https://docsbot.ai/', streak: 12 },
+  { username: 'charlie', avatar: 'https://docsbot.ai/', streak: 10 }
+];
 
-This implementation provides an interactive leaderboard using AG Grid while ensuring a professional structure. Let me know if you need further customization! 🚀 [[0]](https://github.com/ferhado/smoothscroll/tree/4ff228333a824dff212c1ec886272d2785e3df0e/README.md) [[1]](https://github.com/Sirjoseph94/hngleaderboard/tree/7ed621bcda562ed3159de8a27bf29c338b61ea15/resources/views/layouts/base.blade.php)
+// Column definitions
+const columnDefs = [
+  { headerName: 'Username', field: 'username', sortable: true, filter: true },
+  {
+    headerName: 'Avatar',
+    field: 'avatar',
+    cellRenderer: params => `<img src="${params.value}" alt="avatar" style="width:32px;height:32px;border-radius:50%;" />`,
+    width: 80,
+    suppressMenu: true
+  },
+  { headerName: 'Streak', field: 'streak', sortable: true, filter: true }
+];
 
+// Grid options
+const gridOptions = {
+  columnDefs,
+  rowData,
+  domLayout: 'autoHeight',
+  defaultColDef: {
+    resizable: true,
+    flex: 1
+  }
+};
 
+// Initialize the grid after the page loads
+document.addEventListener('DOMContentLoaded', function () {
+  const gridDiv = document.getElementById('myGrid');
+  new agGrid.Grid(gridDiv, gridOptions);
+});
+```
 
-> [0] [](https://github.com/ferhado/smoothscroll/tree/4ff228333a824dff212c1ec886272d2785e3df0e/README.md)
->
-> [1] [](https://github.com/Sirjoseph94/hngleaderboard/tree/7ed621bcda562ed3159de8a27bf29c338b61ea15/resources/views/layouts/base.blade.php)
+**Best Practices Demonstrated:**
+- Use of cellRenderer for custom avatar rendering.
+- Responsive column sizing with flex and resizable columns.
+- Sorting and filtering enabled for relevant columns.
+- Clean separation of data, column definitions, and grid options.
+
+Let me know if you need this adapted for a specific framework or additional features.
