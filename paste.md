@@ -1,74 +1,64 @@
-In PostgreSQL, numeric types are used to store exact, arbitrary-precision numbers. They are ideal when you require precise decimal calculations, such as in financial applications or when you need to avoid the rounding errors associated with floating-point types.
+In PostgreSQL, data types are used to specify the nature of data stored in columns. Among numeric types, `NUMERIC` (or `DECIMAL`) is a versatile, precise data type designed for exact numeric storage, especially useful for financial and monetary calculations.
 
----
+### `NUMERIC` Data Type in PostgreSQL:
 
-### Numeric Type in PostgreSQL
-
-- **Definition**: The `NUMERIC` (or `DECIMAL`) type stores numbers with user-defined precision and scale. You can specify the total number of digits (`precision`) and the number of digits to the right of the decimal point (`scale`).
-
-- **Usage**:
-  ```sql
-  CREATE TABLE financial_records (
-      amount NUMERIC(15, 2)
-  );
-  ```
-  Here, `amount` can store numbers with up to 15 digits overall, with 2 digits after the decimal point.
-
-- **Advantages**:
-  - Arbitrary precision (can handle very large/small numbers)
-  - Exact decimal representation
-  - No rounding errors due to floating-point representation
-
-- **Disadvantages**:
-  - Slightly slower than fixed-size types
-  - Uses more storage space depending on precision
-
----
-
-### Integer Types in PostgreSQL
-
-PostgreSQL provides fixed-size integer types, which are more efficient for storage and computation when floating-point precision isn't required:
-
-| Type   | Storage size | Range                                       | Description                         |
-|---------|--------------|----------------------------------------------|-------------------------------------|
-| `smallint` | 2 bytes    | -32,768 to 32,767                            | Synonym for `int2`                 |
-| `integer` or `int4` | 4 bytes | -2,147,483,648 to 2,147,483,647            | Synonym for `int4`                 |
-| `bigint` or `int8` | 8 bytes | -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 | Synonym for `int8`             |
-
-### Differences between `numeric` and integer types:
-
-| Aspect                    | `NUMERIC`                                                    | `int2` / `int4` / `int8`                           |
-|---------------------------|--------------------------------------------------------------|---------------------------------------------------|
-| Precision                 | Arbitrary (user-defined)                                    | Fixed; limited by size                            |
-| Storage                   | Variable (depends on precision)                               | Fixed-size (2, 4, or 8 bytes)                    |
-| Usage                     | Exact decimal numbers, monetary calculations                  | Whole numbers without fractional parts           |
-| Performance               | Slower due to variable-length storage                        | Faster; optimized for integer arithmetic         |
-| Range                     | Depends on specified precision; effectively unlimited       | Fixed range per type                              |
-| Rounding                  | No (exact representation)                                      | Not applicable                                    |
-
----
-
-### Summary
-- Use `NUMERIC` when you need **precise decimal representation** with **user-defined precision**, especially for financial or high-precision calculations.
-- Use `int2`, `int4`, or `int8` (or their aliases) when dealing with **whole numbers** within known fixed ranges, where performance and storage efficiency are priorities.
-
----
+- **Purpose:** Stores numbers with exact precision and scale, meaning it can hold very large or very precise decimal numbers.
+- **Syntax:** `NUMERIC(precision, scale)` where:
+  - `precision` (total number of digits) defaults to unlimited if not specified.
+  - `scale` (number of digits after the decimal point).
+- **Usage:** Suitable for calculations requiring exactness, such as currency, scientific data, or where rounding errors from floating-point types are unacceptable.
 
 ### Example:
-
 ```sql
--- Numeric with specified precision and scale:
-CREATE TABLE prices (
-    product_id SERIAL PRIMARY KEY,
-    price NUMERIC(10, 2) -- up to 8 digits before decimal, 2 after
-);
-
--- Integer type usage:
-CREATE TABLE inventory (
-    item_id SERIAL PRIMARY KEY,
-    quantity INT4 -- whole number, up to ~2 billion
+CREATE TABLE financials (
+  amount NUMERIC(15, 2) -- up to 15 digits, with 2 after decimal
 );
 ```
 
-### Additional tip:
-Always choose the smallest appropriate fixed size integer type (`smallint`, `int4`, `int8`) for performance and storage reasons when fractional precision isn't needed. Use `NUMERIC` only when decimal precision is essential.
+### `int2`, `int4`, `int8` Data Types:
+These are fixed-width integer types that store whole numbers:
+
+| Type | Storage Size | Range of Values | Description                          |
+|--------|----------------|-----------------|--------------------------------------|
+| `int2` | 2 bytes        | -32,768 to +32,767 | Alias for `smallint`                |
+| `int4` | 4 bytes        | -2,147,483,648 to +2,147,483,647 | Alias for `integer`        |
+| `int8` | 8 bytes        | -9,223,372,036,854,775,808 to +9,223,372,036,854,775,807 | Alias for `bigint` |
+
+### Differences:
+1. **Type of Data Stored:**
+   - `NUMERIC`: Stores exact decimal/numeric data, suitable for precise computations like currency.
+   - `int2`, `int4`, `int8`: Store only whole numbers, no fractional part.
+
+2. **Precision:**
+   - `NUMERIC`: Can specify arbitrary precision, great for exact calculations.
+   - Integer types: Fixed size, limited to their range. No fractional part, no precision beyond the whole number.
+
+3. **Performance:**
+   - Integer types are faster and more efficient for counting or indexing.
+   - `NUMERIC` is more resource-intensive due to its flexibility and precision.
+
+4. **Use Cases:**
+   - Use integer types (`int2`, `int4`, `int8`) for counts, IDs, indices.
+   - Use `NUMERIC` for financial data, measurements requiring exact decimal representation.
+
+---
+
+### Summary:
+- **`NUMERIC`**: for precise decimal numbers, customizable precision and scale.
+- **`int2`/`int4`/`int8`**: for fixed-range whole numbers, fixed storage width.
+
+### Example comparisons:
+```sql
+-- Numeric for precise monetary value
+CREATE TABLE invoice (
+  total_amount NUMERIC(12, 2) -- supports exact currency figures
+);
+
+-- Integer for count
+CREATE TABLE products (
+  product_id INT4 PRIMARY KEY,
+  quantity INT4
+);
+```
+
+Understanding these differences ensures choosing the right data type for data integrity, performance, and storage efficiency in PostgreSQL.
