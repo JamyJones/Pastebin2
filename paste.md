@@ -8,4 +8,4 @@ To select all `<button>`, `<select>`, and `<input>` elements within a `<div>` el
 }
 ```
 
-This selector targets all `<button>`, `<select>`, and `<input>` elements that are descendants of the `<div>` with the ID `foo`. You can replace `/* Your styles here */` with the actual styles you want to apply to these elements.
+This selector targets all `<button>`, `<select>`, and `<input>` elements that are descendants of the `<div>` with the ID `foo`. You can then add your desired styles within the curly braces.
