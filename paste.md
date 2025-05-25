@@ -1,177 +1,84 @@
-Let's solve this with a more efficient approach than reloading the entire page. Here's a professional solution that uses modern web practices:
+It sounds like you have a great project going on! To avoid using `window.location.reload()` and to handle updates more efficiently, you can implement a more dynamic approach using JavaScript. Here are some suggestions to improve your app:
 
+### 1. Use AJAX or Fetch API
+Instead of reloading the entire page, you can use AJAX or the Fetch API to fetch new GIFs and update the cards dynamically. This way, you can update only the parts of the page that need to change.
+
+### Example using Fetch API:
 ```javascript
-class StreamCard {
-    constructor(streamData) {
-        this.streamId = streamData.id;
-        this.startTime = new Date(streamData.startTime);
-        this.gifUrl = streamData.gifUrl;
-        this.element = null;
-    }
-
-    createCard() {
-        this.element = document.createElement('div');
-        this.element.className = 'stream-card';
-        this.element.id = `card-${this.streamId}`;
-        
-        this.element.innerHTML = `
-            <img src="${this.gifUrl}" alt="Stream GIF" class="stream-gif">
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-${this.streamId}"></div>
-            </div>
-            <div class="stream-duration" id="duration-${this.streamId}"></div>
-        `;
-
-        return this.element;
-    }
-
-    updateProgress() {
-        const progressBar = document.getElementById(`progress-${this.streamId}`);
-        const durationElement = document.getElementById(`duration-${this.streamId}`);
-        const duration = Math.floor((new Date() - this.startTime) / 1000);
-        
-        progressBar.style.width = `${(duration % 600) / 6}%`; // 600 seconds = 10 minutes
-        durationElement.textContent = this.formatDuration(duration);
-    }
-
-    formatDuration(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    updateGif(newGifUrl) {
-        const imgElement = this.element.querySelector('.stream-gif');
-        imgElement.src = newGifUrl;
-    }
+function updateGifs() {
+    fetch('/path/to/your/api/for/gifs')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach((gif, index) => {
+                const card = document.getElementById(`card-${index}`);
+                const img = card.querySelector('img');
+                img.src = gif.url; // Update the GIF source
+                // Update progress bar
+                const progressBar = card.querySelector('.progress-bar');
+                progressBar.style.width = `${gif.progress}%`; // Update progress
+            });
+        })
+        .catch(error => console.error('Error fetching GIFs:', error));
 }
 
-class StreamManager {
-    constructor() {
-        this.streams = new Map();
-        this.container = document.getElementById('streams-container');
-    }
+// Call updateGifs every 10 seconds
+setInterval(updateGifs, 10000);
+```
 
-    async fetchUpdates() {
-        try {
-            const response = await fetch('/api/streams');
-            const streams = await response.json();
-            
-            this.updateStreams(streams);
-        } catch (error) {
-            console.error('Failed to fetch stream updates:', error);
+### 2. Use WebSockets
+If you want real-time updates without polling, consider using WebSockets. This allows your server to push updates to the client whenever new GIFs are available.
+
+### 3. Manage State with JavaScript
+Instead of relying on the DOM to manage the state of your cards, maintain a JavaScript object that holds the state of each card. This can help you avoid race conditions.
+
+### Example State Management:
+```javascript
+let cardsState = {};
+
+function updateCardState(index, gifUrl, progress) {
+    cardsState[index] = { gifUrl, progress };
+    renderCard(index);
+}
+
+function renderCard(index) {
+    const card = document.getElementById(`card-${index}`);
+    const img = card.querySelector('img');
+    const progressBar = card.querySelector('.progress-bar');
+
+    img.src = cardsState[index].gifUrl;
+    progressBar.style.width = `${cardsState[index].progress}%`;
+}
+
+// Call this function to update the state and render
+function updateGifs() {
+    fetch('/path/to/your/api/for/gifs')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach((gif, index) => {
+                updateCardState(index, gif.url, gif.progress);
+            });
+        })
+        .catch(error => console.error('Error fetching GIFs:', error));
+}
+```
+
+### 4. Use a Timer for Progress Bars
+Instead of updating the progress bar every second in a race condition, you can set a timer for each card that updates its progress independently.
+
+### Example Timer for Progress Bar:
+```javascript
+function startProgressBar(index, duration) {
+    let progress = 0;
+    const interval = setInterval(() => {
+        if (progress < 100) {
+            progress++;
+            updateCardState(index, cardsState[index].gifUrl, progress);
+        } else {
+            clearInterval(interval);
         }
-    }
-
-    updateStreams(streamData) {
-        // Handle new streams
-        streamData.forEach(data => {
-            if (!this.streams.has(data.id)) {
-                const streamCard = new StreamCard(data);
-                this.streams.set(data.id, streamCard);
-                this.container.appendChild(streamCard.createCard());
-            } else {
-                // Update existing stream
-                const streamCard = this.streams.get(data.id);
-                if (data.gifUrl !== streamCard.gifUrl) {
-                    streamCard.updateGif(data.gifUrl);
-                }
-            }
-        });
-
-        // Remove ended streams
-        const currentIds = new Set(streamData.map(s => s.id));
-        [...this.streams.keys()].forEach(id => {
-            if (!currentIds.has(id)) {
-                const element = document.getElementById(`card-${id}`);
-                element?.remove();
-                this.streams.delete(id);
-            }
-        });
-    }
-
-    startUpdates() {
-        // Update progress bars every second
-        setInterval(() => {
-            this.streams.forEach(stream => stream.updateProgress());
-        }, 1000);
-
-        // Fetch new GIFs every 10 minutes
-        setInterval(() => {
-            this.fetchUpdates();
-        }, 600000); // 10 minutes
-    }
-}
-
-// Initialize
-const manager = new StreamManager();
-manager.fetchUpdates();
-manager.startUpdates();
-```
-
-This solution addresses several key points:
-
-1. **Avoid Page Reloads**: Instead of reloading the entire page, we update only the necessary components.
-
-2. **Race Condition Prevention**: 
-   - Using a `Map` to track streams
-   - Atomic updates for each stream card
-   - Clear separation between progress updates and content updates
-
-3. **Performance Optimization**:
-   - DOM manipulation is minimized
-   - Progress bars update independently
-   - GIF updates happen only when new content is available
-
-4. **Memory Management**:
-   - Proper cleanup of ended streams
-   - Event listener management
-   - Clear object references
-
-To complement this, add this CSS for smooth transitions:
-
-```css
-.stream-card {
-    margin: 10px;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.stream-gif {
-    width: 100%;
-    height: auto;
-    transition: opacity 0.3s ease;
-}
-
-.progress-container {
-    height: 4px;
-    background: #eee;
-    margin-top: 10px;
-}
-
-.progress-bar {
-    height: 100%;
-    background: #2196F3;
-    transition: width 0.3s linear;
+    }, duration / 100); // Adjust the duration as needed
 }
 ```
 
-For the backend API endpoint, ensure you're sending properly structured data:
-
-```javascript
-// Example API response structure
-{
-    streams: [
-        {
-            id: "stream1",
-            startTime: "2023-05-24T08:00:00Z",
-            gifUrl: "path/to/gif.gif"
-        },
-        // ... more streams
-    ]
-}
-```
-
-This solution provides better scalability and maintainability while avoiding race conditions. The modular class structure makes it easier to add features or modify behavior in the future.
+### Conclusion
+By using AJAX or WebSockets, managing state with JavaScript, and handling progress bars with independent timers, you can create a more efficient and responsive web app without the need for full page reloads. This will also help you avoid race conditions and improve the user experience.
