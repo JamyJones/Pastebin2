@@ -1,9 +1,8 @@
-To select all `<button>` elements within a `<div>` element that has an `id` of `foo`, you can use a descendant CSS selector:
+To select all button elements within a div element whose id is foo, you can use the following CSS selector:
 
 ```css
 #foo button {
-  /* Your styles here */
+  /* your styles here */
 }
 ```
-
-This selector targets all `<button>` elements that are anywhere inside the `<div id="foo">`.
+Would you like me to explain how this selector works?
