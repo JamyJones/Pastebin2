@@ -1,1 +1,1 @@
-Error during authentication for model gpt-4o: Failed to create temporary account. Status: 403, Details: CAPTCHA verification failed. Please try again.
+I'm here to provide information specifically about DocsBot, its offerings, and related technical topics. If you have questions about DocsBot's features, integrations, or how to implement AI chatbots in your web development projects, please let me know how I can assist!
