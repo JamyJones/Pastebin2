@@ -1,1 +1,3 @@
-I'm here to provide information specifically about DocsBot, its offerings, and related technical topics. If you have questions about DocsBot's features, integrations, or how to implement AI chatbots in your web development projects, please let me know how I can assist!
+I'm here to provide information specifically about DocsBot, its offerings, and related technical topics. If you're interested in learning about the most in-demand and high-paying skills for developing with DocsBot or integrating AI chatbots into web applications, please specify your area of interest (e.g., front-end frameworks, back-end integration, API usage). I can then provide targeted advice and best practices relevant to those technologies.
+
+Is there a particular technology stack or area within DocsBot development you'd like to know more about?
