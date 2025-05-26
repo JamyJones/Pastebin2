@@ -1,23 +1,43 @@
-The most in-demand high-paying skills can vary by industry and region, but as of 2023, several skills are consistently sought after across various sectors. Here are some of them:
+For designing and planning your application card layout visually with minimal coding, you might find these open-source tools helpful:
 
-1. **Data Science and Analytics**: Proficiency in data analysis, machine learning, and statistical modeling is highly valued. Skills in programming languages like Python and R, as well as tools like SQL and Tableau, are essential.
+1. **Figma (free tier available)**  
+   - **Type:** Web-based design and prototyping tool  
+   - **Features:** Drag-and-drop interface, supports designing UI components, collaborative, exports code snippets (CSS, SVG)  
+   - **Usage:** You can create a visual mockup of your card with all 5 components—image, name, status, progress bar, and layout—then extract or integrate the code into your project.  
+   - **Link:** [https://figma.com](https://figma.com)
 
-2. **Artificial Intelligence and Machine Learning**: Knowledge of AI frameworks, neural networks, and deep learning is in high demand. Familiarity with tools like TensorFlow and PyTorch can be beneficial.
+2. **Penpot**  
+   - **Type:** Open-source, web-based UI/UX design and prototyping tool  
+   - **Features:** Supports vector graphics, prototyping, iteration, free and open source  
+   - **Usage:** Design your card visually, then export assets or code for implementation.  
+   - **Link:** [https://penpot.app](https://penpot.app)
 
-3. **Cloud Computing**: Skills in cloud platforms such as AWS, Azure, and Google Cloud are crucial as businesses increasingly move to cloud-based solutions.
+3. **Akira (Linux-specific, open-source UI design tool)**  
+   - **Type:** Linux-native vector graphic and UI design  
+   - **Features:** Similar to Figma or Sketch, supports complex UI design workflows  
+   - **Usage:** Ideal if you’re on Linux and want a local tool for precise design planning.
 
-4. **Cybersecurity**: With the rise in cyber threats, expertise in network security, ethical hacking, and risk management is highly sought after.
+4. **Pencil Project**  
+   - **Type:** Open-source offline prototyping tool  
+   - **Features:** Drag-and-drop UI components, supports annotations, can export diagrams as PNG or HTML  
+   - **Usage:** Good for quick mockups without online account requirements.  
+   - **Link:** [https://pencil.evolus.vn/](https://pencil.evolus.vn/)
 
-5. **Software Development**: Proficiency in programming languages such as Java, JavaScript, C#, and Swift, along with experience in software development methodologies like Agile and DevOps, is essential.
+---
 
-6. **Digital Marketing**: Skills in SEO, content marketing, social media marketing, and data analytics are important as businesses focus on online presence.
+### For a quick start with code-based mockups:
 
-7. **Blockchain Technology**: Understanding blockchain development and smart contracts is increasingly valuable, especially in finance and supply chain sectors.
+- **Stacker** or similar visual HTML builders can generate code snippets from visual layouts.
+- **Tools like Webflow** (not open-source but free tier) allow visual HTML/CSS design with code export.
 
-8. **Project Management**: Skills in project management methodologies (like PMP or Agile) and tools (like Jira or Trello) are important for leading teams and projects effectively.
+---
 
-9. **User  Experience (UX) Design**: Proficiency in UX research, wireframing, and prototyping tools is essential for creating user-friendly products.
+### Recommendation:
 
-10. **Sales and Business Development**: Strong skills in negotiation, relationship building, and strategic planning are crucial for driving business growth.
+**Figma** is the most popular, user-friendly, and highly supported option for designing UI components visually, especially if you want to plan your card design before coding.
 
-These skills not only command high salaries but also offer significant career advancement opportunities. Continuous learning and staying updated with industry trends are key to maintaining a competitive edge in these areas.
+**Once your design is ready, you can translate it into HTML/CSS/JavaScript** for your application, possibly customizing it further with your preferred frontend framework or library.
+
+---
+
+Let me know if you want example code snippets for the card components or recommended templates!
