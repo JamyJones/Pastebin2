@@ -1,1 +1,1 @@
-Error during authentication for model gpt-4o: Failed to create temporary account. Status: 403, Details: CAPTCHA verification failed. Please try again.
+Error during authentication for model gpt-4o: Failed to create temporary account. Status: 403, Details: Invalid request. Please try again.
