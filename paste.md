@@ -7,7 +7,7 @@ The command `diff --color=always file.js file2.js` is used in a Unix-like termin
 To read the output of this command, follow these steps:
 
 1. **Open a Terminal**: Launch your terminal application.
-2. **Navigate to the Directory**: Use the `cd` command to navigate to the directory containing `file.js` and `file2.js`.
+2. **Navigate to the Directory**: Use the `cd` command to navigate to the directory where `file.js` and `file2.js` are located.
 3. **Run the Command**: Type the command `diff --color=always file.js file2.js` and press Enter.
 
 ### Understanding the Output
@@ -18,18 +18,14 @@ To read the output of this command, follow these steps:
 
 ### Example Output
 
-Here’s an example of what the output might look like:
-
 ```
-- const oldFunction = () => { return 'old'; }
-+ const newFunction = () => { return 'new'; }
+- const oldVariable = 10;
++ const newVariable = 20;
 ```
 
-In this example, the first line (in red) indicates that `oldFunction` is present in `file.js` but not in `file2.js`, while the second line (in green) indicates that `newFunction` is present in `file2.js` but not in `file.js`.
+In this example, the line with `oldVariable` is in `file.js` but not in `file2.js`, while the line with `newVariable` is in `file2.js` but not in `file.js`.
 
 ### Additional Tips
 
 - If you want to save the output to a file, you can redirect it using `>` like this: `diff --color=always file.js file2.js > diff_output.txt`.
-- You can also use `diff -u` for a unified format, which provides a more compact view of the differences.
-
-This command is very useful for developers to quickly see changes between different versions of code files.
+- You can also use `less -R` to view the output in a paginated format while preserving the color: `diff --color=always file.js file2.js | less -R`.
