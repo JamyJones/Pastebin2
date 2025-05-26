@@ -68,4 +68,4 @@ class Program
 }
 ```
 
-In all these examples, the asynchronous methods allow for non-blocking operations, which can improve the performance of applications, especially when dealing with I/O-bound tasks.
+In all these examples, the asynchronous methods allow for non-blocking operations, which can improve the responsiveness of applications, especially when dealing with I/O-bound tasks.
