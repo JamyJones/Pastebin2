@@ -1,59 +1,35 @@
-In JavaScript, when you resolve a `Promise`, you can pass any data you want — including objects, arrays, or multiple values. Typically, if you want to pass multiple pieces of data, you wrap them in an object or array.
+To pass multiple data objects using the `resolve` function in a Promise, you can pass an object that contains all the data you want to return. This way, you can easily retrieve the data when you await the function. Here's an example of how to do this:
 
-### Common approach: Wrap multiple data items in an object
-
-```js
+```javascript
 function foo() {
-  return new Promise(function(resolve, reject) {
-    const data1 = [1, 2, 3];
-    const data2 = { key: 'value' };
-    // Pass an object containing multiple data items
-    resolve({ data1, data2 });
-  });
+    return new Promise(function(resolve) {
+        // Simulate some asynchronous operation
+        setTimeout(() => {
+            const dataObject = { 
+                arrayData: [1, 2, 3], 
+                objectData: { key: 'value' } 
+            };
+            resolve(dataObject); // Pass the data object to resolve
+        }, 1000);
+    });
 }
-```
 
-### Consuming the Promise with `await`
-
-```js
+// Usage with async/await
 async function main() {
-  const { data1, data2 } = await foo();
-  console.log(data1); // [1, 2, 3]
-  console.log(data2); // { key: 'value' }
+    try {
+        const result = await foo(); // Wait for the promise to resolve
+        console.log(result.arrayData); // Access the array
+        console.log(result.objectData); // Access the object
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 main();
 ```
 
----
+In this example:
 
-### Alternative: Pass an array of multiple values
-
-```js
-function foo() {
-  return new Promise(function(resolve, reject) {
-    const arrayData = [1, 2, 3];
-    const objectData = { key: 'value' };
-    resolve([arrayData, objectData]);
-  });
-}
-```
-
-```js
-async function main() {
-  const [arrayData, objectData] = await foo();
-  console.log(arrayData); // [1, 2, 3]
-  console.log(objectData); // { key: 'value' }
-}
-
-main();
-```
-
----
-
-### Summary
-
-- Use `resolve()` with an **object** or **array** containing multiple data pieces.
-- When consuming, **destructure** the resolved value accordingly.
-
-**Note:** For clarity and maintainability, using an object with descriptive keys is preferred, especially when passing multiple data items.
+1. The `foo` function returns a Promise that resolves after a timeout.
+2. The `resolve` function is called with an object containing both an array and another object.
+3. In the `main` function, we use `await` to wait for the Promise to resolve and then access the data from the resolved object.
