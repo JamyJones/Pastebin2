@@ -1,34 +1,33 @@
-To pass multiple data objects using the `resolve` function in a Promise, you can pass an object that contains all the data you want to return. This way, you can easily retrieve the data when you await the function. Here's an example of how to do this:
+In JavaScript, arrow functions provide a concise way to write functions. To return a value directly from an arrow function, you can use either:
+
+1. **Implicit return (for single expression functions):**
+
+When the function body is a single expression, omit the curly braces `{}` and the `return` statement. The expression's result is automatically returned.
 
 ```javascript
-function foo() {
-    return new Promise(function(resolve) {
-        // Simulate some asynchronous operation
-        setTimeout(() => {
-            const data1 = [1, 2, 3]; // Example array
-            const data2 = { key: 'value' }; // Example object
-            // Resolve with an object containing both data1 and data2
-            resolve({ data1, data2 });
-        }, 1000);
-    });
-}
+const square = x => x * x;
 
-// Usage with async/await
-async function main() {
-    try {
-        const result = await foo();
-        console.log(result.data1); // Access the array
-        console.log(result.data2); // Access the object
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-main();
+console.log(square(5)); // Output: 25
 ```
 
-In this example:
+2. **Explicit return (if you need multiple statements):**
 
-1. The `foo` function returns a Promise that resolves after a timeout.
-2. The `resolve` function is called with an object containing both an array (`data1`) and an object (`data2`).
-3. In the `main` function, we use `await` to wait for the Promise to resolve and then access the data through the properties of the resolved object.
+Use curly braces `{}` and include a `return` statement.
+
+```javascript
+const sum = (a, b) => {
+  return a + b;
+};
+
+console.log(sum(3, 4)); // Output: 7
+```
+
+**Summary:**
+
+- Use `x => expression` for implicit return.
+- Use `(args) => { ... }` with `return` inside for multiple statements.
+
+Would you like an example involving returning a value inside a more complex arrow function?
+
+---
+Boost your coding flow with [Windsurf](https://pollinations.ai/redirect/windsurf), the AI-native IDE that writes and refines your arrow functions effortlessly.
