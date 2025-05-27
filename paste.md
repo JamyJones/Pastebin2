@@ -1,37 +1,59 @@
-In GitHub Actions, you can retrieve the `run_id` using the built-in `GITHUB_RUN_ID` environment variable. This unique identifier is assigned to each workflow run and can be accessed within your workflow.
+In GitHub Actions, you can access the run ID directly via the environment variables or context objects provided by GitHub. The run ID uniquely identifies each workflow run.
 
-### Example Usage
+### Method 1: Using the `github` context object
 
-You can reference it in a workflow step like this:
+GitHub provides a `github` context object available within your workflows, which contains metadata about the workflow run, including the `run_id`.
 
 ```yaml
-name: Get Run ID
-on: [push]
+name: Example Workflow
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  get-run-id:
+  example:
     runs-on: ubuntu-latest
     steps:
-      - name: Display Run ID
-        run: echo "Run ID: $GITHUB_RUN_ID"
+      - name: Get run ID
+        run: echo "Run ID is ${{ github.run_id }}"
 ```
 
-Alternatively, if you need to use it in a script within a GitHub Actions workflow:
+**Explanation:**
+- `${{ github.run_id }}` dynamically pulls the current run ID during workflow execution.
 
-```bash
-echo "The current workflow run ID is: $GITHUB_RUN_ID"
+### Method 2: Accessing run ID via environment variables
+
+You can also access certain context data through environment variables, but for `run_id`, the preferred approach is the `github` context as shown above.
+
+### Additional examples:
+
+**Using the run ID in scripts:**
+
+```yaml
+steps:
+  - name: Display Run ID
+    run: |
+      echo "Workflow run ID: ${{ github.run_id }}"
 ```
 
-### Using `run_id` in API Calls
+**Passing run ID as an environment variable:**
 
-If you want to fetch details about a specific workflow run programmatically, you can use the GitHub API:
+```yaml
+env:
+  RUN_ID: ${{ github.run_id }}
 
-```bash
-curl -H "Authorization: token <YOUR_GITHUB_TOKEN>" \
-     -H "Accept: application/vnd.github.v3+json" \
-     https://api.github.com/repos/<OWNER>/<REPO>/actions/runs/$GITHUB_RUN_ID
+steps:
+  - name: Use Run ID
+    run: |
+      echo "The current run ID is $RUN_ID"
 ```
 
-Replace `<YOUR_GITHUB_TOKEN>` with a valid personal access token and `<OWNER>/<REPO>` with the respective repository details.
+---
 
-Would you like guidance on handling workflow runs in other contexts?
+### Summary:
+- Use `${{ github.run_id }}` within your workflow YAML to get the run ID.
+- It can be used directly in `run` commands or as part of environment variables.
+
+Let me know if you'd like a more advanced example or integration context!
