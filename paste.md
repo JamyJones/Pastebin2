@@ -17,7 +17,7 @@ To create a single-page application with Bootstrap 5 that displays five sections
         }
     </style>
 </head>
-<body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="0" tabindex="0">
+<body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="70" tabindex="0">
 
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container-fluid">
@@ -70,7 +70,8 @@ To create a single-page application with Bootstrap 5 that displays five sections
         </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
 ```
@@ -79,12 +80,12 @@ To create a single-page application with Bootstrap 5 that displays five sections
 
 1. **Navbar**: The navigation bar is created using Bootstrap's Navbar component. Each link in the navbar corresponds to a section on the page.
 
-2. **Sections**: Each section is given a unique ID (e.g., `section1`, `section2`, etc.) that matches the href attribute of the corresponding navbar link. This allows the page to scroll to the correct section when a link is clicked.
+2. **Sections**: Each section has a unique ID that matches the href attribute of the corresponding navbar link. This allows the page to scroll to the correct section when a link is clicked.
 
-3. **Scrollspy**: The `data-bs-spy="scroll"` attribute on the body element enables Bootstrap's Scrollspy feature, which automatically updates the active class on the navbar links as you scroll through the sections.
+3. **Scrollspy**: The `data-bs-spy="scroll"` attribute on the body enables Bootstrap's Scrollspy feature, which automatically updates the active class on the navbar links as you scroll through the sections.
 
-4. **Styling**: Each section has a different background color for visual distinction, and the height is set to 100vh to fill the viewport.
+4. **Styling**: Each section is given a height of 100vh (full viewport height) and some padding for better visibility.
 
-### Usage
+5. **JavaScript**: Bootstrap's JavaScript and Popper.js are included for the navbar toggler functionality.
 
-You can copy and paste the above code into an HTML file and open it in a web browser. Clicking on the navigation links will smoothly scroll to the corresponding sections.
+You can customize the content and styles of each section as needed. This setup provides a smooth navigation experience within a single-page application.
