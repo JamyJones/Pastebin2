@@ -1,24 +1,38 @@
-You're seeing a function definition instead of its returned value because when you assign an arrow function to `'pages_obj'`, you're storing the function itself inside the object, not its execution result. 
+The issue you're encountering is due to the fact that you're defining `pages_obj` as an arrow function rather than as an object. When you access `pages_obj`, you're getting the function definition instead of the object you expect.
 
-When you later try to access `'pages_obj'`, you're retrieving the function definition—not executing it. To resolve this, you need to call the function explicitly when you need its result, like this:
+Here's a breakdown of what's happening:
+
+1. You are defining `pages_obj` as a function: `()=>{pages_obj["length"]=page_count;return pages_obj;}`.
+2. When you try to access `pages_obj`, you are actually accessing the function itself, not the result of calling that function.
+
+To fix this, you should define `pages_obj` as an object directly, or if you want to keep it as a function, you need to call it to get the object. Here are two possible solutions:
+
+### Solution 1: Define `pages_obj` as an object
+
+If you want `pages_obj` to be an object that you can modify, you can define it directly:
 
 ```javascript
-const resolvedValue = resolve({
-    'arr_students2': arr_students2,
-    'pages_obj': () => {
-        const pages_obj = {}; // Declare the object
-        pages_obj["length"] = page_count;
-        return pages_obj;
-    }
-});
+const pages_obj = {
+    length: page_count
+};
 
-// Access the value by calling the function
-console.log(resolvedValue.pages_obj()); // This will return the expected object
+resolve({'arr_students2': arr_students2, 'pages_obj': pages_obj});
 ```
 
-### Best Practice:
-- **Avoid modifying undefined objects**: In your original code, `pages_obj["length"]=page_count;` assumes `pages_obj` is already defined. If it isn't, you'll encounter an error.
-- **Use function execution explicitly**: If an object property holds a function, you need to invoke it manually when accessing its value.
-- **Consider direct object assignment**: If you don’t need dynamic execution, assign the object directly instead of wrapping it inside a function.
+### Solution 2: Keep it as a function but call it
 
-Let me know if you need further clarification or refinements. 🚀
+If you want to keep the function definition, you need to call it to get the object:
+
+```javascript
+const pages_obj = () => {
+    const obj = {};
+    obj["length"] = page_count;
+    return obj;
+};
+
+resolve({'arr_students2': arr_students2, 'pages_obj': pages_obj()});
+```
+
+In this second solution, `pages_obj()` is called, and it returns the object with the `length` property set to `page_count`. 
+
+Choose the solution that best fits your use case!
