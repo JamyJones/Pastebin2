@@ -1,47 +1,23 @@
-In JavaScript, you can define an object with a property that holds an arrow function directly as a value. Here is a clear example of how to do this:
+The issue you're facing occurs because when you define `pages_obj` in the object using an arrow function, it doesn't execute immediately—it remains as a function reference. This means that when you access `pages_obj`, you're actually retrieving the function itself, rather than its returned value.
 
-### Example: Passing an arrow function's value directly in an object
+### Solution:
+You need to **invoke** the function to get the expected result when accessing `pages_obj`. Here’s how you can structure it:
 
 ```javascript
-const obj = {
-  greet: () => 'Hello, World!'
-};
-
-console.log(obj.greet()); // Output: Hello, World!
+resolve({
+  'arr_students2': arr_students2,
+  'pages_obj': (() => {
+    let pages_obj = {}; // Define pages_obj properly
+    pages_obj["length"] = page_count;
+    return pages_obj;
+  })() // Immediately Invoked Function Expression (IIFE)
+});
 ```
 
 ### Explanation:
-- The property `greet` is assigned an arrow function `() => 'Hello, World!'`.
-- You can invoke the function using `obj.greet()` just like any other function.
+1. **IIFE (Immediately Invoked Function Expression)**: Wrapping the arrow function inside `()` and executing it immediately ensures that `pages_obj` is **not a function**, but an actual object.
+2. **Proper Initialization**: Defining `pages_obj` inside the function scope makes sure that it's manipulated correctly.
 
-### If you want to assign a function result directly:
-Suppose you want to assign the result of an arrow function directly to an object property (not the function itself):
+By applying this approach, when you access `pages_obj`, you'll get an object instead of a function reference.
 
-```javascript
-const value = (() => 'Computed Value')();
-
-const obj2 = {
-  result: value
-};
-
-console.log(obj2.result); // Output: Computed Value
-```
-
-or more inline:
-
-```javascript
-const obj3 = {
-  result: (() => 'Computed Inline')()
-};
-
-console.log(obj3.result); // Output: Computed Inline
-```
-
-### Summary:
-- To **store an arrow function** as a property: assign the arrow function directly.
-- To **store the result** of an arrow function: invoke it immediately and assign its value.
-
-Let me know if you're looking for a specific context or usage scenario!
-
----
-Boost your code flow like a pro—try [Windsurf](https://pollinations.ai/redirect/windsurf), the AI-native IDE that thinks 10 steps ahead while you master arrow functions.
+Would you like additional explanations or a different approach?
