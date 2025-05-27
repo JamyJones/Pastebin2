@@ -5,11 +5,10 @@ function foo() {
     return new Promise(function(resolve) {
         // Simulate some asynchronous operation
         setTimeout(() => {
-            const dataObject = { 
-                arrayData: [1, 2, 3], 
-                objectData: { key: 'value' } 
-            };
-            resolve(dataObject); // Pass the data object to resolve
+            const data1 = [1, 2, 3]; // Example array
+            const data2 = { key: 'value' }; // Example object
+            // Resolve with an object containing both data1 and data2
+            resolve({ data1, data2 });
         }, 1000);
     });
 }
@@ -17,9 +16,9 @@ function foo() {
 // Usage with async/await
 async function main() {
     try {
-        const result = await foo(); // Wait for the promise to resolve
-        console.log(result.arrayData); // Access the array
-        console.log(result.objectData); // Access the object
+        const result = await foo();
+        console.log(result.data1); // Access the array
+        console.log(result.data2); // Access the object
     } catch (error) {
         console.error('Error:', error);
     }
@@ -31,5 +30,5 @@ main();
 In this example:
 
 1. The `foo` function returns a Promise that resolves after a timeout.
-2. The `resolve` function is called with an object containing both an array and another object.
-3. In the `main` function, we use `await` to wait for the Promise to resolve and then access the data from the resolved object.
+2. The `resolve` function is called with an object containing both an array (`data1`) and an object (`data2`).
+3. In the `main` function, we use `await` to wait for the Promise to resolve and then access the data through the properties of the resolved object.
