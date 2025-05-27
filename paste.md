@@ -1,79 +1,52 @@
-In ES6 modules, each module has its own scope, and there's no truly *global* variable shared across modules in the traditional sense. However, you can achieve shared state by exporting variables or objects that are mutable, which can then be imported and modified across different modules.
+In ES6 JavaScript modules, you can create a global variable by exporting it from a module. To achieve a variable that points to an array and can be modified (e.g., pushed to or cleared), you can follow these steps:
 
-Here's a common and **standard** approach:
+1. **Create a module**: Define your variable and export it.
+2. **Modify the variable**: Use functions to manipulate the array.
 
-### 1. Create a singleton state object
+Here's an example:
 
-You can define an *object* containing the array and export it. Since objects are mutable, other modules can import and modify the array directly.
+### myModule.js
+```javascript
+// Create a global variable that points to an array
+let globalArray = [];
 
-```js
-// state.js
-export const globalState = {
-  myArray: []
-};
+// Function to push a value to the array
+export function pushToArray(value) {
+    globalArray.push(value);
+}
+
+// Function to clear the array
+export function clearArray() {
+    globalArray = [];
+}
+
+// Function to get the current state of the array
+export function getArray() {
+    return globalArray;
+}
 ```
 
-### 2. Import and modify the array in other modules
+### main.js
+```javascript
+import { pushToArray, clearArray, getArray } from './myModule.js';
 
-```js
-// moduleA.js
-import { globalState } from './state.js';
+// Push values to the global array
+pushToArray(1);
+pushToArray(2);
+pushToArray(3);
 
-// Push to the array
-globalState.myArray.push('item1');
-
-console.log(globalState.myArray); // ['item1']
-```
-
-```js
-// moduleB.js
-import { globalState } from './state.js';
-
-console.log(globalState.myArray); // ['item1']
+console.log(getArray()); // Output: [1, 2, 3]
 
 // Clear the array
-globalState.myArray.length = 0;
+clearArray();
 
-console.log(globalState.myArray); // []
+console.log(getArray()); // Output: []
 ```
 
----
+### Explanation:
+- In `myModule.js`, we define a variable `globalArray` and export functions to manipulate it.
+- The `pushToArray` function allows you to add elements to the array.
+- The `clearArray` function resets the array to an empty state.
+- The `getArray` function returns the current state of the array.
 
-### Summary of best practices:
-- Export an object (or a class instance).
-- Mutate the internal properties (like an array) directly.
-- All modules that import the object share the same reference, maintaining a shared state.
-
-### Additional note:
-Be cautious with shared state—consider better state management approaches if your application grows complex (e.g., using state management libraries or context in frameworks like React).
-
----
-
-**Full example:**
-
-```js
-// state.js
-export const globalState = {
-  myArray: []
-};
-```
-
-```js
-// app.js
-import { globalState } from './state.js';
-
-globalState.myArray.push('Item 1');
-console.log(globalState.myArray); // ['Item 1']
-
-// Later, in another module
-import { globalState } from './state.js';
-
-globalState.myArray.push('Item 2');
-console.log(globalState.myArray); // ['Item 1', 'Item 2']
-```
-
-This pattern ensures that all modules are working with the same shared mutable object.
-
----
-
-If you need a *more encapsulated* approach, you can export getter/setter functions, but the above pattern is most straightforward for shared mutable state in ES6 modules.
+This way, you can maintain a global variable that can be modified across different modules.
