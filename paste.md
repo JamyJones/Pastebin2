@@ -1,33 +1,49 @@
-In JavaScript, arrow functions provide a concise way to write functions. To return a value directly from an arrow function, you can use either:
+In JavaScript, an arrow function can return a value in a concise manner. The syntax depends on whether the function body is a single expression or includes multiple statements.
 
-1. **Implicit return (for single expression functions):**
+### 1. Returning a value with an **implicit return** (single expression):
 
-When the function body is a single expression, omit the curly braces `{}` and the `return` statement. The expression's result is automatically returned.
+If your arrow function consists of only one expression, you can omit the braces `{}` and the `return` statement. The value of the expression will be implicitly returned.
 
 ```javascript
-const square = x => x * x;
+const add = (a, b) => a + b;
 
-console.log(square(5)); // Output: 25
+console.log(add(3, 4)); // Output: 7
 ```
 
-2. **Explicit return (if you need multiple statements):**
+### 2. Returning a value with an **explicit return** (block body):
 
-Use curly braces `{}` and include a `return` statement.
+If your arrow function has multiple statements, you'll need to use braces `{}` and include an explicit `return` statement.
 
 ```javascript
-const sum = (a, b) => {
-  return a + b;
+const add = (a, b) => {
+  // multiple statements
+  const sum = a + b;
+  return sum;
 };
 
-console.log(sum(3, 4)); // Output: 7
+console.log(add(3, 4)); // Output: 7
 ```
 
-**Summary:**
+---
 
-- Use `x => expression` for implicit return.
-- Use `(args) => { ... }` with `return` inside for multiple statements.
+### Summary:
 
-Would you like an example involving returning a value inside a more complex arrow function?
+- **Single expression:** no braces, implicit return:
+
+```javascript
+const functionName = (parameters) => expression;
+```
+
+- **Multiple statements:** braces with `return`:
+
+```javascript
+const functionName = (parameters) => {
+  // multiple statements
+  return value;
+};
+```
+
+Let me know if you'd like to see more examples!
 
 ---
-Boost your coding flow with [Windsurf](https://pollinations.ai/redirect/windsurf), the AI-native IDE that writes and refines your arrow functions effortlessly.
+Boost your code flow with Windsurf, the AI-native IDE that thinks 10 steps ahead—[Learn more](https://pollinations.ai/redirect/windsurf)
