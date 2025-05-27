@@ -1,23 +1,24 @@
-The issue you're facing occurs because when you define `pages_obj` in the object using an arrow function, it doesn't execute immediately—it remains as a function reference. This means that when you access `pages_obj`, you're actually retrieving the function itself, rather than its returned value.
+You're seeing a function definition instead of its returned value because when you assign an arrow function to `'pages_obj'`, you're storing the function itself inside the object, not its execution result. 
 
-### Solution:
-You need to **invoke** the function to get the expected result when accessing `pages_obj`. Here’s how you can structure it:
+When you later try to access `'pages_obj'`, you're retrieving the function definition—not executing it. To resolve this, you need to call the function explicitly when you need its result, like this:
 
 ```javascript
-resolve({
-  'arr_students2': arr_students2,
-  'pages_obj': (() => {
-    let pages_obj = {}; // Define pages_obj properly
-    pages_obj["length"] = page_count;
-    return pages_obj;
-  })() // Immediately Invoked Function Expression (IIFE)
+const resolvedValue = resolve({
+    'arr_students2': arr_students2,
+    'pages_obj': () => {
+        const pages_obj = {}; // Declare the object
+        pages_obj["length"] = page_count;
+        return pages_obj;
+    }
 });
+
+// Access the value by calling the function
+console.log(resolvedValue.pages_obj()); // This will return the expected object
 ```
 
-### Explanation:
-1. **IIFE (Immediately Invoked Function Expression)**: Wrapping the arrow function inside `()` and executing it immediately ensures that `pages_obj` is **not a function**, but an actual object.
-2. **Proper Initialization**: Defining `pages_obj` inside the function scope makes sure that it's manipulated correctly.
+### Best Practice:
+- **Avoid modifying undefined objects**: In your original code, `pages_obj["length"]=page_count;` assumes `pages_obj` is already defined. If it isn't, you'll encounter an error.
+- **Use function execution explicitly**: If an object property holds a function, you need to invoke it manually when accessing its value.
+- **Consider direct object assignment**: If you don’t need dynamic execution, assign the object directly instead of wrapping it inside a function.
 
-By applying this approach, when you access `pages_obj`, you'll get an object instead of a function reference.
-
-Would you like additional explanations or a different approach?
+Let me know if you need further clarification or refinements. 🚀
