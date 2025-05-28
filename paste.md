@@ -1,71 +1,58 @@
-It looks like you're using Bootstrap 5, but your code is still using the `data-toggle` attribute, which is not supported in Bootstrap 5. Instead, Bootstrap 5 uses the `data-bs-toggle` attribute for tab functionality. 
+In Bootstrap 5, the `offcanvas` component is typically used to create sidebars or hidden content areas that slide in. However, if your goal is to prevent users from accessing content unless the offcanvas is interacted with, you might consider using it as a login form or authentication gateway. Here's an approach:
 
-Here's how you can modify your code to make the tabs work correctly:
+### Steps to Implement:
+1. **Trigger Offcanvas Automatically**: Open the offcanvas as soon as the page loads.
+2. **Restrict Content Access**: Disable interactions with the main page until the user performs an action (e.g., enters credentials).
+3. **Use JavaScript to Control Access**: Ensure users can’t dismiss the offcanvas without authentication.
 
-1. Change `data-toggle` to `data-bs-toggle`.
-2. Ensure that you have included the Bootstrap 5 JavaScript library in your project, as the tab functionality relies on it.
-
-Here’s the corrected code:
+### Example Code:
 
 ```html
-<div class="container mt-5">
-    <ul class="nav nav-tabs" id="authTabs" role="tablist">
-        <li class="nav-item">
-            <button type="button" class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" role="tab" aria-controls="login" aria-selected="true">Login</button>
-        </li>
-        <li class="nav-item">
-            <button type="button" class="nav-link" id="signup-tab" data-bs-toggle="tab" data-bs-target="#signup" role="tab" aria-controls="signup" aria-selected="false">Sign Up</button>
-        </li>
-    </ul>
-    <div class="tab-content" id="authTabsContent">
-        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-            <div class="container d-flex justify-content-center align-items-center vh-100">
-                <div class="card p-4" style="width: 350px;">
-                    <h2 class="text-center mb-3">Log in</h2>
-                    <form>
-                        <div class="mb-3">
-                            <input type="email" id="email-entry" class="form-control" placeholder="Email or phone number" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" id="password-entry" class="form-control" placeholder="Password" required>
-                        </div>
-                        <button type="button" id="login-form-submit" class="btn btn-primary w-100">Log In</button>
-                        <hr>
-                        <div class="text-center">
-                            <a href="signup" class="btn btn-success">Create New Account</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 5 Offcanvas Restriction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            pointer-events: none; /* Initially disable user interactions */
+        }
+    </style>
+</head>
+<body>
+    <!-- Offcanvas Component -->
+    <div class="offcanvas offcanvas-start show" tabindex="-1" id="authCanvas" data-bs-backdrop="static">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Restricted Access</h5>
         </div>
-        <div class="tab-pane fade" id="signup" role="tabpanel" aria-labelledby="signup-tab">
-            <div class="container my-5">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <form>
-                            <h2 class="mb-4 text-center">Sign Up</h2>
-                            <div class="mb-3">
-                                <input id="email-entry-signup" type="text" class="form-control" placeholder="Email or Phone Number" required>
-                            </div>
-                            <div class="mb-3">
-                                <input type="password" id="password-entry-signup" class="form-control" placeholder="Password" required>
-                            </div>
-                            <button type="button" id="signup-form-btn" class="btn btn-primary w-100">Sign Up</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="offcanvas-body">
+            <p>Please log in to access the page.</p>
+            <button class="btn btn-primary" id="loginButton">Login</button>
         </div>
     </div>
-</div>
+
+    <div class="container mt-5">
+        <h1>Restricted Page Content</h1>
+        <p>This content is locked behind the offcanvas authentication.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('loginButton').addEventListener('click', function () {
+            document.getElementById('authCanvas').classList.remove('show');
+            document.body.style.pointerEvents = 'auto'; // Allow interactions
+        });
+    </script>
+</body>
+</html>
 ```
 
-### Additional Notes:
-- Make sure to include the Bootstrap 5 CSS and JS files in your HTML. You can use the following CDN links:
+### Explanation:
+1. **Offcanvas Auto-Opens**: The `show` class ensures the offcanvas appears immediately.
+2. **Backdrop Static**: Prevents users from closing it by clicking outside.
+3. **Pointer Events Disabled**: Initially restricts interactions with the page.
+4. **Login Button**: When clicked, it removes the offcanvas and restores page access.
 
-```html
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-```
-
-- Ensure that the IDs for the input fields in the signup form are unique (e.g., `id="email-entry-signup"` and `id="password-entry-signup"`), as having duplicate IDs can lead to unexpected behavior.
+Would you like additional enhancements like form validation or database integration?
