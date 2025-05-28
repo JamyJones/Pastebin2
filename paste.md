@@ -1,104 +1,80 @@
-I'll help you convert this into proper Bootstrap tabs with corresponding content panes. Here's the complete implementation:
+You can create a Bootstrap tabbed interface for user authentication with separate tabs for login and signup. Below is a complete HTML snippet that includes the necessary Bootstrap structure and your provided code for both the login and signup forms.
+
+Make sure to include Bootstrap CSS and JS in your project for the tabs to function correctly. Here’s how you can set it up:
 
 ```html
-<!-- Nav tabs -->
-<ul class="nav nav-tabs" id="top_nav_bar" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
-      <i class="fas fa-home" style="margin-right:8px;"></i>Home
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="streams-tab" data-bs-toggle="tab" data-bs-target="#streams" type="button" role="tab" aria-controls="streams" aria-selected="false">
-      <i class="fas fa-video" style="margin-right:8px;"></i>Streams
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab" aria-controls="favorites" aria-selected="false">
-      <i class="fas fa-star" style="margin-right:8px;"></i>Favorite Streams
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab" aria-controls="leaderboard" aria-selected="false">
-      <i class="fas fa-trophy" style="margin-right:8px;"></i>LeaderBoard
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="false">
-      <i class="fas fa-info-circle" style="margin-right:8px;"></i>About
-    </button>
-  </li>
-  <li class="nav-item dropdown" id="login-profile"></li>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
 
-<!-- Tab content -->
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-    <!-- Home content -->
-  </div>
-  <div class="tab-pane fade" id="streams" role="tabpanel" aria-labelledby="streams-tab">
-    <!-- Streams content -->
-  </div>
-  <div class="tab-pane fade" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
-    <!-- Favorites content -->
-  </div>
-  <div class="tab-pane fade" id="leaderboard" role="tabpanel" aria-labelledby="leaderboard-tab">
-    <!-- Leaderboard content -->
-  </div>
-  <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab">
-    <!-- About content -->
-  </div>
+<div class="container mt-5">
+    <ul class="nav nav-tabs" id="authTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="true">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="signup-tab" data-toggle="tab" href="#signup" role="tab" aria-controls="signup" aria-selected="false">Sign Up</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="authTabsContent">
+        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+            <div class="container d-flex justify-content-center align-items-center vh-100">
+                <div class="card p-4" style="width: 350px;">
+                    <h2 class="text-center mb-3">Log in</h2>
+                    <form>
+                        <div class="mb-3">
+                            <input type="email" id="email-entry" class="form-control" placeholder="Email or phone number" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" id="password-entry" class="form-control" placeholder="Password" required>
+                        </div>
+                        <button type="button" id="login-form-submit" class="btn btn-primary w-100">Log In</button>
+                        <hr>
+                        <div class="text-center">
+                            <a href="signup" class="btn btn-success">Create New Account</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="signup" role="tabpanel" aria-labelledby="signup-tab">
+            <div class="container my-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <form>
+                            <h2 class="mb-4 text-center">Sign Up</h2>
+                            <div class="mb-3">
+                                <input id="email-entry" type="text" class="form-control" placeholder="Email or Phone Number" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" id="password-entry" class="form-control" placeholder="Password" required>
+                            </div>
+                            <button type="button" id="signup-form-btn" class="btn btn-primary w-100">Sign Up</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Auth buttons -->
-<div class="container" id="auth-buttons">
-  <div class="row text-center">
-    <div class="col-6">
-      <button class="btn" id="login-btn">Login</button>
-    </div>
-    <div class="col-6">
-      <button class="btn" id="signup-btn">SignUp</button>
-    </div>
-  </div>
-</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
 ```
 
-Key changes made:
+### Explanation:
+- The code creates a Bootstrap tabbed interface with two tabs: "Login" and "Sign Up".
+- Each tab contains a form for user authentication.
+- The login form is displayed by default, while the signup form is hidden until the corresponding tab is clicked.
+- Bootstrap's JavaScript and jQuery are included to enable the tab functionality. 
 
-1. Changed `<a>` tags to `<button>` elements for proper tab functionality
-2. Added proper data attributes for Bootstrap 5 tabs:
-   - `data-bs-toggle="tab"`
-   - `data-bs-target="#id"`
-3. Added corresponding tab content panes
-4. Added proper ARIA attributes for accessibility
-5. Added `role="presentation"` to nav items
-6. Made the home tab active by default
-
-To make this work, ensure you have:
-
-1. Bootstrap 5 CSS and JS included
-2. Font Awesome for the icons
-3. Initialize Bootstrap's JavaScript components
-
-You might also want to add this JavaScript to enable the tabs:
-
-```javascript
-document.addEventListener('DOMContentLoaded', function() {
-  const triggerTabList = [].slice.call(document.querySelectorAll('#top_nav_bar button'))
-  triggerTabList.forEach(function(triggerEl) {
-    new bootstrap.Tab(triggerEl)
-  })
-});
-``` [[0]](https://github.com/mr-sivamareedu/node-app/tree/a58413c415b381c6bf6ce7748a263927b0e6acc5/public/lib/bootstrap/site/content/docs/5.1/components/navs-tabs.md) [[1]](https://github.com/muzammalrahim/talenttubeLaravel/tree/1b9a2a533b17e391fa7da6cd08a7d66588f1ff91/resources/views/site/employer/profile/tabs.blade.php) [[2]](https://github.com/serggiio/CbbaTurismo-web-backend/tree/3ab4eda6d83ee7f6052fe7bbecf0d60891ad14f8/resources/views/admin/places/detailPlace.blade.php) [[3]](https://github.com/knightmayank/knightmayank/tree/8745c02520e7c7595efa48bf015411ff1309c0d3/page-templates/my-courses.php) [[4]](https://github.com/tiagolascasas/lbaw1726/tree/9745df187052fbc25bce5e894b27ddbe3a58dc68/development-env/resources/views/pages/moderator.blade.php)
-
-
-
-> [0] [](https://github.com/mr-sivamareedu/node-app/tree/a58413c415b381c6bf6ce7748a263927b0e6acc5/public/lib/bootstrap/site/content/docs/5.1/components/navs-tabs.md)
->
-> [1] [](https://github.com/muzammalrahim/talenttubeLaravel/tree/1b9a2a533b17e391fa7da6cd08a7d66588f1ff91/resources/views/site/employer/profile/tabs.blade.php)
->
-> [2] [](https://github.com/serggiio/CbbaTurismo-web-backend/tree/3ab4eda6d83ee7f6052fe7bbecf0d60891ad14f8/resources/views/admin/places/detailPlace.blade.php)
->
-> [3] [](https://github.com/knightmayank/knightmayank/tree/8745c02520e7c7595efa48bf015411ff1309c0d3/page-templates/my-courses.php)
->
-> [4] [](https://github.com/tiagolascasas/lbaw1726/tree/9745df187052fbc25bce5e894b27ddbe3a58dc68/development-env/resources/views/pages/moderator.blade.php)
+Make sure to test this code in a local or online HTML environment where Bootstrap is supported.
