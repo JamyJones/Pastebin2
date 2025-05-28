@@ -1,92 +1,83 @@
-To create a single-page application with Bootstrap 5 that displays five sections and allows navigation between them, you can use Bootstrap's built-in components like the Navbar and Scrollspy. Below is a simple example of how to set this up.
+To achieve this functionality in Bootstrap 5, you can use the Bootstrap `nav` component along with JavaScript to display five sections at a time dynamically. Below is a structured approach:
 
-### HTML Structure
+### **Steps to Implement**
+1. Create your navigation links.
+2. Organize the sections with unique IDs.
+3. Use JavaScript to show only five sections at a time.
 
+### **Example Implementation**
+
+#### **HTML Structure**
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Page Navigation</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Section Navigation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        section {
-            height: 100vh; /* Full viewport height for each section */
-            padding: 20px;
-        }
+        .section { display: none; }
+        .active { display: block; }
     </style>
 </head>
-<body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="0" tabindex="0">
+<body>
+    <div class="container mt-4">
+        <ul class="nav nav-pills" id="navLinks">
+            <li class="nav-item"><a class="nav-link active" href="#" data-start="0">Page 1</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-start="5">Page 2</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-start="10">Page 3</a></li>
+        </ul>
 
-    <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">My App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section1">Section 1</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section2">Section 2</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section3">Section 3</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section4">Section 4</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#section5">Section 5</a>
-                    </li>
-                </ul>
-            </div>
+        <div class="mt-4" id="sections">
+            <!-- Sections -->
+            <div class="section active" id="section1">Section 1</div>
+            <div class="section active" id="section2">Section 2</div>
+            <div class="section active" id="section3">Section 3</div>
+            <div class="section active" id="section4">Section 4</div>
+            <div class="section active" id="section5">Section 5</div>
+            <div class="section" id="section6">Section 6</div>
+            <div class="section" id="section7">Section 7</div>
+            <div class="section" id="section8">Section 8</div>
+            <div class="section" id="section9">Section 9</div>
+            <div class="section" id="section10">Section 10</div>
         </div>
-    </nav>
-
-    <div class="container mt-5 pt-5">
-        <section id="section1" class="bg-primary text-white">
-            <h1>Section 1</h1>
-            <p>This is the content of Section 1.</p>
-        </section>
-        <section id="section2" class="bg-secondary text-white">
-            <h1>Section 2</h1>
-            <p>This is the content of Section 2.</p>
-        </section>
-        <section id="section3" class="bg-success text-white">
-            <h1>Section 3</h1>
-            <p>This is the content of Section 3.</p>
-        </section>
-        <section id="section4" class="bg-danger text-white">
-            <h1>Section 4</h1>
-            <p>This is the content of Section 4.</p>
-        </section>
-        <section id="section5" class="bg-warning text-dark">
-            <h1>Section 5</h1>
-            <p>This is the content of Section 5.</p>
-        </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script>
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                let startIndex = parseInt(this.getAttribute('data-start'));
+
+                document.querySelectorAll('.section').forEach((section, index) => {
+                    section.classList.remove('active');
+                    if (index >= startIndex && index < startIndex + 5) {
+                        section.classList.add('active');
+                    }
+                });
+
+                document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
 ```
 
-### Explanation
+### **Explanation**
+- **Navigation Links (`nav-pills`)**: Each link contains a `data-start` attribute that determines the starting section to display.
+- **Section Display**: Initially, the first five sections are visible (`active` class).
+- **JavaScript Event Listener**: When a navigation link is clicked, it dynamically updates the visibility of the sections based on the `data-start` value.
 
-1. **Navbar**: The navigation bar is created using Bootstrap's Navbar component. Each link in the navbar corresponds to a section on the page.
+### **Best Practices**
+- Ensure your CSS properly hides inactive sections.
+- Use Bootstrap's built-in `nav` styling to enhance UX.
+- Optimize JavaScript for dynamic updates without reloading the page.
 
-2. **Sections**: Each section has a unique ID that matches the href attribute of the corresponding navbar link. This allows the page to scroll to the correct section when a link is clicked.
+This approach efficiently provides the navigation-like section display using Bootstrap 5 while keeping the logic clean and easy to manage. Let me know if you need refinements! [[0]](https://github.com/l7u7ch/absarcs/tree/7c007fc5bd21cd71bcd0c942f098143b9cb2fc62/content/How+to/2021-01-11T01_24_33+0900/index.md)
 
-3. **Scrollspy**: The `data-bs-spy="scroll"` attribute on the body enables Bootstrap's Scrollspy feature, which automatically updates the active class on the navbar links as you scroll through the sections.
 
-4. **Styling**: Each section is given a height of 100vh (full viewport height) to ensure that they take up the entire screen.
 
-5. **JavaScript**: Bootstrap's JavaScript and Popper.js are included for the navbar functionality.
-
-### Usage
-You can copy and paste the above code into an HTML file and open it in a web browser to see the navigation in action. Adjust the content and styles as needed for your application!
+> [0] [](https://github.com/l7u7ch/absarcs/tree/7c007fc5bd21cd71bcd0c942f098143b9cb2fc62/content/How+to/2021-01-11T01_24_33+0900/index.md)
