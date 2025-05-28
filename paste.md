@@ -1,24 +1,8 @@
-To convert your current navigation structure into Bootstrap tabs, you'll need to follow Bootstrap's tab component structure. Bootstrap tabs are based on a set of navigational links with `data-bs-toggle="tab"` attributes and corresponding tab content panes with matching IDs.
-
-Here's how to refactor your code into Bootstrap 5 tabs:
-
----
-
-### Step 1: Create the tab navigation (the list of tabs)
-
-Use `nav nav-tabs` along with `<button>` or `<a>` elements with `data-bs-toggle="tab"`.
-
-### Step 2: Set up tab content containers
-
-Create `<div class="tab-content">` with individual `<div class="tab-pane">` for each tab, matching the `href` or `data-bs-target` of the navigation items.
-
----
-
-### Converted Example:
+I'll help you convert this into proper Bootstrap tabs with corresponding content panes. Here's the complete implementation:
 
 ```html
 <!-- Nav tabs -->
-<ul class="nav nav-tabs" id="top_nav_tabs" role="tablist">
+<ul class="nav nav-tabs" id="top_nav_bar" role="tablist">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
       <i class="fas fa-home" style="margin-right:8px;"></i>Home
@@ -44,50 +28,77 @@ Create `<div class="tab-content">` with individual `<div class="tab-pane">` for 
       <i class="fas fa-info-circle" style="margin-right:8px;"></i>About
     </button>
   </li>
-  <!-- Add additional dropdown or login/profile as needed -->
+  <li class="nav-item dropdown" id="login-profile"></li>
 </ul>
 
 <!-- Tab content -->
-<div class="tab-content p-3" id="top_nav_tabsContent">
+<div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-    <!-- Home content here -->
+    <!-- Home content -->
   </div>
   <div class="tab-pane fade" id="streams" role="tabpanel" aria-labelledby="streams-tab">
-    <!-- Streams content here -->
+    <!-- Streams content -->
   </div>
   <div class="tab-pane fade" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
-    <!-- Favorites content here -->
+    <!-- Favorites content -->
   </div>
   <div class="tab-pane fade" id="leaderboard" role="tabpanel" aria-labelledby="leaderboard-tab">
-    <!-- Leaderboard content here -->
+    <!-- Leaderboard content -->
   </div>
   <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab">
-    <!-- About content here -->
+    <!-- About content -->
+  </div>
+</div>
+
+<!-- Auth buttons -->
+<div class="container" id="auth-buttons">
+  <div class="row text-center">
+    <div class="col-6">
+      <button class="btn" id="login-btn">Login</button>
+    </div>
+    <div class="col-6">
+      <button class="btn" id="signup-btn">SignUp</button>
+    </div>
   </div>
 </div>
 ```
 
----
+Key changes made:
 
-### Important notes:
-- Use `<button>` with `data-bs-toggle="tab"` for accessibility and flexibility.
-- The first tab has classes `active` and `show` to make it visible by default.
-- Ensure your content panes have matching IDs (`#home`, `#streams`, etc.) and the `aria-labelledby` corresponds to the tab button IDs (`#home-tab`, `#streams-tab`, etc.)
-- You can include your existing icons with `<i>` tags as shown.
-- Add your specific content inside each `<div class="tab-pane">`.
+1. Changed `<a>` tags to `<button>` elements for proper tab functionality
+2. Added proper data attributes for Bootstrap 5 tabs:
+   - `data-bs-toggle="tab"`
+   - `data-bs-target="#id"`
+3. Added corresponding tab content panes
+4. Added proper ARIA attributes for accessibility
+5. Added `role="presentation"` to nav items
+6. Made the home tab active by default
 
----
+To make this work, ensure you have:
 
-### Additional:
-Your existing login/signup buttons are outside tabs; keep them where needed separately. If they need to be part of tabs, they should be integrated inside the tab content or added as a separate component as per your design.
+1. Bootstrap 5 CSS and JS included
+2. Font Awesome for the icons
+3. Initialize Bootstrap's JavaScript components
 
----
+You might also want to add this JavaScript to enable the tabs:
 
-**Follow these best practices for Bootstrap 5:**
-- Use semantic HTML semantics where applicable.
-- Ensure accessibility with `role`, `aria-` attributes.
-- Keep your tab content dynamic if needed.
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+  const triggerTabList = [].slice.call(document.querySelectorAll('#top_nav_bar button'))
+  triggerTabList.forEach(function(triggerEl) {
+    new bootstrap.Tab(triggerEl)
+  })
+});
+``` [[0]](https://github.com/mr-sivamareedu/node-app/tree/a58413c415b381c6bf6ce7748a263927b0e6acc5/public/lib/bootstrap/site/content/docs/5.1/components/navs-tabs.md) [[1]](https://github.com/muzammalrahim/talenttubeLaravel/tree/1b9a2a533b17e391fa7da6cd08a7d66588f1ff91/resources/views/site/employer/profile/tabs.blade.php) [[2]](https://github.com/serggiio/CbbaTurismo-web-backend/tree/3ab4eda6d83ee7f6052fe7bbecf0d60891ad14f8/resources/views/admin/places/detailPlace.blade.php) [[3]](https://github.com/knightmayank/knightmayank/tree/8745c02520e7c7595efa48bf015411ff1309c0d3/page-templates/my-courses.php) [[4]](https://github.com/tiagolascasas/lbaw1726/tree/9745df187052fbc25bce5e894b27ddbe3a58dc68/development-env/resources/views/pages/moderator.blade.php)
 
----
 
-Let me know if you'd like further customization!
+
+> [0] [](https://github.com/mr-sivamareedu/node-app/tree/a58413c415b381c6bf6ce7748a263927b0e6acc5/public/lib/bootstrap/site/content/docs/5.1/components/navs-tabs.md)
+>
+> [1] [](https://github.com/muzammalrahim/talenttubeLaravel/tree/1b9a2a533b17e391fa7da6cd08a7d66588f1ff91/resources/views/site/employer/profile/tabs.blade.php)
+>
+> [2] [](https://github.com/serggiio/CbbaTurismo-web-backend/tree/3ab4eda6d83ee7f6052fe7bbecf0d60891ad14f8/resources/views/admin/places/detailPlace.blade.php)
+>
+> [3] [](https://github.com/knightmayank/knightmayank/tree/8745c02520e7c7595efa48bf015411ff1309c0d3/page-templates/my-courses.php)
+>
+> [4] [](https://github.com/tiagolascasas/lbaw1726/tree/9745df187052fbc25bce5e894b27ddbe3a58dc68/development-env/resources/views/pages/moderator.blade.php)
