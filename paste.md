@@ -1,6 +1,6 @@
-You can create a Bootstrap tabbed interface for user authentication with separate tabs for login and signup. Below is a complete HTML snippet that includes the necessary Bootstrap structure and your provided code for both the login and signup forms.
+To create a Bootstrap tabbed interface for user authentication with separate tabs for login and signup, you can use the following HTML code snippet. This code includes the necessary Bootstrap classes and structure to implement the tabs, along with the provided login and signup forms.
 
-Make sure to include Bootstrap CSS and JS in your project for the tabs to function properly. Here’s how you can set it up:
+Make sure to include Bootstrap's CSS and JS files in your project for the tabs to function correctly.
 
 ```html
 <!DOCTYPE html>
@@ -8,8 +8,8 @@ Make sure to include Bootstrap CSS and JS in your project for the tabs to functi
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Authentication</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>User Authentication</title>
 </head>
 <body>
 
@@ -73,8 +73,7 @@ Make sure to include Bootstrap CSS and JS in your project for the tabs to functi
 
 ### Explanation:
 - The code creates a tabbed interface using Bootstrap's nav-tabs component.
-- The `tab-content` div contains two `tab-pane` divs, one for the login form and one for the signup form.
+- The `tab-content` div contains two `tab-pane` divs for the login and signup forms.
 - The login form is set as the active tab by default.
-- Bootstrap's JavaScript and jQuery are included at the bottom of the document to enable tab functionality. 
-
-Make sure to test the code in a browser to see the tabs in action!
+- Bootstrap's JavaScript is included at the bottom to enable tab functionality.
+- Make sure to replace the links to Bootstrap CSS and JS with the latest versions if needed.
