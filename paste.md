@@ -1,99 +1,71 @@
-Your issue stems from how you're implementing tab navigation in Bootstrap 5. In Bootstrap 5, the `data-toggle` attribute was replaced by `data-bs-toggle`, and the tab toggling functionality is managed through the JavaScript plugin tied to these data attributes.
+It looks like you're using Bootstrap 5, but your code is still using the `data-toggle` attribute, which is not supported in Bootstrap 5. Instead, Bootstrap 5 uses the `data-bs-toggle` attribute for tab functionality. 
 
-Additionally, by default, Bootstrap's tab component relies on `<a>` elements, not `<button>`, for navigation tabs. However, it is possible to use `<button>` with proper data attributes, but you need to switch from `data-toggle` to `data-bs-toggle`, and ensure the JavaScript is initialized correctly.
+Here's how you can modify your code to make the tabs work correctly:
 
-### Problems identified:
-1. **Incorrect data attribute:** You are using `data-toggle="tab"`; in Bootstrap 5, it should be `data-bs-toggle="tab"`.
-2. **Using `<button>` for tabs:** Bootstrap 5 supports using `<button>` with `data-bs-toggle="tab"`, but you need to ensure the attributes are correct.
-3. **Missing Bootstrap JavaScript initialization:** Make sure Bootstrap's JS is included, and no conflicting code prevents tab switching.
+1. Change `data-toggle` to `data-bs-toggle`.
+2. Ensure that you have included the Bootstrap 5 JavaScript library in your project, as the tab functionality relies on it.
 
-### Corrected version:
-Replace `data-toggle` with `data-bs-toggle` and ensure the buttons are correctly recognized by Bootstrap's JS.
+Here’s the corrected code:
 
 ```html
-<ul class="nav nav-tabs" id="authTabs" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button 
-      class="nav-link active" 
-      id="login-tab" 
-      data-bs-toggle="tab" 
-      data-bs-target="#login" 
-      type="button" 
-      role="tab" 
-      aria-controls="login" 
-      aria-selected="true">
-      Login
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button 
-      class="nav-link" 
-      id="signup-tab" 
-      data-bs-toggle="tab" 
-      data-bs-target="#signup" 
-      type="button" 
-      role="tab" 
-      aria-controls="signup" 
-      aria-selected="false">
-      Sign Up
-    </button>
-  </li>
-</ul>
+<div class="container mt-5">
+    <ul class="nav nav-tabs" id="authTabs" role="tablist">
+        <li class="nav-item">
+            <button type="button" class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" role="tab" aria-controls="login" aria-selected="true">Login</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link" id="signup-tab" data-bs-toggle="tab" data-bs-target="#signup" role="tab" aria-controls="signup" aria-selected="false">Sign Up</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="authTabsContent">
+        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+            <div class="container d-flex justify-content-center align-items-center vh-100">
+                <div class="card p-4" style="width: 350px;">
+                    <h2 class="text-center mb-3">Log in</h2>
+                    <form>
+                        <div class="mb-3">
+                            <input type="email" id="email-entry" class="form-control" placeholder="Email or phone number" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" id="password-entry" class="form-control" placeholder="Password" required>
+                        </div>
+                        <button type="button" id="login-form-submit" class="btn btn-primary w-100">Log In</button>
+                        <hr>
+                        <div class="text-center">
+                            <a href="signup" class="btn btn-success">Create New Account</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="signup" role="tabpanel" aria-labelledby="signup-tab">
+            <div class="container my-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <form>
+                            <h2 class="mb-4 text-center">Sign Up</h2>
+                            <div class="mb-3">
+                                <input id="email-entry-signup" type="text" class="form-control" placeholder="Email or Phone Number" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" id="password-entry-signup" class="form-control" placeholder="Password" required>
+                            </div>
+                            <button type="button" id="signup-form-btn" class="btn btn-primary w-100">Sign Up</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 ```
 
-### Key changes:
-- Use **`data-bs-toggle="tab"`** instead of `data-toggle="tab"`.
-- Use **`data-bs-target="#id_of_tab_content"`** to link the tabs to content.
-- Make sure `<button>` elements have `type="button"` to prevent accidental form submissions.
+### Additional Notes:
+- Make sure to include the Bootstrap 5 CSS and JS files in your HTML. You can use the following CDN links:
 
-### Additional notes:
-- Your current elements with `id="email-entry"` and `id="password-entry"` are duplicated within both forms. IDs should be unique within the DOM. Assign distinct IDs for each input.
-- Ensure Bootstrap 5 CSS and JS are correctly included:
 ```html
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap JS Bundle (includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 ```
 
-### Complete example of tab headers:
-```html
-<ul class="nav nav-tabs" id="authTabs" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button 
-      class="nav-link active" 
-      id="login-tab" 
-      data-bs-toggle="tab" 
-      data-bs-target="#login" 
-      type="button" 
-      role="tab" 
-      aria-controls="login" 
-      aria-selected="true">
-      Login
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button 
-      class="nav-link" 
-      id="signup-tab" 
-      data-bs-toggle="tab" 
-      data-bs-target="#signup" 
-      type="button" 
-      role="tab" 
-      aria-controls="signup" 
-      aria-selected="false">
-      Sign Up
-    </button>
-  </li>
-</ul>
-```
-
-### Summary:
-- Replace `data-toggle="tab"` with `data-bs-toggle="tab"`.
-- Use `data-bs-target` to connect tabs with content.
-- Ensure Bootstrap's JS is correctly included.
-- Use `<button>` with `type="button"` for tab triggers.
-- Verify that IDs within your form are unique and consistent.
-
-This will make your tabs switch properly when clicking on "Sign Up" or "Login."
+- Ensure that the IDs for the input fields in the signup form are unique (e.g., `id="email-entry-signup"` and `id="password-entry-signup"`), as having duplicate IDs can lead to unexpected behavior.
