@@ -1,78 +1,47 @@
-To improve the performance of Vim when opening large text files, you can consider removing or modifying certain settings in your `.vimrc` file. Here are some suggestions:
+To improve the performance of Vim when opening large text files, you can consider removing or modifying certain settings in your `.vimrc` file. Here are some suggestions on what to remove or change:
 
-1. **Disable Syntax Highlighting**: Syntax highlighting can slow down Vim with large files. You can disable it for large files or entirely if you don't need it.
+1. **Remove or Comment Out Unused Plugins**: If you are not using certain plugins, consider commenting them out or removing them entirely. For example, if you are not using NERDTree or airline, you can comment out their related lines.
+
+2. **Disable Syntax Highlighting**: Syntax highlighting can slow down Vim with large files. You can disable it for large files by adding the following line:
    ```vim
    syntax off
    ```
 
-2. **Disable Line Numbers**: Line numbers can also slow down performance. You can disable them or set them to be shown only in certain file types.
+3. **Disable Line Wrapping**: If you don't need line wrapping, you can disable it:
    ```vim
-   set nonumber
+   set nowrap
    ```
 
-3. **Disable Search Highlighting**: If you don't need search highlighting, you can disable it.
-   ```vim
-   set nohlsearch
-   ```
-
-4. **Disable Auto Indentation**: Auto indentation can slow down performance with large files.
-   ```vim
-   set paste
-   ```
-
-5. **Reduce Command Height**: If you don't need a large command height, you can set it to a smaller value.
+4. **Reduce Command Height**: You can set the command height to a lower value:
    ```vim
    set cmdheight=0
    ```
 
-6. **Disable Wildmenu**: The wildmenu can slow down performance, especially with large files.
+5. **Disable Search Highlighting**: If you don't need search highlighting, you can disable it:
    ```vim
-   set nowildmenu
+   set nohlsearch
    ```
 
-7. **Disable Folding**: If you have folding enabled, it can slow down performance with large files.
+6. **Disable Auto Indentation**: If you don't need auto-indentation for large files, you can disable it:
    ```vim
-   set nofoldenable
+   set paste
    ```
 
-8. **Lazy Redraw**: You already have `set lazyredraw`, which is good for performance. Ensure it remains.
+7. **Remove or Comment Out the Following Settings**: These settings can also contribute to slowness:
+   ```vim
+   set hlsearch
+   set incsearch
+   set showmatch
+   set foldcolumn=1
+   ```
 
-9. **Avoid Plugins**: If you have any plugins that are not essential for coding, consider disabling them when working with large files.
+8. **Lazy Redraw**: Ensure that `set lazyredraw` is enabled, as it can help with performance when executing macros.
 
-Here’s a modified section of your `.vimrc` with the suggested changes:
+9. **Remove or Comment Out the Following Autocommands**: Autocommands can slow down file opening:
+   ```vim
+   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+   ```
 
-```vim
-" Disable syntax highlighting for large files
-syntax off
+10. **Disable Unused Filetype Plugins**: If you are not using certain file types, you can disable their plugins.
 
-" Disable line numbers
-set nonumber
-
-" Disable search highlighting
-set nohlsearch
-
-" Disable auto indentation
-set paste
-
-" Reduce command height
-set cmdheight=0
-
-" Disable wildmenu
-set nowildmenu
-
-" Disable folding
-set nofoldenable
-```
-
-You can add these lines to your `.vimrc` file. If you want to keep some features but improve performance, consider using conditional statements to disable them only for large files. For example:
-
-```vim
-if line('$') > 1000
-    syntax off
-    set nonumber
-    set nohlsearch
-    set paste
-endif
-```
-
-This way, you can maintain your preferred settings for smaller files while optimizing for larger ones.
+After making these changes, your `.vimrc` file should be more optimized for handling large files. Remember to restart Vim after modifying the configuration for the changes to take effect.
