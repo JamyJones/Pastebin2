@@ -1,36 +1,78 @@
-Certainly! Here's a professionally styled offcanvas using HTML and Bootstrap 5, complete with emojis for a friendly and engaging experience:
+To improve the performance of Vim when opening large text files, you can consider removing or modifying certain settings in your `.vimrc` file. Here are some suggestions:
 
-```html
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-  <div class="offcanvas-header bg-primary text-white">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">🚀 Welcome to Our Application!</h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <p>🎉 Thank you for signing up! To complete your registration, please check your email inbox for a confirmation email.</p>
-    
-    <p>📩 Inside the email, you will find a confirmation link. Click on this link to verify your account.</p>
-    
-    <p>🔐 Once your account is verified, return to the login page and log in using your email and password.</p>
+1. **Disable Syntax Highlighting**: Syntax highlighting can slow down Vim with large files. You can disable it for large files or entirely if you don't need it.
+   ```vim
+   syntax off
+   ```
 
-    <p>🚨 If you do not see the email in your inbox, please check your spam or junk folder.</p>
-    
-    <button type="button" class="btn btn-success mt-3" data-bs-dismiss="offcanvas">Got it! ✅</button>
-  </div>
-</div>
+2. **Disable Line Numbers**: Line numbers can also slow down performance. You can disable them or set them to be shown only in certain file types.
+   ```vim
+   set nonumber
+   ```
+
+3. **Disable Search Highlighting**: If you don't need search highlighting, you can disable it.
+   ```vim
+   set nohlsearch
+   ```
+
+4. **Disable Auto Indentation**: Auto indentation can slow down performance with large files.
+   ```vim
+   set paste
+   ```
+
+5. **Reduce Command Height**: If you don't need a large command height, you can set it to a smaller value.
+   ```vim
+   set cmdheight=0
+   ```
+
+6. **Disable Wildmenu**: The wildmenu can slow down performance, especially with large files.
+   ```vim
+   set nowildmenu
+   ```
+
+7. **Disable Folding**: If you have folding enabled, it can slow down performance with large files.
+   ```vim
+   set nofoldenable
+   ```
+
+8. **Lazy Redraw**: You already have `set lazyredraw`, which is good for performance. Ensure it remains.
+
+9. **Avoid Plugins**: If you have any plugins that are not essential for coding, consider disabling them when working with large files.
+
+Here’s a modified section of your `.vimrc` with the suggested changes:
+
+```vim
+" Disable syntax highlighting for large files
+syntax off
+
+" Disable line numbers
+set nonumber
+
+" Disable search highlighting
+set nohlsearch
+
+" Disable auto indentation
+set paste
+
+" Reduce command height
+set cmdheight=0
+
+" Disable wildmenu
+set nowildmenu
+
+" Disable folding
+set nofoldenable
 ```
 
-### Explanation:
-- **Bootstrap 5 Offcanvas:** Provides a slide-in panel from the right.
-- **Header Styling:** A primary-colored background with white text for emphasis.
-- **Emojis:** Makes the instructions more engaging and visually appealing.
-- **Button Close:** Allows users to dismiss the offcanvas easily.
-- **Action Button:** Reinforces acknowledgment with a "Got it!" button.
+You can add these lines to your `.vimrc` file. If you want to keep some features but improve performance, consider using conditional statements to disable them only for large files. For example:
 
-Let me know if you need further customization! 🚀 [[0]](https://github.com/fakhrudinrh/tournyaka/tree/966acae9f10511f6153c50ecf4fe898c9bf48dee/app/Views/layout/navbar.php) [[1]](https://github.com/atcobravo/minishop/tree/412689c2938cd870bd6a171597449b3adcc05dfc/resources/views/layouts/dashboard/toolbar.blade.php)
+```vim
+if line('$') > 1000
+    syntax off
+    set nonumber
+    set nohlsearch
+    set paste
+endif
+```
 
-
-
-> [0] [](https://github.com/fakhrudinrh/tournyaka/tree/966acae9f10511f6153c50ecf4fe898c9bf48dee/app/Views/layout/navbar.php)
->
-> [1] [](https://github.com/atcobravo/minishop/tree/412689c2938cd870bd6a171597449b3adcc05dfc/resources/views/layouts/dashboard/toolbar.blade.php)
+This way, you can maintain your preferred settings for smaller files while optimizing for larger ones.
