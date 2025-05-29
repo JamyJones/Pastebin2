@@ -1,27 +1,19 @@
-## **User Authentication Confirmation Email**  
----  
+Here's a clear and concise message you can use to inform new users about the next steps after they receive the confirmation email. This message is designed to be user-friendly and straightforward, ensuring that users understand what they need to do next.
 
-### **Subject:** Welcome! Please Confirm Your Email  
+```html
+<div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">Welcome to Our Application!</h4>
+    <p>Thank you for signing up! To complete your registration, please check your email inbox for a confirmation email.</p>
+    <p>Inside the email, you will find a confirmation link. Click on this link to verify your account.</p>
+    <p>Once your account is verified, return to the login page and log in using your email and password.</p>
+    <hr>
+    <p class="mb-0">If you do not see the email in your inbox, please check your spam or junk folder.</p>
+</div>
+```
 
-### **Email Body:**  
-**Dear [User's Name],**  
+### Explanation:
+- **Alert Component**: The message is wrapped in a Bootstrap alert component to make it visually distinct and easy to notice.
+- **Clear Instructions**: The message clearly outlines the steps the user needs to take, ensuring they know to check their email and what to do after clicking the confirmation link.
+- **Helpful Reminder**: It includes a reminder to check the spam or junk folder in case the email is not found in the inbox. 
 
-Thank you for signing up! To complete your registration, please confirm your email address by clicking the link below:  
-
-🔗 **[Confirm My Email]**  
-
-Once you’ve verified your email, you can return to the login page and sign in with your registered email and password.  
-
-If you did not create this account, please disregard this message.  
-
-Best regards,  
-**[Your Application Name] Team**  
-
----  
-
-### **Explanation:**  
-- **Clear Call to Action:** The message explicitly instructs the user to click the confirmation link.  
-- **Next Steps Defined:** It tells the user what to do after verification (return to the login page).  
-- **Security Note:** If the user did not sign up, they know they can ignore the email.  
-
-Would you like any modifications or branding elements added to this?  
+Feel free to customize the wording or styling as needed!
