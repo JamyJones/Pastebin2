@@ -1,19 +1,20 @@
-Here's a clear and concise message you can use to inform new users about the next steps after they receive the confirmation email. This message is designed to be user-friendly and straightforward, ensuring that users understand what they need to do next.
+## Email Confirmation Message for User Authentication  
 
-```html
-<div class="alert alert-info" role="alert">
-    <h4 class="alert-heading">Welcome to Our Application!</h4>
-    <p>Thank you for signing up! To complete your registration, please check your email inbox for a confirmation email.</p>
-    <p>Inside the email, you will find a confirmation link. Click on this link to verify your account.</p>
-    <p>Once your account is verified, return to the login page and log in using your email and password.</p>
-    <hr>
-    <p class="mb-0">If you do not see the email in your inbox, please check your spam or junk folder.</p>
-</div>
-```
+---
+**Hello [User's First Name],**  
 
-### Explanation:
-- **Alert Component**: The message is wrapped in a Bootstrap alert component to make it visually distinct and easy to notice.
-- **Clear Instructions**: The message clearly outlines the steps the user needs to take, ensuring they know to check their email and what to do after clicking the confirmation link.
-- **Helpful Reminder**: It includes a reminder to check the spam or junk folder in case the email is not found in the inbox. 
+Thank you for signing up! To complete your registration and verify your account, please follow the steps below:  
 
-Feel free to customize the wording or styling as needed!
+1. **Check Your Inbox** – We’ve sent a confirmation email to **[User's Email]**.  
+2. **Click the Confirmation Link** – Open the email and click the verification link inside.  
+3. **Log in to Your Account** – Once confirmed, return to the login page and sign in using your email and password.  
+
+If you don’t see the email in your inbox, check your spam or junk folder. Still can’t find it? [Resend Confirmation Email]  
+
+We’re excited to have you on board!  
+
+Best regards,  
+**[Your Application Name]** Team  
+
+---
+This message is clear, concise, and guides the user through the verification process while also troubleshooting potential issues. Let me know if you need any adjustments! 🚀
