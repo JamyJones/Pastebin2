@@ -1,55 +1,63 @@
-To include `@supabase/supabase-js` version `2.49.8` in your project's dependencies, you have two common approaches:
+To include `@supabase/supabase-js` version `v2.49.8` as a dependency in your project, you need to specify it in your `package.json` file under the `dependencies` section.
 
-### 1. Using `npm` command
-Run the following command in your terminal within your project directory:
+### Step-by-step instructions:
+
+1. **Using npm (recommended if your project uses npm):**
+
+Run the following command in your project directory:
 
 ```bash
-npm install @supabase/supabase-js@2.49.8
+npm install @supabase/supabase-js@2.49.8 --save
 ```
 
-This command updates your `package.json` to include the specified version automatically.
+This will:
+- Add `@supabase/supabase-js` with version `2.49.8` to your `package.json` dependencies.
+- Install it into your `node_modules` directory.
 
----
+2. **Manually add to `package.json`:**
 
-### 2. Manually editing `package.json`
-If you prefer to manually add or update the dependency, modify your `package.json` as follows:
+Alternatively, you can manually add it under `dependencies`:
 
 ```json
 {
   "dependencies": {
     "@supabase/supabase-js": "2.49.8",
-    // ... other dependencies
+    // other dependencies...
   }
 }
 ```
 
-Then, run:
+Then run:
 
 ```bash
 npm install
 ```
 
-to install the specified version and update your `node_modules`.
+### Example of `package.json` snippet:
 
----
-
-### Additional best practices:
-- Keep your dependencies up to date to benefit from security patches and new features.
-- Use exact versioning (`"2.49.8"`) to avoid unexpected breaking changes from semver ranges when deploying or sharing your project.
-
----
-
-### Summary:
-- **Command line:**  
-  ```bash
-  npm install @supabase/supabase-js@2.49.8
-  ```
-
-- **Manual (`package.json`):**  
-  ```json
+```json
+{
+  "name": "your-project-name",
+  "version": "1.0.0",
   "dependencies": {
     "@supabase/supabase-js": "2.49.8"
   }
-  ```
+}
+```
 
-Followed by `npm install` to sync your dependencies.
+### Summary:
+
+- Use `npm install @supabase/supabase-js@2.49.8 --save` for automatic update.
+- Or manually specify the version in `package.json` and then run `npm install`.
+
+---
+
+### Bonus:
+
+If you're using yarn, the equivalent command is:
+
+```bash
+yarn add @supabase/supabase-js@2.49.8
+```
+
+This will automatically update your `package.json`.
