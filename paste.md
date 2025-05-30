@@ -42,11 +42,11 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'], // Resolve these extensions
   },
-  mode: 'production', // Set mode to production for minification
+  mode: 'production', // Set mode to production
 };
 ```
 
-### Step 3: Update Your `package.json` Scripts
+### Step 3: Update Your `package.json`
 
 Modify your `scripts` section in `package.json` to include a build command for Webpack:
 
@@ -56,9 +56,19 @@ Modify your `scripts` section in `package.json` to include a build command for W
 }
 ```
 
-### Step 4: Create an HTML File
+### Step 4: Build Your Project
 
-Create an `index.html` file in your project root to include the bundled JavaScript:
+Run the build command:
+
+```bash
+npm run build
+```
+
+This will create a `bundle.js` file in the `dist` directory.
+
+### Step 5: Include the Bundled File in Your HTML
+
+Now, you can include the `bundle.js` file in your HTML without needing to use `require`:
 
 ```html
 <!DOCTYPE html>
@@ -70,23 +80,11 @@ Create an `index.html` file in your project root to include the bundled JavaScri
 </head>
 <body>
     <div id="root"></div>
-    <script src="dist/bundle.js"></script> <!-- Include the bundled file -->
+    <script src="dist/bundle.js"></script>
 </body>
 </html>
 ```
 
-### Step 5: Build Your Project
+### Summary
 
-Run the build command:
-
-```bash
-npm run build
-```
-
-### Step 6: Open Your HTML File
-
-Open the `index.html` file in your browser. Your React application should now run without requiring any `require` statements or additional libraries via CDN.
-
-### Note
-
-Make sure to adjust the paths in the configuration according to your project structure. This setup will bundle your React application into a single file that can be included in an HTML file, allowing it to run directly in the browser.
+By using Webpack, you can bundle your React application into a single file that can be included in your HTML without any `require` statements. This allows you to run your React code directly in the browser.
