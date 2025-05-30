@@ -1,63 +1,44 @@
-To include `@supabase/supabase-js` version `v2.49.8` as a dependency in your project, you need to specify it in your `package.json` file under the `dependencies` section.
+To include `@supabase/supabase-js` version `2.49.8` in your project's dependencies via `package.json`, follow these steps:
 
-### Step-by-step instructions:
+### 1. Using the Command Line
 
-1. **Using npm (recommended if your project uses npm):**
-
-Run the following command in your project directory:
+Run this command in your terminal within your project directory:
 
 ```bash
 npm install @supabase/supabase-js@2.49.8 --save
 ```
 
-This will:
-- Add `@supabase/supabase-js` with version `2.49.8` to your `package.json` dependencies.
-- Install it into your `node_modules` directory.
+This will add the specified version to your `package.json` dependencies automatically.
 
-2. **Manually add to `package.json`:**
+### 2. Manually Editing `package.json`
 
-Alternatively, you can manually add it under `dependencies`:
+Alternatively, if you prefer to manually add it:
 
 ```json
 {
-  "dependencies": {
-    "@supabase/supabase-js": "2.49.8",
-    // other dependencies...
-  }
-}
-```
-
-Then run:
-
-```bash
-npm install
-```
-
-### Example of `package.json` snippet:
-
-```json
-{
-  "name": "your-project-name",
-  "version": "1.0.0",
   "dependencies": {
     "@supabase/supabase-js": "2.49.8"
   }
 }
 ```
 
-### Summary:
+After editing, run:
 
-- Use `npm install @supabase/supabase-js@2.49.8 --save` for automatic update.
-- Or manually specify the version in `package.json` and then run `npm install`.
+```bash
+npm install
+```
+
+to install the dependencies listed in `package.json`.
 
 ---
 
-### Bonus:
+### Additional Tips:
+- Ensure your project uses a supported version of Node.js and npm.
+- Always prefer specifying exact versions in production to ensure stability.
+- Check for updates periodically or pin to specific versions based on your project requirements.
 
-If you're using yarn, the equivalent command is:
+If you're using Yarn, the equivalent command is:
 
 ```bash
 yarn add @supabase/supabase-js@2.49.8
 ```
-
-This will automatically update your `package.json`.
