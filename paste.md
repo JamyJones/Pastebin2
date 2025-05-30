@@ -1,56 +1,101 @@
-To produce React components that run independently of React's dependencies, you'll need to bundle them into standalone JavaScript files that include the necessary parts of React internally. Babel only transpiles JSX and modern JavaScript—it doesn’t bundle dependencies. For this, you should use a module bundler like Webpack, Rollup, or esbuild.
+To create a truly standalone, dependency-free JavaScript bundle that can run independently without requiring React libraries at runtime, you need to **bundle** your code along with all dependencies into a single file. This process is different from just transpiling with Babel.
 
-### Steps to Bundle a React Component as Standalone
-1. **Use a Module Bundler**  
-   Babel transpiles code but doesn’t bundle dependencies. A tool like Rollup or Webpack will package everything into a single distributable file.
-   
-2. **Externalizing React (If Needed)**  
-   If you want the output to include React, you need to bundle React inside the compiled JavaScript file. Otherwise, you can mark React as an external dependency.
+### Why your current setup doesn't produce an independent bundle:
+- Babel only transpiles modern JS and JSX into compatible JavaScript.
+- It does **not** bundle or include external dependencies like React or ReactDOM.
+- As a result, your output code assumes React and ReactDOM are available globally at runtime.
 
-3. **Modify Babel Config (If Needed)**  
-   If you're using Babel in isolation, ensure it's set to transform JSX properly without requiring React at runtime.
+---
 
-### Example Using Rollup
-Here’s how you can set up **Rollup** to bundle your React components into a single file.
+### Solution: Bundle your code with dependencies
 
-#### Install Dependencies
-```sh
-npm install --save-dev rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs rollup-plugin-terser @rollup/plugin-babel
+Use a bundler such as **Webpack** or **Rollup** to:
+- Bundle your code
+- Inline all dependencies into a single file
+- Minify if needed
+
+#### Using Rollup (recommended for libraries and simple setups)
+
+Here's a step-by-step:
+
+1. **Install Rollup and necessary plugins:**
+
+```bash
+npm install --save-dev rollup @rollup/plugin-babel @rollup/plugin-node-resolve @rollup/plugin-commonjs
 ```
 
-#### Rollup Configuration (`rollup.config.js`)
+2. **Create a `rollup.config.js`:**
+
 ```js
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
-import { terser } from 'rollup-plugin-terser';
 
 export default {
-  input: 'my_app/static/js/index.js',  // Entry file
+  input: 'my_app/static/js/index.js', // your entry point
   output: {
-    file: 'dist/index.min.js',
-    format: 'iife', // Self-contained script
-    sourcemap: false
+    file: 'dist/bundle.js',          // output file
+    format: 'iife',                  // immediately-invoked function expression (suitable for <script>)
+    name: 'MyApp',                   // global name if using IIFE
+    globals: {
+      react: 'React',
+      'react-dom': 'ReactDOM'
+    }
   },
   plugins: [
-    resolve(),  // Allows bundling external dependencies
-    commonjs(), // Converts CommonJS to ES modules
-    babel({ babelHelpers: 'bundled' }), // Transpile with Babel
-    terser() // Minify the bundle
-  ]
+    resolve(),
+    commonjs(),
+    babel({
+      babelHelpers: 'bundled',
+      presets: ['@babel/preset-env', '@babel/preset-react']
+    })
+  ],
+  external: [] // no external dependencies to exclude, so everything gets bundled
 };
 ```
 
-#### Modify `package.json`
+3. **Update your `package.json` script:**
+
 ```json
 "scripts": {
   "build": "rollup -c"
 }
 ```
 
-### Key Benefits:
-✅ **Self-contained JavaScript**—React and dependencies will be included.  
-✅ **No external React library required**—Everything runs independently.  
-✅ **Optimized & Minified**—Ensures performance and reduced file size.
+4. **Build your bundle by running:**
 
-Let me know if you need further refinements! 🚀
+```bash
+npm run build
+```
+
+---
+
+### What this produces:
+- A single `dist/bundle.js` that includes React, ReactDOM, and your code.
+- You can include it in your HTML:
+
+```html
+<script src="https://unpkg.com/react/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+<script src="dist/bundle.js"></script>
+<script>
+  MyApp.render(); // or whatever your entry's global function is
+</script>
+```
+
+**OR** if you configured `format: 'iife'`, the bundle will automatically execute, attaching to the window.
+
+---
+
+### Vue Summary:
+- Babel transpiles but doesn't bundle dependencies.
+- Use a bundler (Rollup/Webpack) to create a single, dependency-free bundle.
+- Adjust your build process to include dependencies within the bundle.
+
+---
+
+**Note:** If you prefer not to include React at runtime, you could also write your app using a **vanilla JS library or custom rendering** but that is a more advanced approach.
+
+---
+
+Let me know if you want the exact code for the Rollup setup or further customization!
