@@ -1,67 +1,60 @@
-To include `@supabase/supabase-js` version `2.49.8` as a dependency in your `package.json`, you should do one of the following:
-
-### 1. Using `npm` command:
-
-Run this command in your terminal within your project directory:
-
-```bash
-npm install @supabase/supabase-js@2.49.8 --save
-```
-
-This will:
-- Add the specific version `2.49.8` to your `package.json` under `"dependencies"`.
-- Update your `package-lock.json`.
-
-### 2. Manually editing `package.json`
-
-If you prefer to add it directly to `package.json`, open the file and add the dependency:
-
-```json
-{
-  "dependencies": {
-    "@supabase/supabase-js": "2.49.8",
-    // ... other dependencies
-  }
-}
-```
-
-Then, run:
-
-```bash
-npm install
-```
-
-This will ensure your `node_modules` directory is updated with the specified version.
-
-### Best practices:
-- Always specify exact versions in production to prevent unexpected updates.
-- Use `npm update` or `npm outdated` to manage dependency versions regularly.
-- Consider using a `package-lock.json` (which `npm` generates automatically) for consistent installs.
+Here's a resume tailored for a dishwasher position, highlighting relevant skills and experiences:
 
 ---
 
-**Summary:**
+**[Your Name]**  
+[Your Address]  
+[City, State, Zip]  
+[Your Phone Number]  
+[Your Email Address]  
 
-```bash
-npm install @supabase/supabase-js@2.49.8 --save
-```
+---
 
-or manually:
+**Objective**  
+Dedicated and hardworking individual seeking a Dishwasher position where I can utilize my strong work ethic, attention to detail, and ability to work in a fast-paced environment.
 
-```json
-// package.json
-{
-  "dependencies": {
-    "@supabase/supabase-js": "2.49.8",
-    // other dependencies
-  }
-}
-```
+---
 
-Followed by:
+**Skills**  
+- Proficient in English, with strong communication skills  
+- Ability to lift heavy items and stand for extended periods  
+- Excellent attention to detail and cleanliness  
+- Strong time management skills  
+- Ability to work effectively in a team environment  
+- Knowledge of proper sanitation and safety procedures  
 
-```bash
-npm install
-```
+---
 
-to install the package.
+**Experience**  
+
+**[Previous Job Title]**  
+[Previous Employer Name] – [City, State]  
+[Month, Year] – [Month, Year]  
+- Operated dishwashing equipment and maintained cleanliness of kitchen areas.  
+- Efficiently washed, rinsed, and sanitized dishes, utensils, and kitchen equipment.  
+- Assisted in maintaining inventory of cleaning supplies and reported shortages.  
+- Collaborated with kitchen staff to ensure timely service and cleanliness standards.  
+
+**[Previous Job Title]**  
+[Previous Employer Name] – [City, State]  
+[Month, Year] – [Month, Year]  
+- Supported kitchen operations by ensuring all dishes were cleaned and organized.  
+- Followed health and safety regulations to maintain a safe working environment.  
+- Assisted in the setup and breakdown of kitchen equipment during service hours.  
+
+---
+
+**Education**  
+**[Your High School Name]**  
+[City, State]  
+[Month, Year] – [Month, Year]  
+- High School Diploma  
+
+---
+
+**References**  
+Available upon request.
+
+---
+
+Feel free to fill in the placeholders with your personal information and any relevant work experience you may have. Good luck with your application!
