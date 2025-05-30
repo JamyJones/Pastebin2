@@ -1,47 +1,31 @@
-`ReactDOM.createPortal()` is a method in React that allows you to render a component's children into a DOM node that exists outside the hierarchy of the parent component. This is particularly useful for rendering modals, tooltips, or any other UI elements that need to visually break out of their parent container while still being part of the React component tree.
+The `createRoot()` method is part of the React 18 API, which introduced concurrent features and a new root API for rendering. If you are missing `createRoot()` in your `ReactDOM` class, it could be due to a few reasons:
 
-### Syntax
+1. **React Version**: Ensure that you are using React 18 or later. You can check your React version in your `package.json` file or by running the following command in your project directory:
 
-The syntax for `ReactDOM.createPortal()` is as follows:
+   ```bash
+   npm list react
+   ```
 
-```javascript
-ReactDOM.createPortal(child, container)
-```
+   If you are using an older version, you will need to upgrade React and ReactDOM to version 18 or later:
 
-- **child**: The React node (or component) that you want to render.
-- **container**: The DOM node where the child will be rendered.
+   ```bash
+   npm install react@latest react-dom@latest
+   ```
 
-### Example
+2. **Import Statement**: Make sure you are importing `ReactDOM` correctly. The import statement should look like this:
 
-Here’s a simple example of how to use `createPortal`:
+   ```javascript
+   import ReactDOM from 'react-dom/client';
+   ```
 
-```javascript
-import React from 'react';
-import ReactDOM from 'react-dom';
+   Note that `createRoot()` is available in the `react-dom/client` package, not in the main `react-dom` package.
 
-function Modal({ isOpen, onClose }) {
-  if (!isOpen) return null;
+3. **TypeScript Definitions**: If you are using TypeScript, ensure that your type definitions are up to date. You may need to install the latest types for React:
 
-  return ReactDOM.createPortal(
-    <div className="modal">
-      <h1>Modal Title</h1>
-      <button onClick={onClose}>Close</button>
-    </div>,
-    document.getElementById('modal-root') // The container where the modal will be rendered
-  );
-}
-```
+   ```bash
+   npm install @types/react @types/react-dom
+   ```
 
-### Use Cases
+4. **Build Configuration**: If you are using a build tool (like Webpack or Babel), ensure that your configuration is set up to handle the latest JavaScript features and React 18.
 
-1. **Modals**: To display a modal dialog that overlays other content.
-2. **Tooltips**: To show tooltips that need to be positioned relative to the viewport rather than the parent element.
-3. **Dropdowns**: For dropdown menus that should not be constrained by overflow styles of parent elements.
-
-### Benefits
-
-- **Separation of Concerns**: It allows you to keep the modal logic separate from the rest of your application.
-- **Styling**: You can style the portal content independently of the parent component.
-- **Accessibility**: It can help with accessibility by allowing you to manage focus and keyboard interactions more effectively.
-
-In summary, `ReactDOM.createPortal()` is a powerful feature in React that enhances the flexibility of rendering components in a way that is both efficient and organized.
+If you have checked all of the above and are still facing issues, please provide more details about your setup, and I can help you troubleshoot further.
