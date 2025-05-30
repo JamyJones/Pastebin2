@@ -1,63 +1,67 @@
-To include `@supabase/supabase-js` version `2.49.8` as a dependency in your `package.json`, follow these steps:
+To include `@supabase/supabase-js` version `2.49.8` as a dependency in your `package.json`, you should do one of the following:
 
-### 1. Using npm CLI
+### 1. Using `npm` command:
 
-Run the following command in your project directory:
+Run this command in your terminal within your project directory:
 
 ```bash
 npm install @supabase/supabase-js@2.49.8 --save
 ```
 
 This will:
-- Add the package to your `node_modules`
-- Add the dependency to your `package.json` file under `"dependencies"`
+- Add the specific version `2.49.8` to your `package.json` under `"dependencies"`.
+- Update your `package-lock.json`.
 
-### 2. Directly editing `package.json`
+### 2. Manually editing `package.json`
 
-Alternatively, you can manually add or update your `package.json` dependencies:
+If you prefer to add it directly to `package.json`, open the file and add the dependency:
 
 ```json
 {
   "dependencies": {
     "@supabase/supabase-js": "2.49.8",
-    // other dependencies...
+    // ... other dependencies
   }
 }
 ```
 
-After editing `package.json`, run:
+Then, run:
 
 ```bash
 npm install
 ```
 
-to install the specified version.
+This will ensure your `node_modules` directory is updated with the specified version.
 
-### 3. Verify the dependency
+### Best practices:
+- Always specify exact versions in production to prevent unexpected updates.
+- Use `npm update` or `npm outdated` to manage dependency versions regularly.
+- Consider using a `package-lock.json` (which `npm` generates automatically) for consistent installs.
 
-Check your `package.json`:
+---
+
+**Summary:**
+
+```bash
+npm install @supabase/supabase-js@2.49.8 --save
+```
+
+or manually:
 
 ```json
+// package.json
 {
   "dependencies": {
-    "@supabase/supabase-js": "2.49.8"
+    "@supabase/supabase-js": "2.49.8",
+    // other dependencies
   }
 }
 ```
 
-And ensure the package is installed correctly:
+Followed by:
 
 ```bash
-npm ls @supabase/supabase-js
+npm install
 ```
 
-This confirms the installed version.
-
----
-
-### Summarized steps:
-
-- Use `npm install @supabase/supabase-js@2.49.8 --save`
-- Or manually update `package.json` and run `npm install`
-
-Let me know if you'd like guidance on how to initialize or use the Supabase client in your project!
+to install the package.
