@@ -1,18 +1,41 @@
-To include `@supabase/supabase-js` version `2.49.8` in your project's dependencies via `package.json`, follow these steps:
+To include `@supabase/supabase-js` version `2.49.8` as a dependency in your `package.json`, follow these steps:
 
-### 1. Using the Command Line
+### 1. Using npm CLI
 
-Run this command in your terminal within your project directory:
+Run the following command in your project directory:
 
 ```bash
 npm install @supabase/supabase-js@2.49.8 --save
 ```
 
-This will add the specified version to your `package.json` dependencies automatically.
+This will:
+- Add the package to your `node_modules`
+- Add the dependency to your `package.json` file under `"dependencies"`
 
-### 2. Manually Editing `package.json`
+### 2. Directly editing `package.json`
 
-Alternatively, if you prefer to manually add it:
+Alternatively, you can manually add or update your `package.json` dependencies:
+
+```json
+{
+  "dependencies": {
+    "@supabase/supabase-js": "2.49.8",
+    // other dependencies...
+  }
+}
+```
+
+After editing `package.json`, run:
+
+```bash
+npm install
+```
+
+to install the specified version.
+
+### 3. Verify the dependency
+
+Check your `package.json`:
 
 ```json
 {
@@ -22,23 +45,19 @@ Alternatively, if you prefer to manually add it:
 }
 ```
 
-After editing, run:
+And ensure the package is installed correctly:
 
 ```bash
-npm install
+npm ls @supabase/supabase-js
 ```
 
-to install the dependencies listed in `package.json`.
+This confirms the installed version.
 
 ---
 
-### Additional Tips:
-- Ensure your project uses a supported version of Node.js and npm.
-- Always prefer specifying exact versions in production to ensure stability.
-- Check for updates periodically or pin to specific versions based on your project requirements.
+### Summarized steps:
 
-If you're using Yarn, the equivalent command is:
+- Use `npm install @supabase/supabase-js@2.49.8 --save`
+- Or manually update `package.json` and run `npm install`
 
-```bash
-yarn add @supabase/supabase-js@2.49.8
-```
+Let me know if you'd like guidance on how to initialize or use the Supabase client in your project!
