@@ -1,106 +1,110 @@
-To create a separate bundle containing React and ReactDOM (the libraries you rely on) so that your main application code doesn't repeat these dependencies, you should follow these steps:
+To create a separate bundle for React libraries (`react` and `react-dom`) and include it in your project, follow these steps:
 
-### 1. Install `webpack` and `webpack-cli` for bundling
-
-Since your current setup uses Babel directly on files, for creating separate bundles, it's more manageable to use Webpack. Here's how:
-
-```bash
-npm install --save-dev webpack webpack-cli
-```
-
-### 2. Create a `webpack.config.js` for bundling React and your app
-
-Set up a webpack configuration with multiple entry points:
-
-- One for React (`all_react.js`)
-- One for your app code
+### 1. Setup Entry Point for React Libraries
+Create a new JavaScript file, e.g., `my_app/static/js/react-bundle.js`, where you will import React and ReactDOM:
 
 ```js
-// webpack.config.js
+// my_app/static/js/react-bundle.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+window.React = React;
+window.ReactDOM = ReactDOM;
+```
+
+This way, React and ReactDOM are globally available as `window.React` and `window.ReactDOM`, which makes it easier to load separately.
+
+---
+
+### 2. Create a Bundling Script for React Libraries
+Update your `package.json` scripts to generate the React bundle:
+
+```json
+"scripts": {
+  "build": "babel my_app/static/js/index.js --out-file dist/index.min.js",
+  "build-react": "webpack --entry ./my_app/static/js/react-bundle.js --output-path ./dist --output-filename all_react.js"
+}
+```
+
+**Note:** Since you're already using Babel for transpiling, for bundling external libraries, it's more straightforward to use **Webpack**.
+
+### 3. Set Up Webpack for React Bundling
+Create a simple `webpack.config.js` in your project root (or wherever appropriate):
+
+```js
 const path = require('path');
 
 module.exports = {
-  mode: 'production', // or 'development' for debugging
-  entry: {
-    // Entry for React libraries
-    all_react: ['react', 'react-dom'],
-    // Entry for your application code
-    app: './my_app/static/js/index.js', // Adjust path as needed
-  },
+  entry: './my_app/static/js/react-bundle.js',
   output: {
-    filename: '[name].bundle.js', // produces all_react.bundle.js and app.bundle.js
-    path: path.resolve(__dirname, 'dist'), // output directory
-    clean: true, // cleans folder before build
+    filename: 'all_react.js',
+    path: path.resolve(__dirname, 'dist'),
   },
+  mode: 'production', // Minifies output
   module: {
     rules: [
       {
-        test: /\.jsx?$/, // handle JS & JSX files
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react']
-          }
-        }
-      }
-    ],
-  },
-  optimization: {
-    splitChunks: {
-      // Avoid duplication of React in main bundle
-      cacheGroups: {
-        reactVendor: {
-          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-          name: 'all_react',
-          chunks: 'all',
         },
       },
-    },
+    ],
   },
 };
 ```
 
-### 3. Run Webpack to generate the bundles
+This configuration tells Webpack to bundle `react` and `react-dom` into a single file `dist/all_react.js`.
 
-Modify your `package.json` scripts:
-
-```json
-"scripts": {
-  "build": "webpack --config webpack.config.js"
-}
+### 4. Install Webpack Dependencies
+```bash
+npm install --save-dev webpack webpack-cli babel-loader
 ```
-Then run:
+
+### 5. Build the React Bundle
+Run the command:
 
 ```bash
-npm run build
+npm run build-react
 ```
 
-### 4. Usage in HTML
-
-In your HTML template, include the React bundle first, then your app code:
-
-```html
-<script src="/dist/all_react.bundle.js"></script>
-<script src="/dist/app.bundle.js"></script>
-```
-
-This setup ensures:
-
-- `all_react.bundle.js` contains React & ReactDOM, referenced everywhere.
-- `app.bundle.js` contains your application code that depends on React, which assumes React is already loaded on the page.
-
-### Summary:
-
-- Use `webpack` with multiple entry points.
-- Extract React libraries into a separate bundle.
-- Load dependencies first in your HTML.
+This will generate `dist/all_react.js` containing React and ReactDOM.
 
 ---
 
-### Notes:
-- Make sure your server serves the `/dist` directory correctly.
-- Adjust paths according to your project structure.
-- You might also consider **DLLPlugin** or **externals** in webpack if you want even more control over vendor libraries.
+### 6. Include React Bundle and Your App in HTML
+In your HTML, add:
 
-Let me know if you'd like a complete example with a minimal setup or further customization!
+```html
+<!-- Load React libraries first -->
+<script src="/static/dist/all_react.js"></script>
+
+<!-- Your app's bundle (processed with Babel) -->
+<script src="/static/dist/index.min.js"></script>
+```
+
+Ensure the order is correct: **React libraries first**, then your transpiled code.
+
+---
+
+### 7. Update Babel Build Script as Needed
+Your existing Babel script remains unchanged, just build your app code separately:
+
+```json
+"build": "babel my_app/static/js/index.js --out-file dist/index.min.js"
+```
+
+### **Summary**
+- Use Webpack to bundle React and ReactDOM separately into `all_react.js`.
+- Load this bundle before your application code in HTML.
+- Use Babel to transpile your app JS code separately.
+
+---
+
+### **Optional: Using Module System Instead of Globals**
+Alternatively, if you prefer to use ES Modules and a build system that supports modules, you can bundle React into your main bundle using Webpack and import React where needed, avoiding global variables—but the above method is simpler for traditional script inclusion.
+
+---
+
+Let me know if you'd like a full working example with all configuration files!
