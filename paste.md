@@ -1,31 +1,10 @@
-The `createRoot()` method is part of the React 18 API, which introduced concurrent features and a new root API for rendering. If you are missing `createRoot()` in your `ReactDOM` class, it could be due to a few reasons:
+When working with React in Vim, the primary file extensions you'll use are:
 
-1. **React Version**: Ensure that you are using React 18 or later. You can check your React version in your `package.json` file or by running the following command in your project directory:
+- **`.jsx`** – If you're writing React components using JSX syntax but not TypeScript.
+- **`.tsx`** – If you're using TypeScript along with React.
+- **`.js`** – If you prefer plain JavaScript without JSX (using `React.createElement()` instead).
+- **`.ts`** – If you're using TypeScript but not JSX (less common for React components).
 
-   ```bash
-   npm list react
-   ```
+For optimal Vim experience, consider using plugins like [vim-jsx-pretty](https://github.com/maxmellon/vim-jsx-pretty) or [vim-react-snippets](https://github.com/justinj/vim-react-snippets) to enhance syntax highlighting and auto-completion.
 
-   If you are using an older version, you will need to upgrade React and ReactDOM to version 18 or later:
-
-   ```bash
-   npm install react@latest react-dom@latest
-   ```
-
-2. **Import Statement**: Make sure you are importing `ReactDOM` correctly. The import statement should look like this:
-
-   ```javascript
-   import ReactDOM from 'react-dom/client';
-   ```
-
-   Note that `createRoot()` is available in the `react-dom/client` module, not in the default `react-dom` module.
-
-3. **TypeScript Definitions**: If you are using TypeScript, ensure that your type definitions for React and ReactDOM are also updated to the latest versions. You can update them using:
-
-   ```bash
-   npm install @types/react@latest @types/react-dom@latest
-   ```
-
-4. **Build Tools**: If you are using a build tool or bundler (like Webpack, Parcel, etc.), ensure that it is configured correctly and that there are no caching issues. Sometimes, clearing the cache or restarting the development server can resolve issues.
-
-If you have checked all of the above and are still facing issues, please provide more details about your setup, and I can help you further troubleshoot the problem.
+Would you like guidance on setting up Vim for a better React development experience?
