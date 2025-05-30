@@ -1,47 +1,72 @@
-## Convert a Text File to PDF Using Mutool  
----  
-### Explanation  
-Mutool is a command-line tool that is part of the MuPDF suite, designed for working with PDF files. It includes a `mutool convert` command that allows you to convert various file formats into PDFs.  
+## Convert a Text File into PDF Using Mutool
 
-#### Step 1: Install MuPDF  
-Before using Mutool, ensure that MuPDF is installed on your system. You can download it from the official MuPDF website or install it using package managers:  
-- **Linux:** `sudo apt install mupdf-tools`  
-- **MacOS:** `brew install mupdf`  
-- **Windows:** Download the executable from the MuPDF website.  
+---
 
-#### Step 2: Use Mutool Convert  
-The `mutool convert` command allows you to convert a text file into a PDF. The basic syntax is:  
+### **Introduction**
+Mutool is a command-line utility that comes with MuPDF, a lightweight PDF viewer and toolkit. It provides various functionalities, including converting documents into different formats. You can use `mutool convert` to transform a text file into a PDF.
+
+---
+
+### **Steps to Convert a Text File to PDF Using Mutool**
+#### **1. Install MuPDF (if not installed)**
+Before using `mutool`, ensure that MuPDF is installed on your system. You can install it using:
+
+- **Linux (Debian-based systems):**
+  ```bash
+  sudo apt install mupdf-tools
+  ```
+- **MacOS (using Homebrew):**
+  ```bash
+  brew install mupdf
+  ```
+- **Windows:**  
+  Download MuPDF from [MuPDF official site](https://mupdf.com) and install it.
+
+---
+
+#### **2. Use Mutool Convert Command**
+Once installed, you can use the following command to convert a text file into a PDF:
+
 ```bash
 mutool convert -o output.pdf -F pdf input.txt
-```  
-- `-o output.pdf` → Specifies the output file name.  
-- `-F pdf` → Defines the output format as PDF.  
-- `input.txt` → The text file you want to convert.  
+```
 
-#### Step 3: Customize the Output  
-Mutool provides additional options to customize the PDF output:  
+**Explanation of the command:**
+- `mutool convert` → Calls the conversion tool.
+- `-o output.pdf` → Specifies the output file name.
+- `-F pdf` → Defines the output format as PDF.
+- `input.txt` → The text file to be converted.
+
+---
+
+### **Example**
+Suppose you have a text file named `document.txt` and want to convert it into a PDF:
+
+```bash
+mutool convert -o document.pdf -F pdf document.txt
+```
+
+After running this command, `document.pdf` will be generated in the same directory.
+
+---
+
+### **Additional Options**
+Mutool provides several options to customize the output:
 - **Specify Page Size:**  
   ```bash
   mutool convert -o output.pdf -F pdf -W 600 -H 800 input.txt
-  ```  
-  - `-W 600` → Sets the width of the page in points.  
-  - `-H 800` → Sets the height of the page in points.  
+  ```
+  - `-W 600` → Sets the width to 600 points.
+  - `-H 800` → Sets the height to 800 points.
 
-- **Use a Specific Font Size:**  
-  ```bash
-  mutool convert -o output.pdf -F pdf -S 12 input.txt
-  ```  
-  - `-S 12` → Sets the font size to 12 points.  
+- **Embed Fonts:**  
+  If your text file contains special characters, embedding fonts may be necessary.
 
----  
-### Example  
-Suppose you have a text file named `document.txt` and want to convert it into a PDF with standard formatting:  
-```bash
-mutool convert -o document.pdf -F pdf document.txt
-```  
-This will generate `document.pdf` containing the text from `document.txt`.  
+---
 
----  
-### References  
-## https://mupdf.readthedocs.io/en/latest/mutool-convert.html ##  
-## https://superuser.com/questions/1496011/creating-a-pdf-with-images ##  
+### **References**
+## https://mupdf.readthedocs.io/en/latest/mutool-convert.html ##
+## https://www.mankier.com/1/mutool ##
+## https://gist.github.com/maehr/dda79ba3604f462c0f214709c9272a94 ##
+
+Would you like additional details on formatting options? 😊
